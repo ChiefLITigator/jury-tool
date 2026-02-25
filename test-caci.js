@@ -37,3 +37,31 @@ results.errors.slice(0, 15).forEach(e => {
   console.log(e.key, '→', e.issue);
   (e.brackets || []).forEach(b => console.log('  [' + b + ']'));
 });
+
+// ── Pass 2: suspicious all-text results in known optional/alt-element series ──
+const SUSPICIOUS_SERIES = [
+  [300, 399], [600, 699], [1000, 1099],
+  [1200, 1299], [1900, 1999], [2000, 2099],
+];
+function inSuspiciousSeries(key) {
+  const n = parseInt(key, 10);
+  return !isNaN(n) && SUSPICIOUS_SERIES.some(([lo, hi]) => n >= lo && n <= hi);
+}
+
+console.log('\n── Pass 2: all-text in known optional/alt-element series ──');
+let suspiciousCount = 0;
+for (const [key, text] of Object.entries(db)) {
+  if (key.includes('_') || !inSuspiciousSeries(key)) continue;
+  if (!/\[/.test(text)) continue;
+  try {
+    const { fields } = parseInstruction(text);
+    const types = [...fields.values()].map(f => f.type);
+    if (types.length > 0 && types.every(t => t === 'text')) {
+      suspiciousCount++;
+      const brackets = findTopLevelBrackets(text).map(b => b.content);
+      console.log(key, '→ all fields text (' + types.length + ' bracket' + (types.length === 1 ? '' : 's') + ')');
+      brackets.forEach(b => console.log('  [' + b + ']'));
+    }
+  } catch(e) { /* already caught in pass 1 */ }
+}
+console.log(`Suspicious all-text count: ${suspiciousCount}`);
