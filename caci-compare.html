@@ -132,11 +132,19 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 /* ─ Visibility ─ */
 .hidden { display: none !important; }
 
+/* ─ Print Settings Panel ─ */
+#print-settings-wrap { margin-bottom: 12px; }
+#print-settings-toggle { background: none; border: none; padding: 2px 0; font-family: var(--sans); font-size: .78em; color: var(--muted); cursor: pointer; text-decoration: underline; letter-spacing: .01em; }
+#print-settings-toggle:hover { color: var(--navy); }
+#print-settings-panel { display: flex; flex-wrap: wrap; gap: 10px 22px; background: #f8f9fa; border: 1px solid var(--border); border-radius: 5px; padding: 10px 16px; margin-top: 7px; }
+#print-settings-panel .ps-group label { display: block; font-family: var(--sans); font-size: .68em; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 3px; }
+#print-settings-panel select { font-family: var(--sans); font-size: .8em; padding: 3px 7px; border: 1px solid var(--border); border-radius: 3px; background: white; cursor: pointer; }
+
 /* ─ Print ─ */
 #print-header { display: none; }
 @media print {
   body { background: white; font-size: 11pt; }
-  header, .tab-nav, button, .compare-toolbar, .draft-toolbar { display: none !important; }
+  header, .tab-nav, button, .compare-toolbar, .draft-toolbar, #print-settings-wrap { display: none !important; }
   #print-header { display: block !important; font-family: var(--sans); font-size: 10pt; color: var(--muted); border-bottom: 1px solid #ccc; padding-bottom: 8pt; margin-bottom: 16pt; }
 
   /* ── Compare print: isolate results only ── */
@@ -191,6 +199,52 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div class="tab-nav">
   <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
   <button class="tab-btn" data-tab="draft">Draft Instruction</button>
+</div>
+
+<!-- Print Settings Panel — shared across both tabs -->
+<div id="print-settings-wrap">
+  <button id="print-settings-toggle">⚙ Print Settings</button>
+  <div id="print-settings-panel" class="hidden">
+    <div class="ps-group">
+      <label for="ps-font">Font</label>
+      <select id="ps-font">
+        <option value="serif" selected>Serif (Georgia)</option>
+        <option value="sans">Sans-serif</option>
+        <option value="mono">Monospace</option>
+      </select>
+    </div>
+    <div class="ps-group">
+      <label for="ps-size">Size</label>
+      <select id="ps-size">
+        <option value="10pt">10pt</option>
+        <option value="11pt" selected>11pt</option>
+        <option value="12pt">12pt</option>
+      </select>
+    </div>
+    <div class="ps-group">
+      <label for="ps-spacing">Line Spacing</label>
+      <select id="ps-spacing">
+        <option value="1">Single</option>
+        <option value="1.5" selected>1.5x</option>
+        <option value="2">Double</option>
+      </select>
+    </div>
+    <div class="ps-group">
+      <label for="ps-align">Alignment</label>
+      <select id="ps-align">
+        <option value="left" selected>Left-aligned</option>
+        <option value="justify">Justified</option>
+      </select>
+    </div>
+    <div class="ps-group">
+      <label for="ps-margins">Margins</label>
+      <select id="ps-margins">
+        <option value="1in" selected>Normal (1in)</option>
+        <option value="1.5in">Wide (1.5in)</option>
+        <option value="0.5in">Narrow (0.5in)</option>
+      </select>
+    </div>
+  </div>
 </div>
 
 <div id="tab-compare" class="tab-panel">
@@ -1135,6 +1189,42 @@ document.getElementById('exportDraftBtn').addEventListener('click', () => {
   const text     = document.getElementById('draftPreview').innerText;
   downloadTXT(text, filename);
 });
+
+// ═══════════════════════════════════════════════════════════════════════
+// PRINT SETTINGS
+// ═══════════════════════════════════════════════════════════════════════
+
+const PS_FONTS = {
+  serif: 'Georgia, "Times New Roman", serif',
+  sans:  '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  mono:  '"Consolas", "Courier New", monospace',
+};
+
+function updatePrintSettings() {
+  const font    = document.getElementById('ps-font').value;
+  const size    = document.getElementById('ps-size').value;
+  const spacing = document.getElementById('ps-spacing').value;
+  const align   = document.getElementById('ps-align').value;
+  const margins = document.getElementById('ps-margins').value;
+
+  let tag = document.getElementById('print-settings');
+  if (!tag) { tag = document.createElement('style'); tag.id = 'print-settings'; document.head.appendChild(tag); }
+
+  tag.textContent = `@media print {
+  body, .diff-col-body, .draft-preview-box { font-family: ${PS_FONTS[font]}; font-size: ${size}; line-height: ${spacing}; text-align: ${align}; }
+}
+@page { margin: ${margins}; }`;
+}
+
+document.getElementById('print-settings-toggle').addEventListener('click', () => {
+  document.getElementById('print-settings-panel').classList.toggle('hidden');
+});
+
+['ps-font', 'ps-size', 'ps-spacing', 'ps-align', 'ps-margins'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updatePrintSettings);
+});
+
+updatePrintSettings(); // apply defaults on load
 </script>
 </body>
 </html>
