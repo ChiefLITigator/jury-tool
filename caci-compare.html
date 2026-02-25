@@ -206,6 +206,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <input type="text" id="caciNumber" placeholder="e.g. 302" style="width:100%">
     </div>
     <button class="btn-secondary" id="loadCaci">Load Official CACI</button>
+    <button class="btn-secondary" id="resetCaci" style="font-size:.8em;padding:6px 14px">Reset to Official</button>
     <span id="loadStatus" class="status"></span>
   </div>
 
@@ -215,8 +216,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <textarea id="versionA" rows="17" placeholder="Paste first version of the jury instruction here…"></textarea>
     </div>
     <div class="col">
-      <label for="officialCaci">Official CACI Text <span style="font-weight:400;color:var(--muted)">(read-only)</span></label>
-      <textarea id="officialCaci" rows="17" readonly placeholder="Enter a CACI number above and click Load, or paste the official text here…"></textarea>
+      <label for="officialCaci">Official CACI Text</label>
+      <textarea id="officialCaci" rows="17" placeholder="Enter a CACI number above and click Load, or paste the official text here…"></textarea>
     </div>
     <div class="col">
       <label for="versionB">Version B</label>
@@ -713,6 +714,26 @@ document.getElementById('loadCaci').addEventListener('click', () => {
 
 document.getElementById('caciNumber').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('loadCaci').click();
+});
+
+document.getElementById('resetCaci').addEventListener('click', () => {
+  const num    = document.getElementById('caciNumber').value.trim();
+  const statEl = document.getElementById('loadStatus');
+  if (!num) {
+    document.getElementById('officialCaci').value = '';
+    statEl.textContent = 'Enter a CACI number first.';
+    statEl.className = 'status err';
+    return;
+  }
+  try {
+    const text = lookupCACIText(num);
+    document.getElementById('officialCaci').value = text;
+    statEl.textContent = `✓ Reset to official CACI ${num}`;
+    statEl.className = 'status ok';
+  } catch (err) {
+    statEl.textContent = `Error: ${err.message}`;
+    statEl.className = 'status err';
+  }
 });
 
 // ═══════════════════════════════════════════════════════════════════════
