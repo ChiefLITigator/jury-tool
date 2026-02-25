@@ -112,6 +112,13 @@ function classifyBracket(content) {
 }
 
 function parseInstruction(rawText) {
+  // Normalize unclosed alternative-element signal brackets.
+  // PDF extraction drops the closing ] from [N. [or] patterns, producing
+  // an unclosed outer bracket that swallows all subsequent content.
+  // [2. [or]  →  [2. [or]]
+  // [3. [ or ]  →  [3. [ or ]]
+  rawText = rawText.replace(/(\[\d+\.\s*\[\s*or\s*\])(?!\])/g, '$1]');
+
   const brackets = findTopLevelBrackets(rawText);
   const fields   = new Map();   // key → field definition (de-duplicated)
   const segments = [];           // ordered mix of {type:'text'} and {type:'field'}
