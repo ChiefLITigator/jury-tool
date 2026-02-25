@@ -83,7 +83,7 @@ function classifyBracket(content) {
 
   // Alternative element — content begins with "N. [or]"; must precede the
   // optional-block check so long alt-element text is not caught there first.
-  if (/^\d+\.\s*\[or\]/i.test(c)) return 'alternative';
+  if (/^\d+\.\s*\[\s*or\s*\]/i.test(c)) return 'alternative';
 
   // Fill-in keywords — always a text input, regardless of slashes.
   // Check BEFORE the slash/dropdown test so e.g. [specify/describe] is
@@ -92,6 +92,9 @@ function classifyBracket(content) {
 
   // Drafting-instruction verbs → note (textarea the user fills in)
   if (/^(add\b|include\b)/i.test(c)) return 'note';
+
+  // e.g.-prefixed brackets are always text fill-ins (e.g. shows an example value)
+  if (/^e\.g\./i.test(c)) return 'text';
 
   // Slash-separated alternatives → dropdown (depth-aware split).
   // Exclude if any option (brackets stripped) starts with "name of".
@@ -139,7 +142,7 @@ function parseInstruction(rawText) {
   const consumed = new Set();      // content bracket indices to skip as standalone fields
   for (let pi = 0; pi < brackets.length; pi++) {
     const pbr = brackets[pi];
-    if (/^\d+\.\s*\[or\]/i.test(pbr.content.trim())) {
+    if (/^\d+\.\s*\[\s*or\s*\]/i.test(pbr.content.trim())) {
       const numMatch = pbr.content.trim().match(/^(\d+)\./);
       const digit = numMatch ? numMatch[1] : null;
       if (digit) {
@@ -268,6 +271,21 @@ function parseInstruction(rawText) {
           label: raw.length > 110 ? raw.slice(0, 110) + '…' : raw,
           fullContent: br.content.trim()
         });
+        // Register any inner brackets so fill-ins inside optional blocks render correctly
+        for (const ibr of findTopLevelBrackets(br.content.trim())) {
+          const ibtype = classifyBracket(ibr.content);
+          if (ibtype === 'alternative' || ibtype === 'skip') continue;
+          const ikey = makeDraftKey(ibr.content);
+          if (fields.has(ikey)) continue;
+          if (ibtype === 'text') {
+            fields.set(ikey, { type: 'text', key: ikey, label: stripInstructionWord(ibr.content.trim()), value: '' });
+          } else if (ibtype === 'dropdown') {
+            const iopts = splitOnSlashDepth0(ibr.content).filter(Boolean);
+            fields.set(ikey, { type: 'dropdown', key: ikey, label: ibr.content.trim(), options: iopts, selected: -1, custom: false, customValue: '' });
+          } else if (ibtype === 'connector') {
+            fields.set(ikey, { type: 'connector', key: ikey, label: ibr.content.trim(), checked: false });
+          }
+        }
       }
       segments.push({ type: 'field', key });
 
