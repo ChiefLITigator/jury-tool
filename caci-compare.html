@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CACI Jury Instruction Comparison Tool</title>
+<style>
+:root {
+  --navy: #1a2744;
+  --navy-lt: #2c3e6b;
+  --green: #166534;
+  --green-bg: #dcfce7;
+  --red: #991b1b;
+  --red-bg: #fee2e2;
+  --yellow: #92400e;
+  --yellow-bg: #fef3c7;
+  --border: #d1d5db;
+  --bg: #f1f3f6;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "Consolas", "Courier New", monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--serif); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }
+
+.wrap { max-width: 1680px; margin: 0 auto; padding: 24px 20px; }
+
+/* ─ Header ─ */
+.site-header { border-bottom: 3px solid var(--navy); padding-bottom: 14px; margin-bottom: 22px; }
+.site-header h1 { font-size: 1.35em; color: var(--navy); letter-spacing: .02em; }
+.site-header p { font-size: .8em; color: var(--muted); font-style: italic; margin-top: 3px; font-family: var(--sans); }
+
+/* ─ Cards ─ */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.card-label { font-family: var(--sans); font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 10px; }
+
+/* ─ Form controls ─ */
+label { display: block; font-family: var(--sans); font-size: .78em; font-weight: 600; color: #374151; margin-bottom: 4px; }
+input[type="text"], input[type="password"], select {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px;
+  font-family: var(--mono); font-size: .85em; color: var(--text); background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,39,68,.12); }
+select { font-family: var(--serif); cursor: pointer; }
+textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px;
+  font-family: var(--serif); font-size: .87em; line-height: 1.75; resize: vertical;
+  transition: border-color .15s, box-shadow .15s;
+}
+textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,39,68,.12); }
+textarea[readonly] { background: #f9fafb; color: #4b5563; }
+
+/* ─ Buttons ─ */
+button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(--serif); font-size: .88em; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
+.btn-primary { background: var(--navy); color: #fff; }
+.btn-primary:hover { background: var(--navy-lt); }
+.btn-primary:disabled { opacity: .5; cursor: default; }
+.btn-secondary { background: #f3f4f6; color: var(--navy); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #e5e7eb; }
+.btn-secondary:disabled { opacity: .5; cursor: default; }
+.btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: .8em; padding: 5px 12px; }
+.btn-ghost:hover { background: #f3f4f6; }
+
+/* ─ Layout helpers ─ */
+.row { display: flex; gap: 14px; }
+.col { flex: 1; min-width: 0; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.flex-shrink-0 { flex-shrink: 0; }
+
+/* ─ Diff highlights ─ */
+.ins { background: var(--green-bg); color: var(--green); border-radius: 2px; padding: 1px 3px; margin: 0 1px; }
+.del { background: var(--red-bg); color: var(--red); border-radius: 2px; padding: 1px 3px; margin: 0 1px; text-decoration: line-through; }
+.yel { background: var(--yellow-bg); color: var(--yellow); border-radius: 2px; padding: 1px 3px; margin: 0 1px; }
+
+/* ─ Diff columns ─ */
+.diff-cols { display: flex; gap: 10px; align-items: stretch; }
+.diff-col { flex: 1; min-width: 0; border: 1px solid var(--border); border-radius: 5px; display: flex; flex-direction: column; }
+.diff-col-base { border-color: #93c5fd; background: #eff6ff; }
+.diff-col-head { padding: 8px 14px; font-family: var(--sans); font-size: .74em; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #374151; border-bottom: 1px solid var(--border); background: #f9fafb; border-radius: 5px 5px 0 0; }
+.diff-col-base .diff-col-head { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+.diff-col-body { padding: 14px; font-family: var(--serif); font-size: .87em; line-height: 1.85; flex: 1; max-height: 520px; overflow-y: auto; scroll-behavior: smooth; }
+
+/* ─ Legend ─ */
+.legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; font-family: var(--sans); font-size: .78em; color: var(--text); }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-sw { width: 14px; height: 14px; border-radius: 2px; border: 1px solid rgba(0,0,0,.1); }
+
+/* ─ Summary table ─ */
+.sum-table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: .83em; }
+.sum-table th { background: #f3f4f6; padding: 8px 14px; text-align: left; font-size: .73em; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); border-bottom: 2px solid var(--border); }
+.sum-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; }
+.sum-table tr:last-child td { border-bottom: none; }
+.sum-table tr:hover td { background: #fafafa; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-weight: 700; font-size: .85em; }
+.badge-g { background: var(--green-bg); color: var(--green); }
+.badge-r { background: var(--red-bg); color: var(--red); }
+.badge-b { background: #dbeafe; color: #1e40af; }
+
+/* ─ Analysis ─ */
+.analysis-body { font-family: var(--serif); font-size: .9em; line-height: 1.8; }
+.analysis-body h4 { font-size: .92em; color: var(--navy); margin: 16px 0 5px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px; }
+.analysis-body p { margin-bottom: 10px; }
+.analysis-body ul { margin: 6px 0 12px 20px; }
+.analysis-body li { margin-bottom: 4px; }
+.analysis-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+/* ─ Status / spinner ─ */
+.status { font-family: var(--sans); font-size: .8em; color: var(--muted); font-style: italic; min-height: 20px; }
+.status.err { color: #b91c1c; font-style: normal; font-weight: 600; }
+.status.ok  { color: var(--green); font-style: normal; }
+.spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid #e5e7eb; border-top-color: var(--navy); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-left: 6px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─ CACI loader row ─ */
+.caci-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; }
+.caci-row .num-wrap { flex: 0 0 160px; }
+
+/* ─ Compare actions ─ */
+.compare-actions { display: flex; align-items: center; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+
+/* ─ Mode row ─ */
+.mode-row { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.mode-row .sel-wrap { flex: 0 0 340px; }
+
+/* ─ Visibility ─ */
+.hidden { display: none !important; }
+
+/* ─ Print ─ */
+@media print {
+  body { background: white; font-size: 11pt; }
+  .card { border: 1px solid #ccc; box-shadow: none; page-break-inside: avoid; }
+  .diff-col-body { max-height: none; overflow: visible; }
+  #card-api, #card-options { display: none; }
+  button { display: none; }
+}
+
+/* ─ Responsive ─ */
+@media (max-width: 900px) {
+  .row { flex-direction: column; }
+  .diff-cols { flex-direction: column; }
+  .caci-row .num-wrap { flex: 1; }
+  .mode-row .sel-wrap { flex: 1; }
+}
+
+/* ─ Tabs ─ */
+.tab-nav { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--navy); }
+.tab-btn { background: #e5e7eb; color: var(--muted); border: 1px solid var(--border); border-bottom: 2px solid var(--navy); border-radius: 5px 5px 0 0; padding: 9px 26px; font-family: var(--sans); font-size: .82em; font-weight: 600; cursor: pointer; transition: all .15s; margin-bottom: -2px; }
+.tab-btn:hover:not(.active) { background: #d1d5db; color: var(--text); }
+.tab-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); border-bottom-color: var(--navy); }
+
+/* ─ Draft Instruction ─ */
+.draft-section { margin-bottom: 22px; }
+.draft-section-label { font-family: var(--sans); font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+.draft-field { margin-bottom: 13px; }
+.draft-opt-label { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; }
+.draft-opt-label input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; width: 15px; height: 15px; cursor: pointer; accent-color: var(--navy); }
+.draft-opt-text { font-family: var(--serif); font-size: .85em; line-height: 1.6; color: #374151; }
+.draft-preview-box { font-family: var(--serif); font-size: .88em; line-height: 1.85; white-space: pre-wrap; background: #f9fafb; border: 1px solid var(--border); border-radius: 4px; padding: 14px 16px; min-height: 220px; max-height: 72vh; overflow-y: auto; }
+.draft-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site-header">
+  <h1>CACI Jury Instruction Comparison Tool</h1>
+  <p>California Civil Jury Instructions — Redline Comparison &amp; AI-Assisted Legal Analysis</p>
+</header>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
+  <button class="tab-btn" data-tab="draft">Draft Instruction</button>
+</div>
+
+<div id="tab-compare" class="tab-panel">
+
+<!-- API Key -->
+<div class="card" id="card-api">
+  <div class="card-label">Claude API Key</div>
+  <div class="row items-end gap-3">
+    <div class="col">
+      <label for="apiKey">API Key <span style="font-weight:400;color:var(--muted)">(required for legal analysis — stays in your browser)</span></label>
+      <input type="password" id="apiKey" placeholder="sk-ant-api03-…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+</div>
+
+<!-- Text Inputs -->
+<div class="card" id="card-inputs">
+  <div class="card-label">Jury Instruction Texts</div>
+
+  <div class="caci-row">
+    <div class="num-wrap">
+      <label for="caciNumber">CACI Instruction Number</label>
+      <input type="text" id="caciNumber" placeholder="e.g. 302" style="width:100%">
+    </div>
+    <button class="btn-secondary" id="loadCaci">Load Official CACI</button>
+    <span id="loadStatus" class="status"></span>
+  </div>
+
+  <div class="row gap-4">
+    <div class="col">
+      <label for="versionA">Version A</label>
+      <textarea id="versionA" rows="17" placeholder="Paste first version of the jury instruction here…"></textarea>
+    </div>
+    <div class="col">
+      <label for="officialCaci">Official CACI Text <span style="font-weight:400;color:var(--muted)">(read-only)</span></label>
+      <textarea id="officialCaci" rows="17" readonly placeholder="Enter a CACI number above and click Load, or paste the official text here…"></textarea>
+    </div>
+    <div class="col">
+      <label for="versionB">Version B</label>
+      <textarea id="versionB" rows="17" placeholder="Paste second version of the jury instruction here…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Options & Compare -->
+<div class="card" id="card-options">
+  <div class="card-label">Comparison Options</div>
+  <div class="mode-row">
+    <div class="sel-wrap">
+      <label for="compMode">Comparison Mode</label>
+      <select id="compMode">
+        <option value="ab">Version A vs Version B only</option>
+        <option value="ao">Version A vs Official CACI only</option>
+        <option value="bo">Version B vs Official CACI only</option>
+        <option value="all" selected>All three simultaneously (default)</option>
+      </select>
+    </div>
+  </div>
+  <div class="compare-actions">
+    <button class="btn-primary" id="compareBtn" style="padding:10px 32px;font-size:.95em">Compare</button>
+    <span id="compareStatus" class="status"></span>
+  </div>
+</div>
+
+<!-- Results -->
+<div id="results" class="hidden">
+
+  <!-- Diff View -->
+  <div class="card" id="card-diff">
+    <div class="card-label">Comparison View</div>
+    <div class="legend" id="legend">
+      <strong style="font-family:var(--sans);font-size:.85em;color:var(--text)">Key:</strong>
+      <div class="legend-item"><div class="legend-sw" style="background:var(--green-bg)"></div><span>Added text</span></div>
+      <div class="legend-item"><div class="legend-sw" style="background:var(--red-bg)"></div><span>Deleted text</span></div>
+      <div class="legend-item hidden" id="yel-legend"><div class="legend-sw" style="background:var(--yellow-bg)"></div><span>Changed in both A &amp; B vs CACI, but differently</span></div>
+    </div>
+    <div class="diff-cols" id="diffCols"></div>
+  </div>
+
+  <!-- Summary (three-way only) -->
+  <div class="card hidden" id="card-summary">
+    <div class="card-label">Change Summary</div>
+    <table class="sum-table">
+      <thead><tr><th>Comparison Pair</th><th>Additions</th><th>Deletions</th><th>Total Changes</th></tr></thead>
+      <tbody id="sumBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Legal Analysis -->
+  <div class="card" id="card-analysis">
+    <div class="analysis-toolbar">
+      <div class="card-label" style="margin:0">Legal Analysis</div>
+      <button class="btn-ghost" id="copyAnalysis" title="Copy analysis text">Copy</button>
+    </div>
+    <div class="analysis-body" id="analysisBody">
+      <p style="color:var(--muted);font-style:italic">Analysis will appear here after comparison…</p>
+    </div>
+  </div>
+
+</div><!-- /results -->
+
+</div><!-- /tab-compare -->
+
+<div id="tab-draft" class="tab-panel hidden">
+
+  <!-- CACI Loader -->
+  <div class="card">
+    <div class="card-label">Load Instruction for Drafting</div>
+    <div class="caci-row">
+      <div class="num-wrap">
+        <label for="draftCaciNum">CACI Instruction Number</label>
+        <input type="text" id="draftCaciNum" placeholder="e.g. 302" style="width:100%">
+      </div>
+      <button class="btn-secondary" id="loadDraftBtn">Load for Drafting</button>
+      <span id="draftLoadStatus" class="status"></span>
+    </div>
+  </div>
+
+  <!-- Workspace (revealed after load) -->
+  <div id="draftWorkspace" class="hidden">
+    <div class="row gap-4" style="align-items:flex-start">
+
+      <!-- Left column: form -->
+      <div style="flex:0 0 360px;min-width:240px">
+        <div class="card" style="position:sticky;top:20px;max-height:calc(100vh - 48px);overflow-y:auto">
+          <div class="card-label">Fill In Blanks</div>
+          <div id="draftForm"></div>
+        </div>
+      </div>
+
+      <!-- Right column: live preview -->
+      <div class="col">
+        <div class="card">
+          <div class="draft-toolbar">
+            <div class="card-label" style="margin:0">Completed Instruction</div>
+            <button class="btn-ghost" id="copyDraftBtn">Copy</button>
+          </div>
+          <div class="draft-preview-box" id="draftPreview" style="color:var(--muted);font-style:italic">Fill in the form to build the instruction…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /tab-draft -->
+
+</div><!-- /wrap -->
+<script src="caci-data.js"></script>
+<script src="draft-parser.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════
+// TOKENIZER
+// ═══════════════════════════════════════════════════════════════════════
+
+function tokenize(text) {
+  return text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// LCS-BASED WORD DIFF
+// Returns [{op:'equal'|'insert'|'delete', text:string}, …]
+// ═══════════════════════════════════════════════════════════════════════
+
+function computeDiff(a, b) {
+  const m = a.length, n = b.length;
+  if (m === 0 && n === 0) return [];
+  if (m === 0) return b.map(t => ({ op: 'insert', text: t }));
+  if (n === 0) return a.map(t => ({ op: 'delete', text: t }));
+
+  // Fall back to chunk-level diff for very large inputs
+  if (m * n > 900000) return computeChunkedDiff(a, b, 10);
+
+  // Flat Int32Array DP table for speed
+  const stride = n + 1;
+  const dp = new Int32Array((m + 1) * stride);
+
+  for (let i = 1; i <= m; i++) {
+    const ai = a[i - 1];
+    const base = i * stride, prev = (i - 1) * stride;
+    for (let j = 1; j <= n; j++) {
+      dp[base + j] = ai === b[j - 1]
+        ? dp[prev + j - 1] + 1
+        : Math.max(dp[prev + j], dp[base + j - 1]);
+    }
+  }
+
+  // Backtrack
+  const ops = [];
+  let i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && a[i-1] === b[j-1]) {
+      ops.push({ op: 'equal',  text: a[i-1] }); i--; j--;
+    } else if (j > 0 && (i === 0 || dp[i*stride + j-1] >= dp[(i-1)*stride + j])) {
+      ops.push({ op: 'insert', text: b[j-1] }); j--;
+    } else {
+      ops.push({ op: 'delete', text: a[i-1] }); i--;
+    }
+  }
+  return ops.reverse();
+}
+
+function computeChunkedDiff(a, b, sz) {
+  const ca = [], cb = [];
+  for (let i = 0; i < a.length; i += sz) ca.push(a.slice(i, i+sz).join(' '));
+  for (let i = 0; i < b.length; i += sz) cb.push(b.slice(i, i+sz).join(' '));
+  const chunkOps = computeDiff(ca, cb);
+  const ops = [];
+  for (const op of chunkOps) {
+    for (const w of op.text.split(' ').filter(Boolean)) {
+      ops.push({ op: op.op, text: w });
+    }
+  }
+  return ops;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// THREE-WAY DIFF
+// Returns opsA and opsB (ops from CACI→A / CACI→B with yellow marks)
+// ═══════════════════════════════════════════════════════════════════════
+
+function threeWayDiff(tA, tCaci, tB) {
+  const opsCA = computeDiff(tCaci, tA);
+  const opsCB = computeDiff(tCaci, tB);
+  const opsAB = computeDiff(tA, tB);
+
+  // Build per-CACI-position change map
+  const map = new Map(); // pos → {aD, aI[], bD, bI[]}
+  function init(pos) {
+    if (!map.has(pos)) map.set(pos, { aD: false, aI: [], bD: false, bI: [] });
+    return map.get(pos);
+  }
+
+  let pos = 0;
+  for (const op of opsCA) {
+    const e = init(pos);
+    if      (op.op === 'equal')  { pos++; }
+    else if (op.op === 'delete') { e.aD = true; pos++; }
+    else if (op.op === 'insert') { e.aI.push(op.text); }
+  }
+  pos = 0;
+  for (const op of opsCB) {
+    const e = init(pos);
+    if      (op.op === 'equal')  { pos++; }
+    else if (op.op === 'delete') { e.bD = true; pos++; }
+    else if (op.op === 'insert') { e.bI.push(op.text); }
+  }
+
+  // Detect conflict positions
+  const yellowPos = new Set();
+  for (const [p, e] of map) {
+    const aCh = e.aD || e.aI.length > 0;
+    const bCh = e.bD || e.bI.length > 0;
+    if (aCh && bCh) {
+      const aOut = (e.aD ? [] : (tCaci[p] ? [tCaci[p]] : [])).concat(e.aI);
+      const bOut = (e.bD ? [] : (tCaci[p] ? [tCaci[p]] : [])).concat(e.bI);
+      if (aOut.join(' ') !== bOut.join(' ')) yellowPos.add(p);
+    }
+  }
+
+  // Apply yellow markers
+  function applyYellow(rawOps) {
+    let p = 0;
+    return rawOps.map(op => {
+      if (op.op === 'equal')  { p++; return op; }
+      if (op.op === 'delete') { const y = yellowPos.has(p); p++; return y ? {...op, op:'yellow'} : op; }
+      if (op.op === 'insert') { return yellowPos.has(p) ? {...op, op:'yellow'} : op; }
+      return op;
+    });
+  }
+
+  return {
+    opsA:     applyYellow(opsCA),
+    opsB:     applyYellow(opsCB),
+    opsAB,
+    countsCA: counts(opsCA),
+    countsCB: counts(opsCB),
+    countsAB: counts(opsAB),
+    hasYellow: yellowPos.size > 0
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// COUNTING
+// ═══════════════════════════════════════════════════════════════════════
+
+function counts(ops) {
+  let ins = 0, del = 0;
+  for (const o of ops) {
+    if (o.op === 'insert') ins++;
+    else if (o.op === 'delete') del++;
+  }
+  return { ins, del, total: ins + del };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HTML RENDERING
+// ═══════════════════════════════════════════════════════════════════════
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/** Full redline: equal plain, insert green, delete red, yellow conflicts */
+function renderFull(ops) {
+  return ops.map(o => {
+    const t = esc(o.text);
+    switch (o.op) {
+      case 'equal':  return t + ' ';
+      case 'insert': return `<span class="ins">${t}</span> `;
+      case 'delete': return `<span class="del">${t}</span> `;
+      case 'yellow': return `<span class="yel">${t}</span> `;
+    }
+  }).join('').trimEnd();
+}
+
+/** Left / base column: show equal + delete (red strikethrough), hide inserts */
+function renderLeft(ops) {
+  return ops
+    .filter(o => o.op !== 'insert')
+    .map(o => o.op === 'delete'
+      ? `<span class="del">${esc(o.text)}</span> `
+      : esc(o.text) + ' ')
+    .join('').trimEnd();
+}
+
+/** Right / modified column: show equal + insert (green), hide deletes */
+function renderRight(ops) {
+  return ops
+    .filter(o => o.op !== 'delete')
+    .map(o => o.op === 'insert'
+      ? `<span class="ins">${esc(o.text)}</span> `
+      : esc(o.text) + ' ')
+    .join('').trimEnd();
+}
+
+function colHtml(title, html, isBase = false) {
+  const cls = isBase ? ' diff-col-base' : '';
+  return `
+    <div class="diff-col${cls}">
+      <div class="diff-col-head">${title}</div>
+      <div class="diff-col-body">${html || '<em style="color:var(--muted)">No text provided</em>'}</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SCROLL SYNC
+// ═══════════════════════════════════════════════════════════════════════
+
+function attachScrollSync() {
+  const bodies = [...document.querySelectorAll('.diff-col-body')];
+  if (bodies.length < 2) return;
+  let syncing = false;
+  bodies.forEach(src => {
+    src.addEventListener('scroll', () => {
+      if (syncing) return;
+      syncing = true;
+      const pct = src.scrollTop / Math.max(1, src.scrollHeight - src.clientHeight);
+      bodies.forEach(tgt => {
+        if (tgt !== src) tgt.scrollTop = pct * (tgt.scrollHeight - tgt.clientHeight);
+      });
+      requestAnimationFrame(() => { syncing = false; });
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CACI DATA (loaded from local file on startup)
+// ═══════════════════════════════════════════════════════════════════════
+
+function lookupCACIText(caciNum) {
+  const key = String(parseInt(caciNum, 10));
+  let text = caciDB[key];
+  if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
+
+ // 1. Strip "CACI No. XXXX [title]" running headers
+text = text.replace(/^CACI No\.\s+\d{3,4}[^\n]*$/gm, '');
+
+// 2. Strip orphaned ALL-CAPS series title lines (second line of split headers)
+text = text.replace(/^[A-Z][A-Z\s\-\/]{5,}$/gm, '');
+
+// 3. Strip bare page folio numbers
+text = text.replace(/^\s*\d{1,4}\s*$/gm, '');
+
+// 4. Strip revision history anchored to month name + year at end of text
+text = text.replace(
+  /\s+(?:New|Renumbered|Formerly)\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}[\s\S]*$/i,
+  ''
+);
+
+// Add this BEFORE step 5 (the \n{3,} collapse):
+text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitespace
+
+// NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
+text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
+
+// 5. Collapse extra blank lines
+text = text.replace(/\n{3,}/g, '\n\n');
+
+// After your existing "CACI No." strip, add this:
+text = text.replace(/^[A-Z][A-Z\s\-\/]{5,}$/gm, '');
+
+
+  return text.trim();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════════════════════════════════
+
+async function callClaude(apiKey, systemPrompt, userContent) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-calls': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: 2800,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userContent }]
+    })
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => null);
+    throw new Error(err?.error?.message || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.content?.[0]?.text ?? '';
+}
+
+const SYSTEM = `You are a California civil litigation attorney and jury instruction expert. \
+You have deep knowledge of CACI (California Civil Jury Instructions), California appellate authority, \
+the Evidence Code, and Civil Code. When analyzing jury instructions you:
+- Quote the exact words changed
+- State specifically how each change alters legal standards, burden of proof, or required elements
+- Identify plaintiff-favorable vs. defendant-favorable modifications and explain why
+- Reference specific CACI numbers, California appellate decisions, and statutory provisions
+- Flag unsupported departures from established California law`;
+
+function buildPrompt(mode, tA, tCaci, tB) {
+  const blocks = [];
+
+  if (mode === 'all') {
+    blocks.push('## OFFICIAL CACI TEXT\n' + tCaci,
+                '## VERSION A\n' + tA,
+                '## VERSION B\n' + tB);
+  } else if (mode === 'ab') {
+    blocks.push('## VERSION A (Base)\n' + tA, '## VERSION B (Modified)\n' + tB);
+  } else if (mode === 'ao') {
+    blocks.push('## OFFICIAL CACI TEXT (Base)\n' + tCaci, '## VERSION A (Modified)\n' + tA);
+  } else {
+    blocks.push('## OFFICIAL CACI TEXT (Base)\n' + tCaci, '## VERSION B (Modified)\n' + tB);
+  }
+
+  const questions = {
+    all:`Provide a structured three-way legal analysis:
+
+**1. Substantive Legal Changes**
+For each version (A and B), identify every change from the official CACI that alters the legal standard, burden of proof, or required elements. Quote the exact language changed.
+
+**2. Strategic Implications**
+For each change identified above, state whether it favors plaintiff or defendant and explain the legal basis under California law.
+
+**3. Shared Modifications**
+Identify any changes that Versions A and B share. Are those changes legally supported or do they depart from CACI without appellate authority?
+
+**4. Conflicting Modifications**
+Where A and B deviate from CACI in different ways at the same provision, analyze the legal significance of each approach.
+
+**5. Conformity with California Authority**
+Which version more closely tracks the official CACI and California appellate authority? Reference specific cases, CACI annotations, Evidence Code sections, or Civil Code provisions.
+
+**6. Recommendation**
+State which version presents the more accurate statement of California law and why.`,
+
+    ab:`Compare these two versions and provide:
+
+**1. Substantive Differences**
+Every modification in Version B relative to Version A that affects legal standards, burden of proof, or required elements. Quote the exact language.
+
+**2. Strategic Implications**
+For each change, whether it favors plaintiff or defendant and why under California law.
+
+**3. Conformity with California Authority**
+Which version more accurately states California law? Reference relevant CACI instructions, appellate decisions, and statutory provisions.
+
+**4. Recommendation**
+Which version better reflects the correct legal standard and why.`,
+
+    ao:`Analyze the modifications in Version A relative to official CACI:
+
+**1. Modifications Made**
+Every change from official CACI. Quote the exact language changed or added.
+
+**2. Legal Significance**
+How each modification alters the legal standard, burden of proof, or required elements.
+
+**3. Strategic Implications**
+Whether each change favors plaintiff or defendant and the legal basis.
+
+**4. Conformity Assessment**
+Are the modifications supported by California appellate authority or do they depart from the official instruction without justification? Reference specific cases and statutory provisions.`,
+
+    bo:`Analyze the modifications in Version B relative to official CACI:
+
+**1. Modifications Made**
+Every change from official CACI. Quote the exact language changed or added.
+
+**2. Legal Significance**
+How each modification alters the legal standard, burden of proof, or required elements.
+
+**3. Strategic Implications**
+Whether each change favors plaintiff or defendant and the legal basis.
+
+**4. Conformity Assessment**
+Are the modifications supported by California appellate authority or do they depart from the official instruction without justification? Reference specific cases and statutory provisions.`
+  };
+
+  return blocks.join('\n\n') + '\n\n---\n\n' + questions[mode];
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MARKDOWN → HTML (minimal converter for analysis output)
+// ═══════════════════════════════════════════════════════════════════════
+
+function md2html(text) {
+  return text
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Headings (#, ##, ###)
+    .replace(/^#{1,3}\s+(.+)$/gm, '<h4>$1</h4>')
+    // Numbered item with bold heading
+    .replace(/^\d+\.\s+\*\*(.+?)\*\*\s*/gm, '<h4>$1</h4>')
+    // Plain numbered items
+    .replace(/^\d+\.\s+(.+)$/gm, '<p><strong>$1</strong></p>')
+    // Bullet items
+    .replace(/^[-•*]\s+(.+)$/gm, '<li>$1</li>')
+    // Wrap consecutive <li> in <ul>
+    .replace(/(<li>[\s\S]*?<\/li>)(?:\s*(<li>[\s\S]*?<\/li>))*/g, m => `<ul>${m}</ul>`)
+    // Paragraphs
+    .split(/\n{2,}/)
+    .map(blk => { blk = blk.trim(); if (!blk) return ''; return blk.startsWith('<') ? blk : `<p>${blk}</p>`; })
+    .join('\n');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MAIN COMPARE
+// ═══════════════════════════════════════════════════════════════════════
+
+async function runCompare() {
+  const mode   = document.getElementById('compMode').value;
+  const textA  = document.getElementById('versionA').value.trim();
+  const textB  = document.getElementById('versionB').value.trim();
+  const textC  = document.getElementById('officialCaci').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  const statusEl   = document.getElementById('compareStatus');
+  const diffColsEl = document.getElementById('diffCols');
+  const sumCard    = document.getElementById('card-summary');
+  const sumBody    = document.getElementById('sumBody');
+  const yelLegend  = document.getElementById('yel-legend');
+  const analysisEl = document.getElementById('analysisBody');
+  const resultsEl  = document.getElementById('results');
+
+  function setStatus(msg, cls = '') {
+    statusEl.className = 'status ' + cls;
+    statusEl.innerHTML = msg;
+  }
+
+  // Validate
+  const reqs = { ab: [textA, textB], ao: [textA, textC], bo: [textB, textC], all: [textA, textB, textC] };
+  const labels = { ab:'Version A and Version B', ao:'Version A and Official CACI', bo:'Version B and Official CACI', all:'all three texts' };
+  if (reqs[mode].some(t => !t)) { setStatus(`Please provide ${labels[mode]}.`, 'err'); return; }
+
+  // Reset
+  setStatus('Computing diff…');
+  resultsEl.classList.remove('hidden');
+  sumCard.classList.add('hidden');
+  yelLegend.classList.add('hidden');
+  analysisEl.innerHTML = '<p style="color:var(--muted);font-style:italic">Analysis will appear here…</p>';
+
+  document.getElementById('compareBtn').disabled = true;
+  await new Promise(r => setTimeout(r, 20));
+
+  try {
+    const tA = tokenize(textA), tB = tokenize(textB), tC = tokenize(textC);
+
+    // ── TWO-WAY ──────────────────────────────────────────────────────
+
+    if (mode === 'ab') {
+      const ops = computeDiff(tA, tB);
+      const c   = counts(ops);
+      diffColsEl.innerHTML =
+        colHtml('Version A — Base', renderLeft(ops)) +
+        colHtml('Version B — Changes', renderRight(ops));
+      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s)`, 'ok');
+
+    } else if (mode === 'ao') {
+      const ops = computeDiff(tC, tA);
+      const c   = counts(ops);
+      diffColsEl.innerHTML =
+        colHtml('Official CACI — Base', renderLeft(ops), true) +
+        colHtml('Version A — Changes from CACI', renderRight(ops));
+      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s) from CACI`, 'ok');
+
+    } else if (mode === 'bo') {
+      const ops = computeDiff(tC, tB);
+      const c   = counts(ops);
+      diffColsEl.innerHTML =
+        colHtml('Official CACI — Base', renderLeft(ops), true) +
+        colHtml('Version B — Changes from CACI', renderRight(ops));
+      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s) from CACI`, 'ok');
+
+    } else {
+      // ── THREE-WAY ────────────────────────────────────────────────
+
+      const { opsA, opsB, opsAB, countsCA, countsCB, countsAB, hasYellow } = threeWayDiff(tA, tC, tB);
+
+      if (hasYellow) yelLegend.classList.remove('hidden');
+
+      diffColsEl.innerHTML =
+        colHtml('Version A', renderFull(opsA)) +
+        colHtml('Official CACI — Base', esc(textC.replace(/\s+/g,' ').trim()), true) +
+        colHtml('Version B', renderFull(opsB));
+
+      sumCard.classList.remove('hidden');
+      sumBody.innerHTML = `
+        <tr><td>Version A vs Official CACI</td>
+            <td><span class="badge badge-g">+${countsCA.ins}</span></td>
+            <td><span class="badge badge-r">−${countsCA.del}</span></td>
+            <td><span class="badge badge-b">${countsCA.total}</span></td></tr>
+        <tr><td>Version B vs Official CACI</td>
+            <td><span class="badge badge-g">+${countsCB.ins}</span></td>
+            <td><span class="badge badge-r">−${countsCB.del}</span></td>
+            <td><span class="badge badge-b">${countsCB.total}</span></td></tr>
+        <tr><td>Version A vs Version B</td>
+            <td><span class="badge badge-g">+${countsAB.ins}</span></td>
+            <td><span class="badge badge-r">−${countsAB.del}</span></td>
+            <td><span class="badge badge-b">${countsAB.total}</span></td></tr>`;
+
+      setStatus(`A↔CACI: ${countsCA.total} change(s) · B↔CACI: ${countsCB.total} change(s) · A↔B: ${countsAB.total} change(s)`, 'ok');
+    }
+
+    attachScrollSync();
+
+    // ── LEGAL ANALYSIS ────────────────────────────────────────────────
+
+    if (!apiKey) {
+      analysisEl.innerHTML = '<p style="color:var(--muted);font-style:italic">Enter a Claude API key at the top to generate substantive legal analysis.</p>';
+    } else {
+      analysisEl.innerHTML = '<p style="color:var(--muted)">Analyzing with Claude… <span class="spinner"></span></p>';
+      setStatus(statusEl.textContent + '  |  Running legal analysis…');
+      try {
+        const raw  = await callClaude(apiKey, SYSTEM, buildPrompt(mode, textA, textC, textB));
+        analysisEl.innerHTML = md2html(raw);
+        setStatus(statusEl.textContent.split('|')[0].trim() + '  |  Analysis complete.', 'ok');
+      } catch (err) {
+        analysisEl.innerHTML = `<p style="color:#b91c1c"><strong>Analysis error:</strong> ${esc(err.message)}</p>`;
+      }
+    }
+
+  } catch (err) {
+    setStatus('Error: ' + err.message, 'err');
+  } finally {
+    document.getElementById('compareBtn').disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// COPY ANALYSIS
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById('copyAnalysis').addEventListener('click', () => {
+  const text = document.getElementById('analysisBody').innerText || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyAnalysis');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// LOAD CACI
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById('loadCaci').addEventListener('click', () => {
+  const num    = document.getElementById('caciNumber').value.trim();
+  const statEl = document.getElementById('loadStatus');
+  if (!num) { statEl.textContent = 'Enter a CACI number first.'; statEl.className = 'status err'; return; }
+
+  try {
+    const text = lookupCACIText(num);
+    document.getElementById('officialCaci').value = text;
+    statEl.textContent = `✓ Loaded CACI ${num}`;
+    statEl.className = 'status ok';
+  } catch (err) {
+    statEl.textContent = `Error: ${err.message}`;
+    statEl.className = 'status err';
+  }
+});
+
+document.getElementById('caciNumber').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loadCaci').click();
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// COMPARE BUTTON
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById('compareBtn').addEventListener('click', runCompare);
+
+// ═══════════════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ═══════════════════════════════════════════════════════════════════════
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + tab));
+    // Pre-populate draft number from main tab if blank
+    if (tab === 'draft') {
+      const mainNum = document.getElementById('caciNumber').value.trim();
+      const draftNumEl = document.getElementById('draftCaciNum');
+      if (mainNum && !draftNumEl.value.trim()) draftNumEl.value = mainNum;
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAFT INSTRUCTION — BRACKET PARSER
+// ═══════════════════════════════════════════════════════════════════════
+
+let draftState = null;
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAFT INSTRUCTION — COMPILER
+// ═══════════════════════════════════════════════════════════════════════
+
+/** Return the string value for a dropdown field (blank, option, or custom). */
+function resolveDropdown(f) {
+  if (f.custom) return f.customValue;
+  if (f.selected === -1) return '[' + f.label + ']';  // verbatim original bracket
+  const raw = f.options[f.selected] || '';
+  // Strip surrounding brackets so [name of plaintiff] → name of plaintiff in output
+  return raw.startsWith('[') && raw.endsWith(']') ? raw.slice(1, -1).trim() : raw;
+}
+
+/** Replace inner brackets inside an optional block's content. */
+function substituteInner(text, fields) {
+  const brackets = findTopLevelBrackets(text);
+  if (!brackets.length) return text;
+  let out = '', lastEnd = 0;
+  for (const br of brackets) {
+    out += text.slice(lastEnd, br.start);
+    const key = makeDraftKey(br.content);
+    const f   = fields.get(key);
+    if (f) {
+      if (f.type === 'text')      out += f.value || `[${f.label}]`;
+      else if (f.type === 'dropdown')  out += resolveDropdown(f);
+      else if (f.type === 'connector') out += f.checked ? f.label : '';
+      else out += text.slice(br.start, br.end);
+    } else {
+      out += text.slice(br.start, br.end);
+    }
+    lastEnd = br.end;
+  }
+  return out + text.slice(lastEnd);
+}
+
+function compileInstruction(state) {
+  let out = '';
+  for (const seg of state.segments) {
+    if (seg.type === 'text') {
+      out += seg.text;
+    } else {
+      const f = state.fields.get(seg.key);
+      if (!f) continue;
+      switch (f.type) {
+        case 'text':      out += f.value || `[${f.label}]`; break;
+        case 'dropdown':  out += resolveDropdown(f); break;
+        case 'connector': out += f.checked ? f.label : ''; break;
+        case 'optional':     if (f.checked) out += substituteInner(f.fullContent, state.fields); break;
+        case 'note':         out += f.value || ''; break;
+        case 'alternative':  if (f.selected === 'b') out += substituteInner(f.altText, state.fields); break;
+      }
+    }
+  }
+  // Tidy: strip trailing whitespace per line, collapse excess blank lines,
+  // and remove artefacts left by blank dropdown selections (double spaces,
+  // leading/orphaned commas or spaces before punctuation).
+  return out
+    .replace(/[ \t]+$/gm, '')
+    .replace(/ {2,}/g, ' ')
+    .replace(/ ([,;:.!?])/g, '$1')
+    .replace(/,\s*,/g, ',')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAFT INSTRUCTION — FORM RENDERER
+// ═══════════════════════════════════════════════════════════════════════
+
+function renderDraftForm(state) {
+  const { fields } = state;
+  const textFields    = [...fields.values()].filter(f => f.type === 'text');
+  const connFields    = [...fields.values()].filter(f => f.type === 'connector');
+  const dropFields    = [...fields.values()].filter(f => f.type === 'dropdown');
+  const altFields     = [...fields.values()].filter(f => f.type === 'alternative');
+  // Suppress standard optional elements that are paired with an alternative toggle
+  const pairedOptKeys = new Set(altFields.map(f => f.pairedOptionalKey).filter(Boolean));
+  const optFields     = [...fields.values()].filter(f => f.type === 'optional' && !pairedOptKeys.has(f.key));
+  const noteFields    = [...fields.values()].filter(f => f.type === 'note');
+
+  let html = '';
+
+  if (textFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Fill in the Blanks</div>';
+    for (const f of textFields) {
+      const id = 'df_' + f.key;
+      html += `<div class="draft-field">
+        <label for="${id}">${esc(f.label)}</label>
+        <input type="text" id="${id}" data-key="${f.key}" data-ftype="text"
+               value="${esc(f.value)}" placeholder="${esc(f.label)}…">
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (connFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Connectors</div>';
+    for (const f of connFields) {
+      html += `<div class="draft-field">
+        <label class="draft-opt-label">
+          <input type="checkbox" data-key="${f.key}" data-ftype="connector"${f.checked ? ' checked' : ''}>
+          <span class="draft-opt-text" style="font-family:var(--mono);font-size:.82em">[${esc(f.label)}]</span>
+        </label>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (dropFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Select Alternatives</div>';
+    for (const f of dropFields) {
+      const id = 'df_' + f.key;
+      if (f.custom) {
+        // Render the custom text-input state
+        html += `<div class="draft-field" id="dff_${f.key}">
+          <label>${esc(f.label)}</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="text" data-key="${f.key}" data-ftype="custom"
+                   value="${esc(f.customValue)}" placeholder="Type custom value\u2026"
+                   style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:4px;font-family:var(--serif);font-size:.85em;color:var(--text)">
+            <button type="button" class="btn-ghost" style="white-space:nowrap"
+                    onclick="restoreDraftDropdown('${f.key}')">&#8592; back</button>
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="draft-field" id="dff_${f.key}"><label for="${id}">${esc(f.label)}</label>
+          <select id="${id}" data-key="${f.key}" data-ftype="dropdown">
+            <option value="-1"${f.selected === -1 ? ' selected' : ''}>&#8212; select &#8212;</option>`;
+        f.options.forEach((opt, i) => {
+          const label = opt.startsWith('[') && opt.endsWith(']') ? opt.slice(1, -1).trim() : opt;
+          html += `<option value="${i}"${i === f.selected ? ' selected' : ''}>${esc(label)}</option>`;
+        });
+        html += `<option value="__custom__">Custom\u2026</option>
+          </select></div>`;
+      }
+    }
+    html += '</div>';
+  }
+
+  if (altFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Alternative Elements</div>';
+    for (const f of altFields) {
+      const raw = f.altText.replace(/\s+/g, ' ');
+      const preview = raw.length > 60 ? raw.slice(0, 60) + '\u2026' : raw;
+      html += `<div class="draft-field">
+        <div style="font-family:var(--sans);font-size:.73em;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);margin-bottom:6px">Element ${esc(f.elemNum)}</div>
+        <label class="draft-opt-label" style="margin-bottom:7px">
+          <input type="radio" name="alt_${f.key}" value="a"
+                 data-key="${f.key}" data-ftype="alternative"${f.selected === 'a' ? ' checked' : ''}
+                 style="margin-top:2px;flex-shrink:0;accent-color:var(--navy)">
+          <span class="draft-opt-text">Standard element ${esc(f.elemNum)}</span>
+        </label>
+        <label class="draft-opt-label">
+          <input type="radio" name="alt_${f.key}" value="b"
+                 data-key="${f.key}" data-ftype="alternative"${f.selected === 'b' ? ' checked' : ''}
+                 style="margin-top:2px;flex-shrink:0;accent-color:var(--navy)">
+          <span class="draft-opt-text">Alternative: <em style="color:var(--muted)">${esc(preview)}</em></span>
+        </label>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (optFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Optional Elements</div>';
+    for (const f of optFields) {
+      html += `<div class="draft-field">
+        <label class="draft-opt-label">
+          <input type="checkbox" data-key="${f.key}" data-ftype="optional"${f.checked ? ' checked' : ''}>
+          <span class="draft-opt-text">${esc(f.label)}</span>
+        </label>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (noteFields.length) {
+    html += '<div class="draft-section"><div class="draft-section-label">Drafting Notes</div>';
+    for (const f of noteFields) {
+      const id = 'df_' + f.key;
+      html += `<div class="draft-field">
+        <label for="${id}">${esc(f.label)}</label>
+        <textarea id="${id}" data-key="${f.key}" data-ftype="note" rows="3"
+                  placeholder="Enter text to insert…">${esc(f.value)}</textarea>
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  const formEl = document.getElementById('draftForm');
+  formEl.innerHTML = html || '<p style="color:var(--muted);font-style:italic;font-family:var(--sans);font-size:.85em">No fill-in placeholders found in this instruction.</p>';
+
+  formEl.querySelectorAll('input[type="text"], select, textarea').forEach(el => {
+    el.addEventListener('input', onDraftChange);
+  });
+  formEl.querySelectorAll('input[type="checkbox"]').forEach(el => {
+    el.addEventListener('change', onDraftChange);
+  });
+  formEl.querySelectorAll('input[type="radio"]').forEach(el => {
+    el.addEventListener('change', onDraftChange);
+  });
+}
+
+function onDraftChange(e) {
+  if (!draftState) return;
+  const el = e.target, key = el.dataset.key, ftype = el.dataset.ftype;
+  const f = draftState.fields.get(key);
+  if (!f) return;
+  if (ftype === 'text' || ftype === 'note') {
+    f.value = el.value;
+  } else if (ftype === 'custom') {
+    f.customValue = el.value;
+  } else if (ftype === 'dropdown') {
+    if (el.value === '__custom__') { activateDraftCustom(key); return; }
+    f.selected = parseInt(el.value, 10);
+  } else if (ftype === 'optional' || ftype === 'connector') {
+    f.checked = el.checked;
+  } else if (ftype === 'alternative') {
+    f.selected = el.value;
+    // Auto-toggle paired standard optional: Option A = include standard, B = exclude it
+    if (f.pairedOptionalKey) {
+      const paired = draftState.fields.get(f.pairedOptionalKey);
+      if (paired) {
+        paired.checked = (el.value === 'a');
+        const cb = document.querySelector(`input[data-key="${f.pairedOptionalKey}"][data-ftype="optional"]`);
+        if (cb) cb.checked = paired.checked;
+      }
+    }
+  }
+  updateDraftPreview();
+}
+
+// ─ Custom dropdown → text input swap ──────────────────────────────────
+
+function activateDraftCustom(key) {
+  const f = draftState.fields.get(key);
+  if (!f || f.type !== 'dropdown') return;
+  f.custom = true;
+  f.customValue = '';
+  // Re-render just the dropdown section by rebuilding the whole form while
+  // preserving all other field values — simplest way to get the custom
+  // input wired up correctly.
+  renderDraftForm(draftState);
+  // Focus the newly rendered custom input for this key
+  const input = document.querySelector(`input[data-key="${key}"][data-ftype="custom"]`);
+  if (input) input.focus();
+  updateDraftPreview();
+}
+
+function restoreDraftDropdown(key) {
+  const f = draftState && draftState.fields.get(key);
+  if (!f) return;
+  f.custom = false;
+  f.customValue = '';
+  f.selected = -1;
+  renderDraftForm(draftState);
+  updateDraftPreview();
+}
+
+function updateDraftPreview() {
+  if (!draftState) return;
+  const el = document.getElementById('draftPreview');
+  el.style.color = '';
+  el.style.fontStyle = '';
+  el.textContent = compileInstruction(draftState);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAFT INSTRUCTION — LOAD & COPY
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById('loadDraftBtn').addEventListener('click', () => {
+  const numEl    = document.getElementById('draftCaciNum');
+  const num      = numEl.value.trim() || document.getElementById('caciNumber').value.trim();
+  const statusEl = document.getElementById('draftLoadStatus');
+
+  if (!num) {
+    statusEl.textContent = 'Enter a CACI number first.';
+    statusEl.className   = 'status err';
+    return;
+  }
+
+  try {
+    const text = lookupCACIText(num);
+    draftState = parseInstruction(text);
+    renderDraftForm(draftState);
+    updateDraftPreview();
+    document.getElementById('draftWorkspace').classList.remove('hidden');
+    if (!numEl.value.trim()) numEl.value = num;
+    statusEl.textContent = `✓ Loaded CACI ${num}`;
+    statusEl.className   = 'status ok';
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.message;
+    statusEl.className   = 'status err';
+  }
+});
+
+document.getElementById('draftCaciNum').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loadDraftBtn').click();
+});
+
+document.getElementById('copyDraftBtn').addEventListener('click', () => {
+  const text = document.getElementById('draftPreview').textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn  = document.getElementById('copyDraftBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+});
+</script>
+</body>
+</html>
