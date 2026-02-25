@@ -65,3 +65,47 @@ for (const [key, text] of Object.entries(db)) {
   } catch(e) { /* already caught in pass 1 */ }
 }
 console.log(`Suspicious all-text count: ${suspiciousCount}`);
+
+// ── Pass 3: [N. [and] alternative signal variants ──────────────────────
+console.log('\n── Pass 3: [N. [and] alternative signal variants ──');
+const andSignalPattern = /\[\d+\.\s*\[\s*and\s*\]/;
+let andSignalCount = 0;
+for (const [key, text] of Object.entries(db)) {
+  if (key.includes('_')) continue;
+  if (andSignalPattern.test(text)) {
+    andSignalCount++;
+    const matches = text.match(new RegExp('\\[\\d+\\.\\s*\\[\\s*and\\s*\\][^\\n]*', 'g')) || [];
+    console.log(key, '→ [N. [and]] pattern found');
+    matches.forEach(m => console.log('  ' + m.trim().slice(0, 100)));
+  }
+}
+console.log(`[N. [and]] count: ${andSignalCount}`);
+
+// ── Pass 4: brackets containing "e.g." (normalized text, with classified type) ──
+console.log('\n── Pass 4: brackets containing "e.g." ──');
+// Inline the same normalization used in parseInstruction so nested brackets
+// inside unclosed [N. [or] blocks are visible at top level.
+function normalizeText(t) {
+  return t.replace(/(\[\d+\.\s*\[\s*or\s*\])(?!\])/g, '$1]');
+}
+const { parseInstruction: _pi, findTopLevelBrackets: _ftlb } = require('./draft-parser.js');
+let egCount = 0;
+for (const [key, text] of Object.entries(db)) {
+  if (key.includes('_')) continue;
+  if (!/e\.g\./.test(text)) continue;
+  const norm = normalizeText(text);
+  const brackets = findTopLevelBrackets(norm).filter(b => /e\.g\./.test(b.content));
+  if (brackets.length === 0) continue;
+  egCount++;
+  console.log(key, '→', brackets.length, 'bracket(s) with e.g.');
+  brackets.forEach(b => {
+    const { fields } = parseInstruction(text);
+    const snip = b.content.trim().replace(/\s+/g, ' ').slice(0, 120);
+    // find what type this bracket got classified as
+    const mk = b.content.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_/]/g,'').slice(0,60);
+    const field = [...fields.values()].find(f => f.key === mk);
+    const classifiedAs = field ? field.type : '(not in fields — likely consumed/nested)';
+    console.log('  type=' + classifiedAs + '  [' + snip + ']');
+  });
+}
+console.log(`Instructions with e.g. brackets: ${egCount}`);
