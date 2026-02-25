@@ -136,15 +136,24 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 #print-header { display: none; }
 @media print {
   body { background: white; font-size: 11pt; }
-  .card { border: 1px solid #ccc; box-shadow: none; page-break-inside: avoid; }
-  .diff-col-body { max-height: none !important; overflow: visible !important; }
-  #card-api, #card-options, #card-inputs { display: none; }
-  button { display: none; }
-  .tab-nav { display: none; }
-  .diff-cols { display: block !important; }
-  .diff-col { width: 100% !important; margin-bottom: 20pt; }
-  .compare-toolbar { display: none !important; }
+  header, .tab-nav, button, .compare-toolbar, .draft-toolbar { display: none !important; }
   #print-header { display: block !important; font-family: var(--sans); font-size: 10pt; color: var(--muted); border-bottom: 1px solid #ccc; padding-bottom: 8pt; margin-bottom: 16pt; }
+
+  /* ── Compare print: isolate results only ── */
+  body.printing-compare #card-api,
+  body.printing-compare #card-inputs,
+  body.printing-compare #card-options,
+  body.printing-compare #tab-draft { display: none !important; }
+  body.printing-compare .card { border: 1px solid #ccc; box-shadow: none; }
+  body.printing-compare .diff-col-body { max-height: none !important; overflow: visible !important; }
+  body.printing-compare .diff-cols { display: block !important; }
+  body.printing-compare .diff-col { width: 100% !important; margin-bottom: 20pt; }
+
+  /* ── Draft print: isolate preview only ── */
+  body.printing-draft #tab-compare > *:not(#print-header) { display: none !important; }
+  body.printing-draft #tab-draft > *:not(#draftWorkspace) { display: none !important; }
+  body.printing-draft #draftWorkspace .row > *:first-child { display: none !important; }
+  body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
 }
 
 /* ─ Responsive ─ */
@@ -254,8 +263,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div id="results" class="hidden">
 
   <div class="compare-toolbar" style="display:flex;align-items:center;gap:8px;margin-bottom:14px;justify-content:flex-end">
-    <button class="btn-ghost" id="printCompareBtn">Print</button>
-    <button class="btn-ghost" id="exportCompareBtn">Export HTML</button>
+    <button class="btn-ghost" id="printCompareBtn">Print / Save PDF</button>
+    <button class="btn-ghost" id="exportCompareBtn">Export TXT</button>
   </div>
 
   <!-- Diff View -->
@@ -328,8 +337,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
             <div class="card-label" style="margin:0">Completed Instruction</div>
             <div style="display:flex;gap:8px">
               <button class="btn-ghost" id="copyDraftBtn">Copy</button>
-              <button class="btn-ghost" id="printDraftBtn">Print</button>
-              <button class="btn-ghost" id="exportDraftBtn">Export HTML</button>
+              <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
+              <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
             </div>
           </div>
           <div class="draft-preview-box" id="draftPreview" style="color:var(--muted);font-style:italic">Fill in the form to build the instruction…</div>
@@ -1247,61 +1256,8 @@ document.getElementById('copyDraftBtn').addEventListener('click', () => {
 
 /* ─ Print & Export ─────────────────────────────────────────── */
 
-const EXPORT_CSS = `
-:root{--navy:#1a2744;--navy-lt:#2c3e6b;--green:#166534;--green-bg:#dcfce7;--red:#991b1b;--red-bg:#fee2e2;--yellow:#92400e;--yellow-bg:#fef3c7;--border:#d1d5db;--bg:#f1f3f6;--card:#ffffff;--text:#111827;--muted:#6b7280;--serif:Georgia,"Times New Roman",serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--serif);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;padding:24px;}
-.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-.card-label{font-family:var(--sans);font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px;}
-.hidden{display:none!important;}
-.diff-cols{display:flex;gap:10px;align-items:stretch;}
-.diff-col{flex:1;min-width:0;border:1px solid var(--border);border-radius:5px;display:flex;flex-direction:column;}
-.diff-col-base{border-color:#93c5fd;background:#eff6ff;}
-.diff-col-head{padding:8px 14px;font-family:var(--sans);font-size:.74em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#374151;border-bottom:1px solid var(--border);background:#f9fafb;border-radius:5px 5px 0 0;}
-.diff-col-base .diff-col-head{background:#dbeafe;border-color:#93c5fd;color:#1e40af;}
-.diff-col-body{padding:14px;font-family:var(--serif);font-size:.87em;line-height:1.85;flex:1;}
-.ins{background:var(--green-bg);color:var(--green);border-radius:2px;padding:1px 3px;margin:0 1px;}
-.del{background:var(--red-bg);color:var(--red);border-radius:2px;padding:1px 3px;margin:0 1px;text-decoration:line-through;}
-.yel{background:var(--yellow-bg);color:var(--yellow);border-radius:2px;padding:1px 3px;margin:0 1px;}
-.legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-family:var(--sans);font-size:.78em;color:var(--text);}
-.legend-item{display:flex;align-items:center;gap:5px;}
-.legend-sw{width:14px;height:14px;border-radius:2px;border:1px solid rgba(0,0,0,.1);}
-.sum-table{width:100%;border-collapse:collapse;font-family:var(--sans);font-size:.83em;}
-.sum-table th{background:#f3f4f6;padding:8px 14px;text-align:left;font-size:.73em;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:2px solid var(--border);}
-.sum-table td{padding:9px 14px;border-bottom:1px solid #f0f0f0;}
-.sum-table tr:last-child td{border-bottom:none;}
-.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-weight:700;font-size:.85em;}
-.badge-g{background:var(--green-bg);color:var(--green);}
-.badge-r{background:var(--red-bg);color:var(--red);}
-.badge-b{background:#dbeafe;color:#1e40af;}
-.analysis-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.analysis-body{font-family:var(--serif);font-size:.9em;line-height:1.8;}
-.analysis-body h4{font-size:.92em;color:var(--navy);margin:16px 0 5px;border-bottom:1px solid #e5e7eb;padding-bottom:3px;}
-.analysis-body p{margin-bottom:10px;}
-.analysis-body ul{margin:6px 0 12px 20px;}
-.analysis-body li{margin-bottom:4px;}
-.draft-preview-box{font-family:var(--serif);font-size:.88em;line-height:1.85;white-space:pre-wrap;background:#f9fafb;border:1px solid var(--border);border-radius:4px;padding:14px 16px;}
-button{display:none;}
-`;
-
-function buildExportHTML(bodyContent, title) {
-  const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>${title}</title>
-<style>${EXPORT_CSS}</style>
-</head>
-<body>
-<p style="font-family:var(--sans);font-size:.8em;color:var(--muted);margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:10px;">${title} &nbsp;·&nbsp; Exported ${date}</p>
-${bodyContent}
-</body>
-</html>`;
-}
-
-function downloadHTML(html, filename) {
-  const blob = new Blob([html], { type: 'text/html' });
+function downloadTXT(text, filename) {
+  const blob = new Blob([text], { type: 'text/plain' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
@@ -1314,40 +1270,47 @@ function setPrintHeader(text) {
   document.getElementById('print-header').textContent = text;
 }
 
-// ── Compare tab: Print ──────────────────────────────────────
+function doPrint(cls) {
+  document.body.classList.add(cls);
+  window.addEventListener('afterprint', function cleanup() {
+    document.body.classList.remove(cls);
+    window.removeEventListener('afterprint', cleanup);
+  });
+  window.print();
+}
+
+// ── Compare tab: Print / Save PDF ───────────────────────────
 document.getElementById('printCompareBtn').addEventListener('click', () => {
   const num  = document.getElementById('caciNumber')?.value.trim() || '';
   const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
   setPrintHeader('CACI Instruction Comparison' + (num ? ' — No. ' + num : '') + '   |   ' + date);
-  window.print();
+  doPrint('printing-compare');
 });
 
-// ── Compare tab: Export ─────────────────────────────────────
+// ── Compare tab: Export TXT ──────────────────────────────────
 document.getElementById('exportCompareBtn').addEventListener('click', () => {
   const num      = document.getElementById('caciNumber')?.value.trim() || '';
   const dateSlug = new Date().toISOString().slice(0, 10);
-  const filename = num ? `CACI-compare-${num}-${dateSlug}.html` : `CACI-compare-${dateSlug}.html`;
-  const title    = 'CACI Comparison' + (num ? ' — No. ' + num : '');
-  const content  = document.getElementById('results').innerHTML;
-  downloadHTML(buildExportHTML(content, title), filename);
+  const filename = num ? `CACI-compare-${num}-${dateSlug}.txt` : `CACI-compare-${dateSlug}.txt`;
+  const text     = document.getElementById('results').innerText;
+  downloadTXT(text, filename);
 });
 
-// ── Draft tab: Print ────────────────────────────────────────
+// ── Draft tab: Print / Save PDF ──────────────────────────────
 document.getElementById('printDraftBtn').addEventListener('click', () => {
   const num  = document.getElementById('draftCaciNum')?.value.trim() || '';
   const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
   setPrintHeader('CACI Instruction' + (num ? ' No. ' + num : '') + '   |   ' + date);
-  window.print();
+  doPrint('printing-draft');
 });
 
-// ── Draft tab: Export ───────────────────────────────────────
+// ── Draft tab: Export TXT ────────────────────────────────────
 document.getElementById('exportDraftBtn').addEventListener('click', () => {
   const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
   const dateSlug = new Date().toISOString().slice(0, 10);
-  const filename = num ? `CACI-${num}-${dateSlug}.html` : `CACI-draft-${dateSlug}.html`;
-  const title    = 'CACI Instruction' + (num ? ' No. ' + num : '');
-  const content  = document.getElementById('draftPreview').outerHTML;
-  downloadHTML(buildExportHTML(content, title), filename);
+  const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
+  const text     = document.getElementById('draftPreview').innerText;
+  downloadTXT(text, filename);
 });
 </script>
 </body>
