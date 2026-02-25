@@ -1,3 +1,6 @@
+/** Diagnostic logging — active only when URL contains ?debug */
+const _DEBUG = (typeof location !== 'undefined') && location.search.includes('debug');
+
 /** Walk text tracking nesting depth; return all top-level [bracket] spans. */
 function findTopLevelBrackets(text) {
   const brackets = [];
@@ -114,6 +117,16 @@ function parseInstruction(rawText) {
   const segments = [];           // ordered mix of {type:'text'} and {type:'field'}
   let lastEnd = 0;
 
+  if (_DEBUG) {
+    const instrNum = (rawText.match(/^\s*(\d+)\s*\./) || [])[1] || '?';
+    console.group(`%c[draft-parser] Instruction ${instrNum}`, 'color:#1a2744;font-weight:bold');
+    console.log(`findTopLevelBrackets → ${brackets.length} top-level bracket(s)`);
+    brackets.forEach((br, i) => {
+      const snip = br.content.trim().replace(/\s+/g, ' ').slice(0, 90);
+      console.log(`  [${i}] classifyBracket="${classifyBracket(br.content)}"  content=${JSON.stringify(snip)}`);
+    });
+  }
+
   // Pass 1: build forward-pointer map for alternative signal → content brackets
   const altContentMap = new Map(); // signal bracket index → content bracket index
   const consumed = new Set();      // content bracket indices to skip as standalone fields
@@ -133,6 +146,20 @@ function parseInstruction(rawText) {
         }
       }
     }
+  }
+
+  if (_DEBUG) {
+    if (altContentMap.size === 0) {
+      console.warn('  Pass 1: altContentMap is EMPTY — no alternative signals matched');
+    } else {
+      console.log(`  Pass 1: altContentMap (${altContentMap.size} entry/entries)`);
+      altContentMap.forEach((cj, pi) => {
+        const sig  = brackets[pi].content.trim().replace(/\s+/g, ' ').slice(0, 60);
+        const cont = brackets[cj].content.trim().replace(/\s+/g, ' ').slice(0, 60);
+        console.log(`    signal[${pi}] "${sig}" → content[${cj}] "${cont}"`);
+      });
+    }
+    console.log(`  Pass 1: consumed indices = [${[...consumed].join(', ')}]`);
   }
 
   // Pass 2: main segment loop
@@ -250,6 +277,15 @@ function parseInstruction(rawText) {
 
   if (lastEnd < rawText.length) {
     segments.push({ type: 'text', text: rawText.slice(lastEnd) });
+  }
+
+  if (_DEBUG) {
+    console.log(`  Pass 2: ${fields.size} field(s) generated`);
+    fields.forEach((f, k) => {
+      const extra = f.type === 'alternative' ? `  elemNum=${f.elemNum} altText=${JSON.stringify((f.altText||'').slice(0,50))} pairedKey=${f.pairedOptionalKey}` : '';
+      console.log(`    key="${k}" type=${f.type}${extra}`);
+    });
+    console.groupEnd();
   }
 
   return { rawText, segments, fields };
