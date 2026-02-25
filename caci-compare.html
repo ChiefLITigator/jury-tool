@@ -132,6 +132,9 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 /* ─ Visibility ─ */
 .hidden { display: none !important; }
 
+/* ─ Lock & Edit ─ */
+#draftWorkspace.draft-locked .draft-form-col { pointer-events: none; opacity: .5; transition: opacity .2s; }
+
 /* ─ Print Settings Panel ─ */
 #print-settings-wrap { margin-bottom: 12px; }
 #print-settings-toggle { background: none; border: none; padding: 2px 0; font-family: var(--sans); font-size: .78em; color: var(--muted); cursor: pointer; text-decoration: underline; letter-spacing: .01em; }
@@ -161,6 +164,10 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   body.printing-draft #tab-draft > *:not(#draftWorkspace) { display: none !important; }
   body.printing-draft #draftWorkspace .row > *:first-child { display: none !important; }
   body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
+  body.printing-draft #draftLockWarning { display: none !important; }
+  /* locked state: swap preview div for textarea */
+  body.printing-draft #draftWorkspace.draft-locked #draftPreview { display: none !important; }
+  body.printing-draft #draftWorkspace.draft-locked #draftEditArea { display: block !important; max-height: none !important; overflow: visible !important; }
 }
 
 /* ─ Responsive ─ */
@@ -357,7 +364,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
     <div class="row gap-4" style="align-items:flex-start">
 
       <!-- Left column: form -->
-      <div style="flex:0 0 360px;min-width:240px">
+      <div class="draft-form-col" style="flex:0 0 360px;min-width:240px">
         <div class="card" style="position:sticky;top:20px;max-height:calc(100vh - 48px);overflow-y:auto">
           <div class="card-label">Fill In Blanks</div>
           <div id="draftForm"></div>
@@ -369,13 +376,16 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
         <div class="card">
           <div class="draft-toolbar">
             <div class="card-label" style="margin:0">Completed Instruction</div>
-            <div style="display:flex;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center">
               <button class="btn-ghost" id="copyDraftBtn">Copy</button>
               <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
               <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
+              <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
             </div>
           </div>
+          <div id="draftLockWarning" class="hidden" style="font-family:var(--sans);font-size:.75em;color:var(--yellow);background:var(--yellow-bg);border:1px solid #fbbf24;border-radius:4px;padding:5px 10px;margin-bottom:8px;">⚠ Manual edits will be lost if you unlock the form</div>
           <div class="draft-preview-box" id="draftPreview" style="color:var(--muted);font-style:italic">Fill in the form to build the instruction…</div>
+          <textarea class="draft-preview-box hidden" id="draftEditArea" style="width:100%;resize:vertical;"></textarea>
         </div>
       </div>
 
@@ -1121,9 +1131,41 @@ document.getElementById('draftCaciNum').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('loadDraftBtn').click();
 });
 
+function getDraftText() {
+  const ws = document.getElementById('draftWorkspace');
+  if (ws.classList.contains('draft-locked')) {
+    return document.getElementById('draftEditArea').value;
+  }
+  return document.getElementById('draftPreview').innerText || '';
+}
+
+document.getElementById('lockEditBtn').addEventListener('click', () => {
+  const ws      = document.getElementById('draftWorkspace');
+  const preview = document.getElementById('draftPreview');
+  const editArea = document.getElementById('draftEditArea');
+  const lockBtn  = document.getElementById('lockEditBtn');
+  const warning  = document.getElementById('draftLockWarning');
+
+  if (!ws.classList.contains('draft-locked')) {
+    // Lock: capture compiled text, switch to textarea
+    editArea.value = preview.innerText || '';
+    preview.classList.add('hidden');
+    editArea.classList.remove('hidden');
+    ws.classList.add('draft-locked');
+    lockBtn.textContent = 'Unlock Form';
+    warning.classList.remove('hidden');
+  } else {
+    // Unlock: restore live preview (pre-edit compiled state), re-enable form
+    editArea.classList.add('hidden');
+    preview.classList.remove('hidden');
+    ws.classList.remove('draft-locked');
+    lockBtn.textContent = 'Lock & Edit';
+    warning.classList.add('hidden');
+  }
+});
+
 document.getElementById('copyDraftBtn').addEventListener('click', () => {
-  const text = document.getElementById('draftPreview').textContent || '';
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(getDraftText()).then(() => {
     const btn  = document.getElementById('copyDraftBtn');
     const orig = btn.textContent;
     btn.textContent = 'Copied!';
@@ -1186,8 +1228,7 @@ document.getElementById('exportDraftBtn').addEventListener('click', () => {
   const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
   const dateSlug = new Date().toISOString().slice(0, 10);
   const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
-  const text     = document.getElementById('draftPreview').innerText;
-  downloadTXT(text, filename);
+  downloadTXT(getDraftText(), filename);
 });
 
 // ═══════════════════════════════════════════════════════════════════════
