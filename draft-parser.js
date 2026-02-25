@@ -69,7 +69,7 @@ function classifyBracket(content) {
   if (!c) return 'skip';
 
   // Skip bare integers, legal citations (e.g. 279 P.2d 966), and Roman numerals.
-  if (/^\d+$/.test(c) || /\d+\s+[A-Z]\.\d+/.test(c) || /^[IVX]+$/.test(c)) return 'skip';
+  if (/^\d+$/.test(c) || /^\d+\s+[A-Z]\.\d+/.test(c) || /^[IVX]+$/.test(c)) return 'skip';
 
   // Connector words/punctuation — checked = include, unchecked = omit.
   // Must be the very first test; nothing else should intercept these.
