@@ -762,7 +762,7 @@ for (let i = 0; i < 3; i++) {
   text = text.replace(
     /^(\d{3,4}\s*\.\s*[^\n]+)\n([A-Z][^.\n!?\[]{0,50})\n/gm,
     (_, t1, cont) => {
-      const firstWord = cont.trim().split(/\s/);
+      const firstWord = cont.trim().split(/\s/)[0];
       return TITLE_SENTENCE_STARTERS.has(firstWord) ? _ : t1 + ' ' + cont + '\n';
     }
   );
