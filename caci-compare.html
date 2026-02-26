@@ -1250,7 +1250,7 @@ function updateDraftPreview() {
   const bodyEl = document.createElement('div');
   bodyEl.className = 'draft-preview-body';
   bodyEl.innerHTML = '';
-  const paragraphs = bodyText.split(/\n\n+/);
+  const paragraphs = bodyText.split(/\n+/).filter(p => p.trim());
   for (const para of paragraphs) {
     const p = document.createElement('p');
     p.className = 'draft-para';
