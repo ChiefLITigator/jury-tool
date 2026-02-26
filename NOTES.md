@@ -57,6 +57,14 @@
   chars with no clause-leading word (`and/or/that/if/when/whether/by/because/
   provided`) → always `text`, placed immediately before the `c.length > 25`
   optional check.
+  - **Correction**: the ≤ 60-char rule was replaced — it misclassified instructional
+    labels like `[one or more of the following:]` and short optional clauses
+    containing nested brackets like `[destroying the [insert item...];]`.
+    Replaced with two precise rules in the same location:
+    `if (c.endsWith(':')) return 'skip'` (colon-terminated labels render verbatim)
+    and `if (c.includes('[')) return 'optional'` (nested bracket → optional block,
+    since genuine fill-in labels never contain a bracket). Keyword expansions
+    (`briefly`, `brief `, `state the`, `denial of`, `summary of`) unchanged.
 
 **Round 3 corrections (same session)**
 

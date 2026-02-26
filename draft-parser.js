@@ -108,8 +108,11 @@ function classifyBracket(content) {
   // Conjunction-led clause → optional block (checkbox)
   if (/^(and|or)\s+\w{2,}/i.test(c)) return 'optional';
 
-  // Short noun-phrase brackets without clause-leading words → text fill-in
-  if (c.length <= 60 && !/^(and|or|that|if|when|whether|by|because|provided)\b/i.test(c)) return 'text';
+  // Instructional labels ending with colon → render verbatim, not as a form field
+  if (c.endsWith(':')) return 'skip';
+
+  // Any bracket containing a nested [ is a clause with fill-ins → optional block
+  if (c.includes('[')) return 'optional';
 
   // Long content or multiple sentences → optional block (checkbox)
   if (c.length > 25 || /[.?!][A-Z]/.test(c)) return 'optional';
