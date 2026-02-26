@@ -744,12 +744,30 @@ function lookupCACIText(caciNum) {
   let text = caciDB[key];
   if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
 
-// 0. Join wrapped title lines: if the line after a NNN. title line is a short
-// noun-phrase continuation (completes a parenthetical or phrase), join them.
-text = text.replace(
-  /^(\d{3,4}\s*\.\s*[^\n]{5,})\n([A-Z][a-z\)][^.\n!?]{0,45})\n/gm,
-  (_, titleLine, continuation) => titleLine + ' ' + continuation + '\n'
-);
+// Step 0: Join wrapped title lines (run up to 3 times for multi-line wraps)
+const TITLE_SENTENCE_STARTERS = new Set([
+  'To','In','If','On','At','By','For','From','Of','With','No','Not','Each',
+  'Either','Neither','Both','All','Any','It','He','She','His','Her','Their',
+  'Its','They','Or','And','But','Whether','When','Where','Who','Which','What',
+  'How','As','You','We','See','Note','This','The','A','An','That','These'
+]);
+for (let i = 0; i < 3; i++) {
+  const prev = text;
+  // Paren continuations: (Corporate Liability...) etc.
+  text = text.replace(
+    /^(\d{3,4}\s*\.\s*[^\n]+)\n(\([^\n]{1,70})\n/gm,
+    (_, t1, cont) => t1 + ' ' + cont + '\n'
+  );
+  // Word continuations: short line that is NOT a sentence-starter word
+  text = text.replace(
+    /^(\d{3,4}\s*\.\s*[^\n]+)\n([A-Z][^.\n!?\[]{0,50})\n/gm,
+    (_, t1, cont) => {
+      const firstWord = cont.trim().split(/\s/);
+      return TITLE_SENTENCE_STARTERS.has(firstWord) ? _ : t1 + ' ' + cont + '\n';
+    }
+  );
+  if (text === prev) break;
+}
 
  // 1. Strip "CACI No. XXXX [title]" running headers
 text = text.replace(/^CACI No\.\s+\d{3,4}[^\n]*$/gm, '');

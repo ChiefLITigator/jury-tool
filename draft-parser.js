@@ -79,7 +79,7 @@ function classifyBracket(content) {
   if (/^(or|and|also|nor|,|;)$/i.test(c)) return 'connector';
 
   // Grammatical suffix toggles — checked = suffix appears, unchecked = omit.
-  if (/^(an|s|ed|ing|ly)$/i.test(c)) return 'connector';
+  if (/^(an|s|ed|ing|ly|it|he|she|his|her|they|their|him|them|its)$/i.test(c)) return 'connector';
 
   // Alternative element — content begins with "N. [or]"; must precede the
   // optional-block check so long alt-element text is not caught there first.

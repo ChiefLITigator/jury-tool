@@ -2,6 +2,10 @@
 
 ## Session: 2026-02-25
 
+### Late fixes (same session)
+- Fix 1: multi-line title join for paren-wrapped titles — replaced single-pass regex with iterative loop (up to 3 passes) handling `(...)` continuations and short word continuations; scoped `TITLE_SENTENCE_STARTERS` Set inside `lookupCACIText`.
+- Fix 2: pronoun toggles now classified as connector — expanded connector regex in `classifyBracket` to include `it|he|she|his|her|they|their|him|them|its`.
+
 ### Output Quality Fixes (caci-compare.html)
 
 **Fix 1 — Join mid-sentence line breaks in lookupCACIText**
