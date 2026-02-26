@@ -744,6 +744,13 @@ function lookupCACIText(caciNum) {
   let text = caciDB[key];
   if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
 
+// 0. Join wrapped title lines: if the line after a NNN. title line is a short
+// noun-phrase continuation (completes a parenthetical or phrase), join them.
+text = text.replace(
+  /^(\d{3,4}\s*\.\s*[^\n]{5,})\n([A-Z][a-z\)][^.\n!?]{0,45})\n/gm,
+  (_, titleLine, continuation) => titleLine + ' ' + continuation + '\n'
+);
+
  // 1. Strip "CACI No. XXXX [title]" running headers
 text = text.replace(/^CACI No\.\s+\d{3,4}[^\n]*$/gm, '');
 
