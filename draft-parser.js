@@ -88,7 +88,7 @@ function classifyBracket(content) {
   // Fill-in keywords — always a text input, regardless of slashes.
   // Check BEFORE the slash/dropdown test so e.g. [specify/describe] is
   // never mis-classified as a dropdown.
-  if (/^(specify|insert|describe|name\s+of)\b/i.test(c)) return 'text';
+  if (/^(specify|insert|describe|name\s+of|briefly|brief\s+|state\s+the|denial\s+of|summary\s+of)\b/i.test(c)) return 'text';
 
   // Drafting-instruction verbs → note (textarea the user fills in)
   if (/^(add\b|include\b)/i.test(c)) return 'note';
@@ -107,6 +107,9 @@ function classifyBracket(content) {
 
   // Conjunction-led clause → optional block (checkbox)
   if (/^(and|or)\s+\w{2,}/i.test(c)) return 'optional';
+
+  // Short noun-phrase brackets without clause-leading words → text fill-in
+  if (c.length <= 60 && !/^(and|or|that|if|when|whether|by|because|provided)\b/i.test(c)) return 'text';
 
   // Long content or multiple sentences → optional block (checkbox)
   if (c.length > 25 || /[.?!][A-Z]/.test(c)) return 'optional';

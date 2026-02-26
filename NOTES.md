@@ -42,6 +42,22 @@
   so lines ending with `]` (e.g., `[name of defendant]`) are joined to their
   continuation. Added a second pass `(\])\n([a-z])` → `$1 $2` for the same case.
 
+**Further corrections (same session — round 2)**
+
+- Fix 1/heading regex: `titleMatch` regex changed to `/^\d{3,4}\s*\.\s*([^\[\n]+)/` —
+  stops at the first `[` or newline, whichever comes first, so body text starting
+  with a bracket never bleeds into the heading string.
+- Fix 2/heading style: `updateDraftPreview` rewritten to build sub-elements with
+  `createElement`/`appendChild` (no more `innerHTML` reuse). Heading is centered,
+  bold, underlined (`.draft-preview-heading`); body is left-aligned, 2em indent,
+  pre-wrap (`.draft-preview-body`). `getDraftText()` updated to read the two
+  sub-elements explicitly rather than `innerText` on the container.
+- Fix 3/classifyBracket: keyword list expanded to include `briefly`, `brief `,
+  `state the`, `denial of`, `summary of`; added safety rule for brackets ≤ 60
+  chars with no clause-leading word (`and/or/that/if/when/whether/by/because/
+  provided`) → always `text`, placed immediately before the `c.length > 25`
+  optional check.
+
 ### Changes to draft-parser.js
 
 **Fix 1 — Pass 1 exclusion regex (inner loop)**
