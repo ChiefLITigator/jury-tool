@@ -162,13 +162,11 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
   /* ── Draft print: isolate preview only ── */
   body.printing-draft #tab-compare > *:not(#print-header) { display: none !important; }
-  body.printing-draft .packet-tray { display: none !important; }
-  body.printing-draft .draft-tab-body { display: block !important; }
-  body.printing-draft .draft-main-col > *:not(#draftWorkspace) { display: none !important; }
+  body.printing-draft .draft-form-col { display: none !important; }
   body.printing-draft #packetTray { display: none !important; }
-  body.printing-draft .draft-form-panel > *:not(#draftPreview):not(#draftEditArea) { display: none !important; }
-  body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
+  body.printing-draft .draft-toolbar { display: none !important; }
   body.printing-draft #draftLockWarning { display: none !important; }
+  body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
   /* locked state: swap preview div for textarea */
   body.printing-draft #draftWorkspace.draft-locked #draftPreview { display: none !important; }
   body.printing-draft #draftWorkspace.draft-locked #draftEditArea { display: block !important; max-height: none !important; overflow: visible !important; }
