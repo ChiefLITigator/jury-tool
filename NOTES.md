@@ -86,15 +86,39 @@
 - `loadCaci` and `resetCaci` handlers now call `stripInstructionHeading(lookupCACIText(num))`
   before setting the official CACI textarea, so the heading never appears in the
   compare input.
-- `runCompare` wraps all three text reads (`textA`, `textB`, `textC`) with
-  `stripInstructionHeading(...)`, so manually pasted text with a heading is
-  also stripped before tokenizing.
+- `runCompare` previously wrapped inputs with `stripInstructionHeading`; now
+  wraps with `flattenForCompare` (see below — heading stripping for pasted text
+  is handled there indirectly; for loaded text the heading was already stripped
+  by the load handler).
 - Diff body formatting: added `.diff-para { text-indent: 2em; margin: 0 0 0.75em 0 }`
   to match `.draft-para`. Each render function (`renderFull`, `renderLeft`,
   `renderRight`) chains `.replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">')`
   after `.trimEnd()` for future paragraph-break support. `colHtml` wraps the
   body content in `<p class="diff-para">...</p>` so every diff column body
   gets the first-line indent and paragraph margin.
+
+### Compare Tool — flattenForCompare
+
+Added `flattenForCompare(text)` helper (placed after `stripInstructionHeading`
+in the utility block). It reuses `findTopLevelBrackets` from `draft-parser.js`
+(globally available) and performs four transformations:
+
+1. Normalizes unclosed `[N. [or]` alternative signal brackets (same regex as
+   `parseInstruction` in draft-parser.js).
+2. Iteratively removes top-level `[N. [or] ...]` alternative-signal blocks,
+   collapsing them to a space so both option lines remain in the output.
+3. Unwraps outer optional brackets around numbered list items
+   (e.g. `[2. That plaintiff did X]` → `2. That plaintiff did X`).
+4. Normalizes inner bracket spacing (`[ name ]` → `[name]`), puts numbered
+   list items on their own lines, and collapses excess whitespace.
+
+Pipeline order for loaded text:
+  `lookupCACIText` (all PDF cleanup steps) → `flattenForCompare` (inside
+  `lookupCACIText`, before `return`) → `stripInstructionHeading` (in the
+  `loadCaci`/`resetCaci` click handler).
+
+`runCompare` wraps all three textarea reads with `flattenForCompare`, so
+user-pasted text gets the same structural normalization before tokenizing.
 
 ### Changes to draft-parser.js
 

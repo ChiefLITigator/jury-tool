@@ -477,6 +477,55 @@ function stripInstructionHeading(text) {
   return text.replace(/^\d{3,4}\s*\.\s*[^\n]*\n?/, '').trim();
 }
 
+/**
+ * Flatten raw CACI instruction text for readable comparison.
+ * - Removes [N. [or] ...] alternative signal brackets (keeps both options as separate lines)
+ * - Unwraps outer optional brackets around numbered list items
+ * - Normalizes bracket spacing
+ * - Puts numbered list items on their own lines
+ */
+function flattenForCompare(text) {
+  // Normalize unclosed alternative signal brackets (same as draft-parser)
+  text = text.replace(/(\[\d+\.\s*\[\s*or\s*\])(?!\])/g, '$1]');
+
+  // Iteratively remove top-level [N. [or] ...] blocks
+  for (let pass = 0; pass < 5; pass++) {
+    const prev = text;
+    const brackets = findTopLevelBrackets(text);
+    for (let i = brackets.length - 1; i >= 0; i--) {
+      const { start, end, content } = brackets[i];
+      if (/^\d+\.\s*\[\s*or\s*\]/i.test(content.trim())) {
+        text = text.slice(0, start).trimEnd() + ' ' + text.slice(end).trimStart();
+      }
+    }
+    if (text === prev) break;
+  }
+
+  // Unwrap outer optional brackets around numbered list items
+  for (let pass = 0; pass < 3; pass++) {
+    const prev = text;
+    const brackets = findTopLevelBrackets(text);
+    for (let i = brackets.length - 1; i >= 0; i--) {
+      const { start, end, content } = brackets[i];
+      if (/^\d+\.\s+\S/.test(content.trim())) {
+        text = text.slice(0, start) + content.trim() + text.slice(end);
+      }
+    }
+    if (text === prev) break;
+  }
+
+  // Normalize spaces inside brackets: [ name of plaintiff ] → [name of plaintiff]
+  text = text.replace(/\[\s+/g, '[').replace(/\s+\]/g, ']');
+
+  // Put numbered list items on their own lines
+  text = text.replace(/(?<=\S)\s+(\d+\.\s+(?:That|The|A|An|Each|Whether|If|All|To|In|Any)\b)/g, '\n$1');
+
+  // Clean up spacing
+  text = text.replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n');
+
+  return text.trim();
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // LCS-BASED WORD DIFF
 // Returns [{op:'equal'|'insert'|'delete', text:string}, …]
@@ -729,6 +778,7 @@ text = text.replace(/\n{3,}/g, '\n\n');
 // After your existing "CACI No." strip, add this:
 text = text.replace(/^[A-Z][A-Z\s\-\/]{5,}$/gm, '');
 
+  text = flattenForCompare(text);
 
   return text.trim();
 }
@@ -739,9 +789,9 @@ text = text.replace(/^[A-Z][A-Z\s\-\/]{5,}$/gm, '');
 
 async function runCompare() {
   const mode   = document.getElementById('compMode').value;
-  const textA  = stripInstructionHeading(document.getElementById('versionA').value.trim());
-  const textB  = stripInstructionHeading(document.getElementById('versionB').value.trim());
-  const textC  = stripInstructionHeading(document.getElementById('officialCaci').value.trim());
+  const textA  = flattenForCompare(document.getElementById('versionA').value.trim());
+  const textB  = flattenForCompare(document.getElementById('versionB').value.trim());
+  const textC  = flattenForCompare(document.getElementById('officialCaci').value.trim());
   const statusEl   = document.getElementById('compareStatus');
   const diffColsEl = document.getElementById('diffCols');
   const sumCard    = document.getElementById('card-summary');
