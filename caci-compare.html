@@ -161,7 +161,9 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
   /* ── Draft print: isolate preview only ── */
   body.printing-draft #tab-compare > *:not(#print-header) { display: none !important; }
-  body.printing-draft #tab-draft > *:not(#draftWorkspace) { display: none !important; }
+  body.printing-draft .packet-tray { display: none !important; }
+  body.printing-draft .draft-tab-body { display: block !important; }
+  body.printing-draft .draft-main-col > *:not(#draftWorkspace) { display: none !important; }
   body.printing-draft #draftWorkspace .row > *:first-child { display: none !important; }
   body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
   body.printing-draft #draftLockWarning { display: none !important; }
@@ -193,6 +195,27 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 .draft-opt-text { font-family: var(--serif); font-size: .85em; line-height: 1.6; color: #374151; }
 .draft-preview-box { font-family: var(--serif); font-size: .88em; line-height: 1.85; white-space: pre-wrap; background: #f9fafb; border: 1px solid var(--border); border-radius: 4px; padding: 14px 16px; min-height: 220px; max-height: 72vh; overflow-y: auto; }
 .draft-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+/* ─ Draft tab two-column layout ─ */
+.draft-tab-body { display: flex; gap: 0; align-items: flex-start; }
+.packet-tray { flex: 0 0 280px; min-width: 220px; border-right: 1px solid var(--border); padding-right: 18px; margin-right: 18px; }
+.draft-main-col { flex: 1; min-width: 0; }
+
+/* ─ Packet Tray ─ */
+.tray-heading { font-family: var(--sans); font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.tray-add-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.tray-add-row input[type="text"] { padding: 7px 9px; }
+.tray-add-btn { width: 100%; }
+.tray-status { font-family: var(--sans); font-size: .75em; min-height: 18px; }
+.tray-empty { font-family: var(--sans); font-size: .8em; color: var(--muted); font-style: italic; text-align: center; padding: 18px 0; }
+.tray-list { display: flex; flex-direction: column; gap: 4px; }
+.tray-row { display: flex; align-items: center; gap: 6px; padding: 7px 8px; border-radius: 4px; border: 1px solid transparent; background: #f9fafb; }
+.tray-row.active { background: #eff6ff; border-color: #bfdbfe; border-left: 3px solid var(--navy); }
+.tray-row-info { flex: 1; min-width: 0; }
+.tray-row-num { font-family: var(--sans); font-size: .8em; font-weight: 700; color: var(--navy); }
+.tray-row-label { font-family: var(--sans); font-size: .73em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tray-row-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.tray-row-btns button { padding: 3px 9px; font-size: .75em; }
 </style>
 </head>
 <body>
@@ -345,53 +368,72 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 </div><!-- /tab-compare -->
 
 <div id="tab-draft" class="tab-panel hidden">
+<div class="draft-tab-body">
 
-  <!-- CACI Loader -->
-  <div class="card">
-    <div class="card-label">Load Instruction for Drafting</div>
-    <div class="caci-row">
-      <div class="num-wrap">
-        <label for="draftCaciNum">CACI Instruction Number</label>
-        <input type="text" id="draftCaciNum" placeholder="e.g. 302" style="width:100%">
-      </div>
-      <button class="btn-secondary" id="loadDraftBtn">Load for Drafting</button>
-      <span id="draftLoadStatus" class="status"></span>
+  <!-- Packet Tray (left column) -->
+  <div class="packet-tray">
+    <div class="tray-heading">Packet</div>
+    <div class="tray-add-row">
+      <input type="text" id="packetCaciNum" placeholder="CACI No. — e.g. 302">
+      <input type="text" id="packetLabel" placeholder="Label — e.g. Plaintiff 1">
+      <button class="btn-primary tray-add-btn" id="packetAddBtn">Add to Packet</button>
+      <span id="packetAddStatus" class="tray-status"></span>
     </div>
+    <div id="packetList"><p class="tray-empty">No instructions added yet.</p></div>
   </div>
 
-  <!-- Workspace (revealed after load) -->
-  <div id="draftWorkspace" class="hidden">
-    <div class="row gap-4" style="align-items:flex-start">
+  <!-- Draft workspace (right column) -->
+  <div class="draft-main-col">
 
-      <!-- Left column: form -->
-      <div class="draft-form-col" style="flex:0 0 360px;min-width:240px">
-        <div class="card" style="position:sticky;top:20px;max-height:calc(100vh - 48px);overflow-y:auto">
-          <div class="card-label">Fill In Blanks</div>
-          <div id="draftForm"></div>
+    <!-- CACI Loader -->
+    <div class="card">
+      <div class="card-label">Load Instruction for Drafting</div>
+      <div class="caci-row">
+        <div class="num-wrap">
+          <label for="draftCaciNum">CACI Instruction Number</label>
+          <input type="text" id="draftCaciNum" placeholder="e.g. 302" style="width:100%">
         </div>
+        <button class="btn-secondary" id="loadDraftBtn">Load for Drafting</button>
+        <span id="draftLoadStatus" class="status"></span>
       </div>
+    </div>
 
-      <!-- Right column: live preview -->
-      <div class="col">
-        <div class="card">
-          <div class="draft-toolbar">
-            <div class="card-label" style="margin:0">Completed Instruction</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <button class="btn-ghost" id="copyDraftBtn">Copy</button>
-              <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
-              <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
-              <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
-            </div>
+    <!-- Workspace (revealed after load) -->
+    <div id="draftWorkspace" class="hidden">
+      <div class="row gap-4" style="align-items:flex-start">
+
+        <!-- Left column: form -->
+        <div class="draft-form-col" style="flex:0 0 360px;min-width:240px">
+          <div class="card" style="position:sticky;top:20px;max-height:calc(100vh - 48px);overflow-y:auto">
+            <div class="card-label">Fill In Blanks</div>
+            <div id="draftForm"></div>
           </div>
-          <div id="draftLockWarning" class="hidden" style="font-family:var(--sans);font-size:.75em;color:var(--yellow);background:var(--yellow-bg);border:1px solid #fbbf24;border-radius:4px;padding:5px 10px;margin-bottom:8px;">⚠ Manual edits will be lost if you unlock the form</div>
-          <div class="draft-preview-box" id="draftPreview" style="color:var(--muted);font-style:italic">Fill in the form to build the instruction…</div>
-          <textarea class="draft-preview-box hidden" id="draftEditArea" style="width:100%;resize:vertical;"></textarea>
         </div>
+
+        <!-- Right column: live preview -->
+        <div class="col">
+          <div class="card">
+            <div class="draft-toolbar">
+              <div class="card-label" style="margin:0">Completed Instruction</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn-ghost" id="copyDraftBtn">Copy</button>
+                <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
+                <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
+                <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
+              </div>
+            </div>
+            <div id="draftLockWarning" class="hidden" style="font-family:var(--sans);font-size:.75em;color:var(--yellow);background:var(--yellow-bg);border:1px solid #fbbf24;border-radius:4px;padding:5px 10px;margin-bottom:8px;">⚠ Manual edits will be lost if you unlock the form</div>
+            <div class="draft-preview-box" id="draftPreview" style="color:var(--muted);font-style:italic">Fill in the form to build the instruction…</div>
+            <textarea class="draft-preview-box hidden" id="draftEditArea" style="width:100%;resize:vertical;"></textarea>
+          </div>
+        </div>
+
       </div>
-
     </div>
-  </div>
 
+  </div><!-- /draft-main-col -->
+
+</div><!-- /draft-tab-body -->
 </div><!-- /tab-draft -->
 
 </div><!-- /wrap -->
@@ -1229,6 +1271,86 @@ document.getElementById('exportDraftBtn').addEventListener('click', () => {
   const dateSlug = new Date().toISOString().slice(0, 10);
   const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
   downloadTXT(getDraftText(), filename);
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// PACKET TRAY
+// ═══════════════════════════════════════════════════════════════════════
+
+let packetInstructions = [];
+let packetIdCounter    = 0;
+let activePacketId     = null;
+
+function renderPacketTray() {
+  const listEl = document.getElementById('packetList');
+  if (!packetInstructions.length) {
+    listEl.innerHTML = '<p class="tray-empty">No instructions added yet.</p>';
+    return;
+  }
+  let html = '<div class="tray-list">';
+  for (const entry of packetInstructions) {
+    const active = entry.id === activePacketId;
+    html += `<div class="tray-row${active ? ' active' : ''}">
+      <div class="tray-row-info">
+        <div class="tray-row-num">CACI ${esc(entry.caciNum)}</div>
+        ${entry.label ? `<div class="tray-row-label">${esc(entry.label)}</div>` : ''}
+      </div>
+      <div class="tray-row-btns">
+        <button class="btn-secondary" onclick="packetLoad(${entry.id})">Load</button>
+        <button class="btn-ghost" onclick="packetRemove(${entry.id})">&times;</button>
+      </div>
+    </div>`;
+  }
+  html += '</div>';
+  listEl.innerHTML = html;
+}
+
+function packetLoad(id) {
+  const entry = packetInstructions.find(e => e.id === id);
+  if (!entry) return;
+  activePacketId = id;
+  draftState = entry.parsedState;
+  renderDraftForm(draftState);
+  updateDraftPreview();
+  document.getElementById('draftWorkspace').classList.remove('hidden');
+  renderPacketTray();
+}
+
+function packetRemove(id) {
+  packetInstructions = packetInstructions.filter(e => e.id !== id);
+  if (activePacketId === id) activePacketId = null;
+  renderPacketTray();
+}
+
+document.getElementById('packetAddBtn').addEventListener('click', () => {
+  const numEl    = document.getElementById('packetCaciNum');
+  const labelEl  = document.getElementById('packetLabel');
+  const statusEl = document.getElementById('packetAddStatus');
+  const num      = numEl.value.trim();
+
+  if (!num) {
+    statusEl.textContent = 'Enter a CACI number.';
+    statusEl.className   = 'tray-status err';
+    return;
+  }
+
+  try {
+    const text        = lookupCACIText(num);
+    const parsedState = parseInstruction(text);
+    packetInstructions.push({ id: ++packetIdCounter, caciNum: num, label: labelEl.value.trim(), parsedState });
+    numEl.value          = '';
+    labelEl.value        = '';
+    statusEl.textContent = '';
+    statusEl.className   = 'tray-status';
+    renderPacketTray();
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.message;
+    statusEl.className   = 'tray-status err';
+  }
+});
+
+document.getElementById('packetCaciNum').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('packetAddBtn').click();
 });
 
 // ═══════════════════════════════════════════════════════════════════════

@@ -148,7 +148,7 @@ function parseInstruction(rawText) {
       if (digit) {
         for (let pj = pi + 1; pj < brackets.length; pj++) {
           const ct = brackets[pj].content.trim();
-          if (new RegExp('^' + digit + '\\.').test(ct) && !/^\d+\.\s*\[or\]/i.test(ct)) {
+          if (new RegExp('^' + digit + '\\.').test(ct) && !/^\d+\.\s*\[\s*or\s*\]/i.test(ct)) {
             altContentMap.set(pi, pj);
             consumed.add(pj);
             break;
@@ -211,7 +211,7 @@ function parseInstruction(rawText) {
           const cBr = brackets[altContentMap.get(i)];
           altText = cBr.content.trim().replace(/^\d+\.\s*/i, '').trim();
         } else {
-          altText = br.content.trim().replace(/^\d+\.\s*\[or\]\s*/i, '').trim();
+          altText = br.content.trim().replace(/^\d+\.\s*\[\s*or\s*\]\s*/i, '').trim();
         }
         // If the alt text is itself a single outer bracket, unwrap it
         const altBrs = findTopLevelBrackets(altText);
@@ -316,4 +316,6 @@ function parseInstruction(rawText) {
   return { rawText, segments, fields };
 }
 
-module.exports = { parseInstruction, findTopLevelBrackets };
+if (typeof module !== 'undefined') {
+  module.exports = { parseInstruction, findTopLevelBrackets };
+}

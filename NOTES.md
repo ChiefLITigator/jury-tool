@@ -1,5 +1,59 @@
 # CACI Tool — Session Notes
 
+## Session: 2026-02-25
+
+### Changes to draft-parser.js
+
+**Fix 1 — Pass 1 exclusion regex (inner loop)**
+- Changed `!/^\d+\.\s*\[or\]/i` → `!/^\d+\.\s*\[\s*or\s*\]/i` in the Pass 1 inner
+  `for (let pj …)` loop that builds `altContentMap`.
+- Reason: The exclusion guard was meant to prevent a signal bracket (e.g., `[2. [or]]`)
+  from matching itself as its own content bracket. If the inner `[or]` has spaces
+  (`[ or ]`), the old regex failed to exclude it, causing a self-referential map entry.
+
+**Fix 2 — Fallback altText strip regex**
+- Changed `replace(/^\d+\.\s*\[or\]\s*/i, '')` → `replace(/^\d+\.\s*\[\s*or\s*\]\s*/i, '')`
+  in the `else` branch of the `altContentMap.has(i)` check inside the `alternative` block.
+- Reason: When no forward-pointer exists and the fallback strip is used, the `[or]` token
+  in the raw bracket content may have internal spaces (`[ or ]`). The old regex left that
+  token in place, polluting the displayed alt text.
+
+Both fixes align these two regexes with the already-correct patterns used in
+`classifyBracket` and the Pass 1 signal-detection line.
+
+### Pass 1 — Packet Tray (in-memory)
+
+Added a Packet Tray to the Draft tab in `caci-compare.html`. No existing logic
+was touched — only new HTML, CSS, and JS were added.
+
+**Layout**
+- `#tab-draft` now uses a `.draft-tab-body` flex wrapper.
+- Left column: `.packet-tray` (fixed 280px wide, right border separator).
+- Right column: `.draft-main-col` (flex:1) containing the existing CACI loader
+  card and `#draftWorkspace` unchanged.
+
+**Tray behavior**
+- `packetInstructions` array holds `{ id, caciNum, label, parsedState }` entries.
+- "Add to Packet": calls `lookupCACIText()` + `parseInstruction()`, pushes entry,
+  re-renders the list. Shows inline error if CACI number not found.
+- "Load": sets `draftState = entry.parsedState` (same object reference — no extra
+  sync needed), calls `renderDraftForm` + `updateDraftPreview`, highlights active row.
+- "Remove": splices entry from array, clears `activePacketId` if it was active.
+- Empty state shows "No instructions added yet." placeholder.
+
+**Print rules updated**
+- Replaced `#tab-draft > *:not(#draftWorkspace)` (broken by new nesting) with:
+  `.packet-tray { display:none }`, `.draft-tab-body { display:block }`,
+  `.draft-main-col > *:not(#draftWorkspace) { display:none }`.
+
+**Next passes**
+- Pass 2: Compile & export the full packet as a single combined draft.
+- Pass 3: localStorage persistence — save/reload packet per named case.
+
+### Changes to module.exports
+
+- Changed `module.exports = { parseInstruction, findTopLevelBrackets }` to `if (typeof module !== 'undefined') {module.exports = { parseInstruction, findTopLevelBrackets }}`
+
 ## Session: 2026-02-24
 
 ### Changes to draft-parser.js
