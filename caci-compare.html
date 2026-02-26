@@ -164,7 +164,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   body.printing-draft .packet-tray { display: none !important; }
   body.printing-draft .draft-tab-body { display: block !important; }
   body.printing-draft .draft-main-col > *:not(#draftWorkspace) { display: none !important; }
-  body.printing-draft #draftWorkspace .row > *:first-child { display: none !important; }
+  body.printing-draft #packetTray { display: none !important; }
+  body.printing-draft .draft-form-panel > *:not(#draftPreview):not(#draftEditArea) { display: none !important; }
   body.printing-draft .card { border: 1px solid #ccc; box-shadow: none; }
   body.printing-draft #draftLockWarning { display: none !important; }
   /* locked state: swap preview div for textarea */
@@ -216,6 +217,9 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 .tray-row-label { font-family: var(--sans); font-size: .73em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tray-row-btns { display: flex; gap: 4px; flex-shrink: 0; }
 .tray-row-btns button { padding: 3px 9px; font-size: .75em; }
+
+/* ─ Draft preview heading ─ */
+.draft-preview-heading { font-family: var(--sans); font-weight: 700; margin-bottom: 1em; }
 </style>
 </head>
 <body>
@@ -371,7 +375,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div class="draft-tab-body">
 
   <!-- Packet Tray (left column) -->
-  <div class="packet-tray">
+  <div class="packet-tray" id="packetTray">
     <div class="tray-heading">Packet</div>
     <div class="tray-add-row">
       <input type="text" id="packetCaciNum" placeholder="CACI No. — e.g. 302">
@@ -412,7 +416,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
         <!-- Right column: live preview -->
         <div class="col">
-          <div class="card">
+          <div class="card draft-form-panel">
             <div class="draft-toolbar">
               <div class="card-label" style="margin:0">Completed Instruction</div>
               <div style="display:flex;gap:8px;align-items:center">
@@ -684,6 +688,9 @@ text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitesp
 
 // NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
 text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
+
+// Join lines broken mid-sentence (PDF column-wrap artifact)
+text = text.replace(/([^.!?:;\]\n])\n([a-z\[])/g, '$1 $2');
 
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
@@ -1136,7 +1143,19 @@ function updateDraftPreview() {
   const el = document.getElementById('draftPreview');
   el.style.color = '';
   el.style.fontStyle = '';
-  el.textContent = compileInstruction(draftState);
+  const num        = document.getElementById('draftCaciNum')?.value.trim() || '';
+  const titleMatch = draftState.rawText.match(/^\d{3,4}\s*\.\s*(.+)/);
+  const title      = titleMatch ? titleMatch[1].trim() : '';
+  const heading    = num && title ? `CACI ${num}: ${title}` : '';
+  // Ensure sub-divs exist (created once, reused on subsequent updates)
+  if (!el.querySelector('.draft-preview-heading')) {
+    el.innerHTML = '<div class="draft-preview-heading"></div><div class="draft-preview-body"></div>';
+  }
+  const headingEl         = el.querySelector('.draft-preview-heading');
+  const bodyEl            = el.querySelector('.draft-preview-body');
+  headingEl.textContent   = heading;
+  headingEl.style.display = heading ? '' : 'none';
+  bodyEl.textContent      = compileInstruction(draftState);
 }
 
 // ═══════════════════════════════════════════════════════════════════════

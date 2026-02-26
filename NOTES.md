@@ -2,6 +2,35 @@
 
 ## Session: 2026-02-25
 
+### Output Quality Fixes (caci-compare.html)
+
+**Fix 1 — Join mid-sentence line breaks in lookupCACIText**
+- Added step (before the existing `\n{3,}` collapse) that joins single newlines
+  where the preceding line does not end a sentence boundary (`.!?:;\]`) and the
+  following line starts with a lowercase letter or `[`.
+- Regex: `text.replace(/([^.!?:;\]\n])\n([a-z\[])/g, '$1 $2')`
+- Reason: PDF extraction breaks long lines mid-sentence at column boundaries;
+  these show up as spurious hard line breaks inside otherwise continuous paragraphs.
+
+**Fix 2 — Print CSS: hide form panel reliably**
+- Added `id="packetTray"` to the packet tray div.
+- Added class `draft-form-panel` to the inner `.card` div in the live-preview column.
+- Replaced the fragile `#draftWorkspace .row > *:first-child` print rule with two
+  targeted rules:
+  - `body.printing-draft #packetTray { display: none }` — hides the tray by ID.
+  - `body.printing-draft .draft-form-panel > *:not(#draftPreview):not(#draftEditArea) { display: none }` — hides toolbar, lock warning, and buttons while keeping only the preview or locked textarea visible.
+
+**Fix 3 — Prepend instruction heading to compiled preview**
+- `updateDraftPreview()` now builds a heading string `CACI [num]: [title]` by
+  reading `draftCaciNum` and extracting the title from `draftState.rawText` via
+  `/^\d{3,4}\s*\.\s*(.+)/`.
+- The preview div is split into two sub-divs: `.draft-preview-heading` (bold,
+  sans-serif, margin-bottom) and `.draft-preview-body` (body text). Each sub-div
+  is populated with `textContent` (XSS-safe). The heading div is hidden if no
+  number/title can be extracted.
+- `getDraftText()` reads `draftPreview.innerText` which spans both sub-divs, so
+  copy, export, print, and lock-to-edit all automatically include the heading.
+
 ### Changes to draft-parser.js
 
 **Fix 1 — Pass 1 exclusion regex (inner loop)**
