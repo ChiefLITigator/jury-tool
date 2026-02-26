@@ -58,6 +58,19 @@
   provided`) → always `text`, placed immediately before the `c.length > 25`
   optional check.
 
+**Round 3 corrections (same session)**
+
+- Fix 1/list re-split: Added step in `lookupCACIText` (before the mid-sentence join
+  regexes) that inserts a newline before any mid-line list item number followed by
+  a sentence-starting word (`That|The|A|An|Each|Whether|If|All|To|In|Any`). Fixes
+  instructions (e.g. CACI 303) where tight PDF vertical spacing caused multiple
+  numbered elements to merge onto one line.
+- Fix 2/paragraph indent: `.draft-preview-body` no longer uses `pre-wrap` or
+  `padding-left`. Body is now rendered as `<p class="draft-para">` elements
+  (split on `\n\n+`), each with `text-indent: 2em` and `margin-bottom: 0.75em`,
+  matching standard jury instruction formatting. `getDraftText()` updated to
+  reconstruct plain text by joining `.draft-para` text content with `\n\n`.
+
 ### Changes to draft-parser.js
 
 **Fix 1 — Pass 1 exclusion regex (inner loop)**

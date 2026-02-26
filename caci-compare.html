@@ -228,10 +228,12 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 }
 .draft-preview-body {
   text-align: left;
-  padding-left: 2em;
-  white-space: pre-wrap;
   font-family: var(--serif, Georgia, serif);
   line-height: 1.7;
+}
+.draft-para {
+  text-indent: 2em;
+  margin: 0 0 0.75em 0;
 }
 </style>
 </head>
@@ -701,6 +703,9 @@ text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitesp
 
 // NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
 text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
+
+// Re-split numbered list items that were merged onto one line by PDF extraction
+text = text.replace(/(?<=\S)\s+(\d{1,2}\.\s+(?:That|The|A|An|Each|Whether|If|All|To|In|Any)\b)/g, '\n$1');
 
 // Join lines broken mid-sentence (PDF column-wrap artifact)
 text = text.replace(/([^.!?:;\n])\n([a-z\[])/g, '$1 $2');
@@ -1175,7 +1180,14 @@ function updateDraftPreview() {
 
   const bodyEl = document.createElement('div');
   bodyEl.className = 'draft-preview-body';
-  bodyEl.textContent = bodyText;
+  bodyEl.innerHTML = '';
+  const paragraphs = bodyText.split(/\n\n+/);
+  for (const para of paragraphs) {
+    const p = document.createElement('p');
+    p.className = 'draft-para';
+    p.textContent = para.trim();
+    bodyEl.appendChild(p);
+  }
   el.appendChild(bodyEl);
 }
 
@@ -1219,9 +1231,9 @@ function getDraftText() {
     return document.getElementById('draftEditArea').value;
   }
   const headingEl = document.querySelector('#draftPreview .draft-preview-heading');
-  const bodyEl    = document.querySelector('#draftPreview .draft-preview-body');
+  const paras     = document.querySelectorAll('#draftPreview .draft-para');
   const heading   = headingEl ? headingEl.textContent.trim() + '\n\n' : '';
-  const body      = bodyEl    ? bodyEl.textContent : '';
+  const body      = [...paras].map(p => p.textContent.trim()).join('\n\n');
   return heading + body;
 }
 
