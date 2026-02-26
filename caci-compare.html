@@ -86,6 +86,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 .diff-col-head { padding: 8px 14px; font-family: var(--sans); font-size: .74em; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #374151; border-bottom: 1px solid var(--border); background: #f9fafb; border-radius: 5px 5px 0 0; }
 .diff-col-base .diff-col-head { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
 .diff-col-body { padding: 14px; font-family: var(--serif); font-size: .87em; line-height: 1.85; flex: 1; max-height: 520px; overflow-y: auto; scroll-behavior: smooth; }
+.diff-para { text-indent: 2em; margin: 0 0 0.75em 0; }
 
 /* ─ Legend ─ */
 .legend { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; font-family: var(--sans); font-size: .78em; color: var(--text); }
@@ -469,6 +470,15 @@ function tokenize(text) {
   return text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
 }
 
+/**
+ * Remove the leading "NNN. Title" line from an instruction text string.
+ * Also applies the same mid-sentence join and list-item split cleanup
+ * that lookupCACIText applies, so pasted text gets the same treatment.
+ */
+function stripInstructionHeading(text) {
+  return text.replace(/^\d{3,4}\s*\.\s*[^\n]*\n?/, '').trim();
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // LCS-BASED WORD DIFF
 // Returns [{op:'equal'|'insert'|'delete', text:string}, …]
@@ -621,7 +631,8 @@ function renderFull(ops) {
       case 'delete': return `<span class="del">${t}</span> `;
       case 'yellow': return `<span class="yel">${t}</span> `;
     }
-  }).join('').trimEnd();
+  }).join('').trimEnd()
+    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
 }
 
 /** Left / base column: show equal + delete (red strikethrough), hide inserts */
@@ -631,7 +642,8 @@ function renderLeft(ops) {
     .map(o => o.op === 'delete'
       ? `<span class="del">${esc(o.text)}</span> `
       : esc(o.text) + ' ')
-    .join('').trimEnd();
+    .join('').trimEnd()
+    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
 }
 
 /** Right / modified column: show equal + insert (green), hide deletes */
@@ -641,15 +653,17 @@ function renderRight(ops) {
     .map(o => o.op === 'insert'
       ? `<span class="ins">${esc(o.text)}</span> `
       : esc(o.text) + ' ')
-    .join('').trimEnd();
+    .join('').trimEnd()
+    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
 }
 
 function colHtml(title, html, isBase = false) {
   const cls = isBase ? ' diff-col-base' : '';
+  const body = '<p class="diff-para">' + (html || '<em style="color:var(--muted)">No text provided</em>') + '</p>';
   return `
     <div class="diff-col${cls}">
       <div class="diff-col-head">${title}</div>
-      <div class="diff-col-body">${html || '<em style="color:var(--muted)">No text provided</em>'}</div>
+      <div class="diff-col-body">${body}</div>
     </div>`;
 }
 
@@ -727,9 +741,9 @@ text = text.replace(/^[A-Z][A-Z\s\-\/]{5,}$/gm, '');
 
 async function runCompare() {
   const mode   = document.getElementById('compMode').value;
-  const textA  = document.getElementById('versionA').value.trim();
-  const textB  = document.getElementById('versionB').value.trim();
-  const textC  = document.getElementById('officialCaci').value.trim();
+  const textA  = stripInstructionHeading(document.getElementById('versionA').value.trim());
+  const textB  = stripInstructionHeading(document.getElementById('versionB').value.trim());
+  const textC  = stripInstructionHeading(document.getElementById('officialCaci').value.trim());
   const statusEl   = document.getElementById('compareStatus');
   const diffColsEl = document.getElementById('diffCols');
   const sumCard    = document.getElementById('card-summary');
@@ -834,7 +848,7 @@ document.getElementById('loadCaci').addEventListener('click', () => {
   if (!num) { statEl.textContent = 'Enter a CACI number first.'; statEl.className = 'status err'; return; }
 
   try {
-    const text = lookupCACIText(num);
+    const text = stripInstructionHeading(lookupCACIText(num));
     document.getElementById('officialCaci').value = text;
     statEl.textContent = `✓ Loaded CACI ${num}`;
     statEl.className = 'status ok';
@@ -858,7 +872,7 @@ document.getElementById('resetCaci').addEventListener('click', () => {
     return;
   }
   try {
-    const text = lookupCACIText(num);
+    const text = stripInstructionHeading(lookupCACIText(num));
     document.getElementById('officialCaci').value = text;
     statEl.textContent = `✓ Reset to official CACI ${num}`;
     statEl.className = 'status ok';

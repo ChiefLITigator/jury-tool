@@ -79,6 +79,23 @@
   matching standard jury instruction formatting. `getDraftText()` updated to
   reconstruct plain text by joining `.draft-para` text content with `\n\n`.
 
+### Compare Tool — Heading Strip + Body Formatting
+
+- Added `stripInstructionHeading(text)` helper (placed after `tokenize`) that
+  removes the leading `NNN. Title` line via `/^\d{3,4}\s*\.\s*[^\n]*\n?/`.
+- `loadCaci` and `resetCaci` handlers now call `stripInstructionHeading(lookupCACIText(num))`
+  before setting the official CACI textarea, so the heading never appears in the
+  compare input.
+- `runCompare` wraps all three text reads (`textA`, `textB`, `textC`) with
+  `stripInstructionHeading(...)`, so manually pasted text with a heading is
+  also stripped before tokenizing.
+- Diff body formatting: added `.diff-para { text-indent: 2em; margin: 0 0 0.75em 0 }`
+  to match `.draft-para`. Each render function (`renderFull`, `renderLeft`,
+  `renderRight`) chains `.replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">')`
+  after `.trimEnd()` for future paragraph-break support. `colHtml` wraps the
+  body content in `<p class="diff-para">...</p>` so every diff column body
+  gets the first-line indent and paragraph margin.
+
 ### Changes to draft-parser.js
 
 **Fix 1 — Pass 1 exclusion regex (inner loop)**
