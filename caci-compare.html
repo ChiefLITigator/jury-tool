@@ -690,7 +690,8 @@ text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitesp
 text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
 
 // Join lines broken mid-sentence (PDF column-wrap artifact)
-text = text.replace(/([^.!?:;\]\n])\n([a-z\[])/g, '$1 $2');
+text = text.replace(/([^.!?:;\n])\n([a-z\[])/g, '$1 $2');
+text = text.replace(/(\])\n([a-z])/g, '$1 $2');
 
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
@@ -932,6 +933,8 @@ function compileInstruction(state) {
       }
     }
   }
+  // Strip leading "NNN. Title" line — it is rendered separately as the heading
+  out = out.replace(/^\d{3,4}\s*\.\s*[^\n]+\n?/, '');
   // Tidy: strip trailing whitespace per line, collapse excess blank lines,
   // and remove artefacts left by blank dropdown selections (double spaces,
   // leading/orphaned commas or spaces before punctuation).
@@ -1144,7 +1147,7 @@ function updateDraftPreview() {
   el.style.color = '';
   el.style.fontStyle = '';
   const num        = document.getElementById('draftCaciNum')?.value.trim() || '';
-  const titleMatch = draftState.rawText.match(/^\d{3,4}\s*\.\s*(.+)/);
+  const titleMatch = draftState.rawText.match(/^\d{3,4}\s*\.\s*(.+?)(?:\n|$)/);
   const title      = titleMatch ? titleMatch[1].trim() : '';
   const heading    = num && title ? `CACI ${num}: ${title}` : '';
   // Ensure sub-divs exist (created once, reused on subsequent updates)

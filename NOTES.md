@@ -31,6 +31,17 @@
 - `getDraftText()` reads `draftPreview.innerText` which spans both sub-divs, so
   copy, export, print, and lock-to-edit all automatically include the heading.
 
+**Follow-up corrections (same session)**
+
+- Fix A: `compileInstruction` now strips the leading `NNN. Title` line from `out`
+  before the cleanup chain, so the body text no longer duplicates the heading.
+- Fix B: `titleMatch` regex changed to non-greedy `(.+?)(?:\n|$)` to prevent
+  body text concatenated onto the first line during PDF extraction from leaking
+  into the heading string.
+- Fix C: Mid-sentence join regex: removed `\]` from the exclusion character class
+  so lines ending with `]` (e.g., `[name of defendant]`) are joined to their
+  continuation. Added a second pass `(\])\n([a-z])` → `$1 $2` for the same case.
+
 ### Changes to draft-parser.js
 
 **Fix 1 — Pass 1 exclusion regex (inner loop)**
