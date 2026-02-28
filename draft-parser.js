@@ -290,6 +290,20 @@ function parseInstruction(rawText) {
             fields.set(ikey, { type: 'dropdown', key: ikey, label: ibr.content.trim(), options: iopts, selected: -1, custom: false, customValue: '' });
           } else if (ibtype === 'connector') {
             fields.set(ikey, { type: 'connector', key: ikey, label: ibr.content.trim(), checked: false });
+          } else if (ibtype === 'optional') {
+            for (const iibr of findTopLevelBrackets(ibr.content)) {
+              const iibtype = classifyBracket(iibr.content);
+              const iikey = makeDraftKey(iibr.content);
+              if (fields.has(iikey)) continue;
+              if (iibtype === 'text') {
+                fields.set(iikey, { type: 'text', key: iikey, label: stripInstructionWord(iibr.content.trim()), value: '' });
+              } else if (iibtype === 'dropdown') {
+                const iiopts = splitOnSlashDepth0(iibr.content).filter(Boolean);
+                fields.set(iikey, { type: 'dropdown', key: iikey, label: iibr.content.trim(), options: iiopts, selected: -1, custom: false, customValue: '' });
+              } else if (iibtype === 'connector') {
+                fields.set(iikey, { type: 'connector', key: iikey, label: iibr.content.trim(), checked: false });
+              }
+            }
           }
         }
       }

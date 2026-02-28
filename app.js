@@ -555,7 +555,11 @@ function substituteInner(text, fields) {
       else if (f.type === 'connector') out += f.checked ? f.label : '';
       else out += text.slice(br.start, br.end);
     } else {
-      out += text.slice(br.start, br.end);
+      if (br.content.includes('[')) {
+        out += substituteInner(br.content, fields);
+      } else {
+        out += text.slice(br.start, br.end);
+      }
     }
     lastEnd = br.end;
   }
