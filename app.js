@@ -595,6 +595,78 @@ function compileInstruction(state) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// DRAFT INSTRUCTION — UNFILLED FIELD TRACKING
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Returns an array of field objects (text, dropdown, note) that are
+ * currently reachable but unfilled in parsedState.
+ * Skips inner fields of unchecked optional blocks and unselected
+ * alternative-B blocks.
+ */
+function getUnfilledFields(parsedState) {
+  const { segments, fields } = parsedState;
+
+  // Collect top-level field keys referenced directly in segments
+  const topLevelKeys = new Set(
+    segments.filter(s => s.type === 'field').map(s => s.key)
+  );
+
+  // Build reachable set: start with top-level, then add inner fields
+  // of active optional / alternative-B blocks
+  const reachable = new Set(topLevelKeys);
+  for (const key of topLevelKeys) {
+    const f = fields.get(key);
+    if (!f) continue;
+    if (f.type === 'optional' && f.checked) {
+      for (const ibr of findTopLevelBrackets(f.fullContent)) {
+        const ibtype = classifyBracket(ibr.content);
+        if (ibtype === 'skip' || ibtype === 'alternative') continue;
+        const ikey = makeDraftKey(ibr.content);
+        if (fields.has(ikey)) reachable.add(ikey);
+      }
+    }
+    if (f.type === 'alternative' && f.selected === 'b') {
+      for (const ibr of findTopLevelBrackets(f.altText)) {
+        const ibtype = classifyBracket(ibr.content);
+        if (ibtype === 'skip' || ibtype === 'alternative') continue;
+        const ikey = makeDraftKey(ibr.content);
+        if (fields.has(ikey)) reachable.add(ikey);
+      }
+    }
+  }
+
+  const unfilled = [];
+  for (const key of reachable) {
+    const f = fields.get(key);
+    if (!f) continue;
+    if (f.type === 'text'     && f.value === '')                      unfilled.push(f);
+    if (f.type === 'dropdown' && f.selected === -1 && !f.custom)      unfilled.push(f);
+    if (f.type === 'note'     && f.value === '')                      unfilled.push(f);
+  }
+  return unfilled;
+}
+
+/** Apply/clear yellow border highlights on form inputs for unfilled fields. */
+function applyUnfilledHighlights(state) {
+  const formEl = document.getElementById('draftForm');
+  if (!formEl) return;
+  // Clear existing highlights
+  formEl.querySelectorAll('input[type="text"], select, textarea').forEach(el => {
+    el.style.borderColor = '';
+    el.style.background  = '';
+  });
+  // Highlight unfilled fields
+  for (const f of getUnfilledFields(state)) {
+    let el;
+    if      (f.type === 'text')     el = formEl.querySelector(`input[data-key="${f.key}"][data-ftype="text"]`);
+    else if (f.type === 'dropdown') el = formEl.querySelector(`select[data-key="${f.key}"]`);
+    else if (f.type === 'note')     el = formEl.querySelector(`textarea[data-key="${f.key}"]`);
+    if (el) { el.style.borderColor = '#fbbf24'; el.style.background = '#fffbeb'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // DRAFT INSTRUCTION — FORM RENDERER
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -730,6 +802,7 @@ function renderDraftForm(state) {
   formEl.querySelectorAll('input[type="radio"]').forEach(el => {
     el.addEventListener('change', onDraftChange);
   });
+  applyUnfilledHighlights(state);
 }
 
 function onDraftChange(e) {
@@ -759,6 +832,8 @@ function onDraftChange(e) {
     }
   }
   updateDraftPreview();
+  renderPacketTray();
+  applyUnfilledHighlights(draftState);
 }
 
 // ─ Custom dropdown → text input swap ──────────────────────────────────
@@ -818,6 +893,27 @@ function updateDraftPreview() {
     bodyEl.appendChild(p);
   }
   el.appendChild(bodyEl);
+
+  // Update unfilled status line
+  const statusEl = document.getElementById('draftUnfilledStatus');
+  if (statusEl) {
+    const unfilled = getUnfilledFields(draftState);
+    const hasTracked = [...draftState.fields.values()].some(
+      f => f.type === 'text' || f.type === 'dropdown' || f.type === 'note'
+    );
+    if (unfilled.length > 0) {
+      let labels = unfilled.map(f => f.label).join(', ');
+      if (labels.length > 80) labels = labels.slice(0, 80) + '\u2026';
+      statusEl.textContent = `\u26A0 ${unfilled.length} unfilled field(s): ${labels}`;
+      statusEl.className = 'warn';
+    } else if (hasTracked) {
+      statusEl.textContent = '\u2713 All fields filled';
+      statusEl.className = 'ok';
+    } else {
+      statusEl.textContent = '';
+      statusEl.className = '';
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -978,10 +1074,15 @@ function renderPacketTray() {
   let html = '<div class="tray-list">';
   for (const entry of packetInstructions) {
     const active = entry.id === activePacketId;
+    const unfilledCount = getUnfilledFields(entry.parsedState).length;
+    const warnHtml = unfilledCount > 0
+      ? `<div style="font-family:var(--sans);font-size:.72em;color:var(--yellow);margin-top:2px">\u26A0 ${unfilledCount} unfilled field(s)</div>`
+      : '';
     html += `<div class="tray-row${active ? ' active' : ''}">
       <div class="tray-row-info">
         <div class="tray-row-num">CACI ${esc(entry.caciNum)}</div>
         ${entry.label ? `<div class="tray-row-label">${esc(entry.label)}</div>` : ''}
+        ${warnHtml}
       </div>
       <div class="tray-row-btns">
         <button class="btn-secondary" onclick="packetLoad(${entry.id})">Load</button>
@@ -1046,8 +1147,24 @@ document.getElementById('packetCaciNum').addEventListener('keydown', e => {
 // PACKET COMPILE
 // ═══════════════════════════════════════════════════════════════════════
 
+/** Returns [{caciNum, label, count}] for any packet instruction with unfilled fields. */
+function getPacketUnfilledSummary() {
+  return packetInstructions
+    .map(e => ({ caciNum: e.caciNum, label: e.label, count: getUnfilledFields(e.parsedState).length }))
+    .filter(x => x.count > 0);
+}
+
 function compilePacket() {
   const parts = [];
+  const warnItems = getPacketUnfilledSummary();
+  if (warnItems.length > 0) {
+    let warn = '\u26A0 UNFILLED FIELDS DETECTED\n';
+    for (const { caciNum, label, count } of warnItems) {
+      const name = label ? `CACI ${caciNum} \u2014 ${label}` : `CACI ${caciNum}`;
+      warn += `[${name}]: ${count} unfilled field(s)\n`;
+    }
+    parts.push(warn.trimEnd());
+  }
   for (const entry of packetInstructions) {
     const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
     const title   = titleMatch ? titleMatch[1].trim() : '';
