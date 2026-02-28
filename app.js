@@ -217,6 +217,7 @@ function renderFull(ops) {
       case 'insert': return `<span class="ins">${t}</span> `;
       case 'delete': return `<span class="del">${t}</span> `;
       case 'yellow': return `<span class="yel">${t}</span> `;
+      default:       return '';
     }
   }).join('').trimEnd()
     .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
@@ -279,7 +280,13 @@ function attachScrollSync() {
 // CACI DATA (loaded from local file on startup)
 // ═══════════════════════════════════════════════════════════════════════
 
-function lookupCACIText(caciNum) {
+/**
+ * Apply all PDF-extraction cleanup steps to raw CACI text, but do NOT
+ * call flattenForCompare. Used by the Draft tab so bracket structure
+ * (alternative signal brackets, optional blocks) is preserved for
+ * parseInstruction.
+ */
+function lookupCACITextForDraft(caciNum) {
   const key = String(parseInt(caciNum, 10));
   let text = caciDB[key];
   if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
@@ -344,9 +351,14 @@ text = text.replace(/(\])\n([a-z])/g, '$1 $2');
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
 
-  text = flattenForCompare(text);
-
   return text.trim();
+}
+
+/**
+ * Same as lookupCACITextForDraft plus flattenForCompare, for the Compare tab.
+ */
+function lookupCACIText(caciNum) {
+  return flattenForCompare(lookupCACITextForDraft(caciNum));
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -420,9 +432,10 @@ async function runCompare() {
 
       if (hasYellow) yelLegend.classList.remove('hidden');
 
+      const caciHtml = esc(textC).replace(/\n{2,}/g, '</p><p class="diff-para">');
       diffColsEl.innerHTML =
         colHtml('Version A', renderFull(opsA)) +
-        colHtml('Official CACI — Base', esc(textC.replace(/\s+/g,' ').trim()), true) +
+        colHtml('Official CACI — Base', caciHtml, true) +
         colHtml('Version B', renderFull(opsB));
 
       sumCard.classList.remove('hidden');
@@ -628,6 +641,15 @@ function getUnfilledFields(parsedState) {
         if (ibtype === 'skip' || ibtype === 'alternative') continue;
         const ikey = makeDraftKey(ibr.content);
         if (fields.has(ikey)) reachable.add(ikey);
+        // Recurse one level deeper for doubly-nested optional blocks
+        if (ibtype === 'optional') {
+          for (const iibr of findTopLevelBrackets(ibr.content)) {
+            const iibtype = classifyBracket(iibr.content);
+            if (iibtype === 'skip' || iibtype === 'alternative') continue;
+            const iikey = makeDraftKey(iibr.content);
+            if (fields.has(iikey)) reachable.add(iikey);
+          }
+        }
       }
     }
     if (f.type === 'alternative' && f.selected === 'b') {
@@ -936,7 +958,7 @@ document.getElementById('loadDraftBtn').addEventListener('click', () => {
   }
 
   try {
-    const text = lookupCACIText(num);
+    const text = lookupCACITextForDraft(num);
     draftState = parseInstruction(text);
     activePacketId = null;
     renderPacketTray();
@@ -1097,7 +1119,8 @@ function renderPacketTray() {
     compileRow.classList.add('hidden');
     return;
   }
-  compileRow.classList.toggle('hidden', packetInstructions.length < 2);
+  compileRow.classList.toggle('hidden', packetInstructions.length === 0);
+  document.getElementById('compilePacketBtn').disabled = packetInstructions.length < 2;
   let html = '<div class="tray-list">';
   for (const entry of packetInstructions) {
     const active = entry.id === activePacketId;
@@ -1152,7 +1175,7 @@ document.getElementById('packetAddBtn').addEventListener('click', () => {
   }
 
   try {
-    const text        = lookupCACIText(num);
+    const text        = lookupCACITextForDraft(num);
     const parsedState = parseInstruction(text);
     packetInstructions.push({ id: ++packetIdCounter, caciNum: num, label: labelEl.value.trim(), parsedState });
     numEl.value          = '';
@@ -1362,13 +1385,14 @@ function caseLoad(name) {
   activePacketId     = null;
   for (const item of saved.instructions) {
     try {
-      const freshState = parseInstruction(lookupCACIText(item.caciNum));
+      const freshState = parseInstruction(lookupCACITextForDraft(item.caciNum));
       applyFieldValues(freshState, item.parsedState.fields);
       packetInstructions.push({ id: ++packetIdCounter, caciNum: item.caciNum, label: item.label || '', parsedState: freshState });
     } catch (err) { console.warn(`Case load: skipped CACI ${item.caciNum} —`, err.message); }
   }
   document.getElementById('caseNameInput').value = name;
   renderPacketTray();
+  if (packetInstructions.length) packetLoad(packetInstructions[0].id);
 }
 
 function caseDelete() {
@@ -1412,7 +1436,7 @@ function caseImport(file) {
       for (const item of data.instructions) {
         if (!item.caciNum || !item.parsedState || !Array.isArray(item.parsedState.fields)) continue;
         try {
-          const freshState = parseInstruction(lookupCACIText(item.caciNum));
+          const freshState = parseInstruction(lookupCACITextForDraft(item.caciNum));
           applyFieldValues(freshState, item.parsedState.fields);
           packetInstructions.push({ id: ++packetIdCounter, caciNum: item.caciNum, label: item.label || '', parsedState: freshState });
         } catch (err) { console.warn(`Case import: skipped CACI ${item.caciNum} —`, err.message); }
