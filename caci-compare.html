@@ -170,6 +170,11 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   /* locked state: swap preview div for textarea */
   body.printing-draft #draftWorkspace.draft-locked #draftPreview { display: none !important; }
   body.printing-draft #draftWorkspace.draft-locked #draftEditArea { display: block !important; max-height: none !important; overflow: visible !important; }
+
+  /* ── Packet print: show only #packetPrintArea ── */
+  body.printing-packet *:not(#packetPrintArea):not(#packetPrintArea *) { display: none !important; }
+  body.printing-packet #packetPrintArea { display: block !important; }
+  .packet-page-break { page-break-after: always; }
 }
 
 /* ─ Responsive ─ */
@@ -234,6 +239,17 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   text-indent: 2em;
   margin: 0 0 0.75em 0;
 }
+
+/* ─ Case Bar ─ */
+.case-bar { background: #f0f4ff; border-bottom: 1px solid var(--border); padding: 8px 20px; margin-bottom: 14px; }
+.case-bar-inner { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; max-width: 1680px; margin: 0 auto; }
+.case-bar-label { font-family: var(--sans); font-size: .78em; font-weight: 700; color: var(--navy); white-space: nowrap; }
+#caseNameInput { padding: 5px 9px; font-size: .82em; }
+#caseSelect { width: auto; min-width: 160px; }
+
+/* ─ Packet Print ─ */
+#packetPrintArea { display: none; }
+.packet-page-break { page-break-after: always; }
 </style>
 </head>
 <body>
@@ -247,6 +263,21 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div class="tab-nav">
   <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
   <button class="tab-btn" data-tab="draft">Draft Instruction</button>
+</div>
+
+<div id="caseBar" class="case-bar hidden">
+  <div class="case-bar-inner">
+    <span class="case-bar-label">Case:</span>
+    <select id="caseSelect"><option value="">— new session —</option></select>
+    <input type="text" id="caseNameInput" placeholder="Case name…" style="width:180px">
+    <button class="btn-secondary" id="caseSaveBtn">Save</button>
+    <button class="btn-secondary" id="caseDeleteBtn">Delete</button>
+    <button class="btn-secondary" id="caseExportBtn">Export JSON</button>
+    <label class="btn-secondary" style="cursor:pointer;margin:0">Import JSON
+      <input type="file" id="caseImportFile" accept=".json" style="display:none">
+    </label>
+    <span id="caseBarStatus" class="status" style="margin-left:8px"></span>
+  </div>
 </div>
 
 <!-- Print Settings Panel — shared across both tabs -->
@@ -291,6 +322,11 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
         <option value="1.5in">Wide (1.5in)</option>
         <option value="0.5in">Narrow (0.5in)</option>
       </select>
+    </div>
+    <div class="ps-group" style="flex-basis:100%;margin-top:4px;border-top:1px solid var(--border);padding-top:8px">
+      <span style="font-family:var(--sans);font-size:.72em;color:var(--muted)">
+        💡 Chrome: Print dialog → <strong>More settings</strong> → uncheck <strong>Headers and footers</strong>
+      </span>
     </div>
   </div>
 </div>
@@ -398,6 +434,13 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <span id="packetAddStatus" class="tray-status"></span>
     </div>
     <div id="packetList"><p class="tray-empty">No instructions added yet.</p></div>
+    <div id="packetCompileRow" class="hidden" style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+      <button class="btn-primary" id="compilePacketBtn" style="width:100%">Compile Packet</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn-secondary" id="printPacketBtn" style="flex:1">Print</button>
+        <button class="btn-secondary" id="exportPacketBtn" style="flex:1">Export TXT</button>
+      </div>
+    </div>
   </div>
 
   <!-- Draft workspace (right column) -->
@@ -455,6 +498,20 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 </div><!-- /tab-draft -->
 
 </div><!-- /wrap -->
+
+<!-- Packet print area — populated at print time, hidden otherwise -->
+<div id="packetPrintArea"></div>
+
+<!-- Packet compile overlay -->
+<div id="packetCompileOverlay" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:6px;width:min(780px,92vw);max-height:80vh;display:flex;flex-direction:column;padding:20px">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn-ghost" id="closeCompileOverlay">Close</button>
+    </div>
+    <pre id="packetCompileText" style="flex:1;overflow-y:auto;font-family:var(--serif);font-size:.88em;line-height:1.75;white-space:pre-wrap;background:#f9fafb;border:1px solid var(--border);border-radius:4px;padding:14px 16px;margin:0"></pre>
+  </div>
+</div>
+
 <script src="caci-data.js"></script>
 <script src="draft-parser.js"></script>
 <script src="app.js"></script>

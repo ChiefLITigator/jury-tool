@@ -300,10 +300,11 @@ for (let i = 0; i < 3; i++) {
   );
   // Word continuations: short line that is NOT a sentence-starter word
   text = text.replace(
-    /^(\d{3,4}\s*\.\s*[^\n]+)\n([A-Z][^.\n!?\[]{0,50})\n/gm,
+    /^(\d{3,4}\s*\.\s*[^\n]+)\n([A-Z][^\n]{0,120})\n/gm,
     (_, t1, cont) => {
-      const firstWord = cont.trim().split(/\s/)[0];
-      return TITLE_SENTENCE_STARTERS.has(firstWord) ? _ : t1 + ' ' + cont + '\n';
+  const firstWord = cont.trim().split(/\s/)[0];
+  if (cont.trim().length <= 30) return t1 + ' ' + cont + '\n';
+  return TITLE_SENTENCE_STARTERS.has(firstWord) ? _ : t1 + ' ' + cont + '\n';
     }
   );
   if (text === prev) break;
@@ -332,6 +333,9 @@ text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
 
 // Re-split numbered list items that were merged onto one line by PDF extraction
 text = text.replace(/(?<=\S)\s+(\d{1,2}\.\s+(?:That|The|A|An|Each|Whether|If|All|To|In|Any)\b)/g, '\n$1');
+
+// Ensure title line is always separated from body by a blank line
+text = text.replace(/^(\d{3,4}\s*\.\s*[^\n]+)\n(?!\n)/m, '$1\n\n');
 
 // Join lines broken mid-sentence (PDF column-wrap artifact)
 text = text.replace(/([^.!?:;\n])\n([a-z\[])/g, '$1 $2');
@@ -507,6 +511,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + tab));
+    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft');
     // Pre-populate draft number from main tab if blank
     if (tab === 'draft') {
       const mainNum = document.getElementById('caciNumber').value.trim();
@@ -962,11 +967,14 @@ let packetIdCounter    = 0;
 let activePacketId     = null;
 
 function renderPacketTray() {
-  const listEl = document.getElementById('packetList');
+  const listEl     = document.getElementById('packetList');
+  const compileRow = document.getElementById('packetCompileRow');
   if (!packetInstructions.length) {
     listEl.innerHTML = '<p class="tray-empty">No instructions added yet.</p>';
+    compileRow.classList.add('hidden');
     return;
   }
+  compileRow.classList.toggle('hidden', packetInstructions.length < 2);
   let html = '<div class="tray-list">';
   for (const entry of packetInstructions) {
     const active = entry.id === activePacketId;
@@ -1035,6 +1043,60 @@ document.getElementById('packetCaciNum').addEventListener('keydown', e => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
+// PACKET COMPILE
+// ═══════════════════════════════════════════════════════════════════════
+
+function compilePacket() {
+  const parts = [];
+  for (const entry of packetInstructions) {
+    const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
+    const title   = titleMatch ? titleMatch[1].trim() : '';
+    const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
+    const body    = compileInstruction(entry.parsedState);
+    parts.push(heading + '\n\n' + body);
+  }
+  return parts.join('\n\n---\n\n');
+}
+
+document.getElementById('compilePacketBtn').addEventListener('click', () => {
+  document.getElementById('packetCompileText').textContent = compilePacket();
+  document.getElementById('packetCompileOverlay').classList.remove('hidden');
+});
+
+document.getElementById('closeCompileOverlay').addEventListener('click', () => {
+  document.getElementById('packetCompileOverlay').classList.add('hidden');
+});
+
+document.getElementById('printPacketBtn').addEventListener('click', () => {
+  const printArea = document.getElementById('packetPrintArea');
+  let html = '';
+  for (let i = 0; i < packetInstructions.length; i++) {
+    const entry      = packetInstructions[i];
+    const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
+    const title      = titleMatch ? titleMatch[1].trim() : '';
+    const heading    = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
+    const body       = compileInstruction(entry.parsedState);
+    const bodyHtml   = body.split(/\n+/).filter(p => p.trim())
+      .map(p => `<p class="draft-para">${esc(p.trim())}</p>`).join('');
+    html += `<div><div class="draft-preview-heading">${esc(heading)}</div><div class="draft-preview-body">${bodyHtml}</div></div>`;
+    if (i < packetInstructions.length - 1) html += '<div class="packet-page-break"></div>';
+  }
+  printArea.innerHTML = html;
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  setPrintHeader('CACI Instruction Packet   |   ' + date);
+  window.addEventListener('afterprint', function cleanup() {
+    printArea.innerHTML = '';
+    window.removeEventListener('afterprint', cleanup);
+  });
+  doPrint('printing-packet');
+});
+
+document.getElementById('exportPacketBtn').addEventListener('click', () => {
+  const dateSlug = new Date().toISOString().slice(0, 10);
+  downloadTXT(compilePacket(), `CACI-packet-${dateSlug}.txt`);
+});
+
+// ═══════════════════════════════════════════════════════════════════════
 // PRINT SETTINGS
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -1069,3 +1131,173 @@ document.getElementById('print-settings-toggle').addEventListener('click', () =>
 });
 
 updatePrintSettings(); // apply defaults on load
+
+// ═══════════════════════════════════════════════════════════════════════
+// CASE FILE PERSISTENCE
+// ═══════════════════════════════════════════════════════════════════════
+
+const CASE_KEY = 'caci_cases';
+
+function loadCaseIndex() {
+  try {
+    const raw = localStorage.getItem(CASE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== 'object' || Array.isArray(parsed) || parsed === null) return {};
+    return parsed;
+  } catch { return {}; }
+}
+
+function saveCaseIndex(obj) {
+  localStorage.setItem(CASE_KEY, JSON.stringify(obj));
+}
+
+function populateCaseSelect() {
+  const sel     = document.getElementById('caseSelect');
+  const index   = loadCaseIndex();
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— new session —</option>';
+  for (const name of Object.keys(index).sort()) {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = name;
+    sel.appendChild(opt);
+  }
+  if (current && index[current]) sel.value = current;
+}
+
+function setCaseBarStatus(msg, cls = '') {
+  const el = document.getElementById('caseBarStatus');
+  el.textContent = msg;
+  el.className = 'status ' + cls;
+  if (msg) setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
+}
+
+/** Serialize a parsedState for storage: convert fields Map → array of entries. */
+function serializeParsedState(ps) {
+  return { rawText: ps.rawText, segments: ps.segments, fields: [...ps.fields.entries()] };
+}
+
+/** Restore field values from a saved parsedState onto a freshly-parsed live state. */
+function applyFieldValues(freshState, savedFields) {
+  const savedMap = new Map(savedFields);
+  for (const [key, saved] of savedMap) {
+    const live = freshState.fields.get(key);
+    if (!live) continue;
+    if ('value'       in saved) live.value       = saved.value;
+    if ('checked'     in saved) live.checked      = saved.checked;
+    if ('selected'    in saved) live.selected     = saved.selected;
+    if ('custom'      in saved) live.custom       = saved.custom;
+    if ('customValue' in saved) live.customValue  = saved.customValue;
+  }
+}
+
+function caseSave() {
+  const name = document.getElementById('caseNameInput').value.trim();
+  if (!name) { setCaseBarStatus('Enter a case name first.', 'err'); return; }
+  const instructions = packetInstructions.map(e => ({
+    caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
+  }));
+  try {
+    const index = loadCaseIndex();
+    index[name] = { instructions };
+    saveCaseIndex(index);
+    populateCaseSelect();
+    document.getElementById('caseSelect').value = name;
+    setCaseBarStatus('✓ Saved', 'ok');
+  } catch (err) {
+    setCaseBarStatus('Save failed: ' + (err.message || 'localStorage quota exceeded'), 'err');
+  }
+}
+
+function caseLoad(name) {
+  const index = loadCaseIndex();
+  const saved = index[name];
+  if (!saved) return;
+  packetInstructions = [];
+  packetIdCounter    = 0;
+  activePacketId     = null;
+  for (const item of saved.instructions) {
+    try {
+      const freshState = parseInstruction(lookupCACIText(item.caciNum));
+      applyFieldValues(freshState, item.parsedState.fields);
+      packetInstructions.push({ id: ++packetIdCounter, caciNum: item.caciNum, label: item.label || '', parsedState: freshState });
+    } catch (err) { console.warn(`Case load: skipped CACI ${item.caciNum} —`, err.message); }
+  }
+  document.getElementById('caseNameInput').value = name;
+  renderPacketTray();
+}
+
+function caseDelete() {
+  const name = document.getElementById('caseSelect').value;
+  if (!name) { setCaseBarStatus('No case selected.', 'err'); return; }
+  const index = loadCaseIndex();
+  delete index[name];
+  saveCaseIndex(index);
+  populateCaseSelect();
+  document.getElementById('caseSelect').value = '';
+  document.getElementById('caseNameInput').value = '';
+  packetInstructions = [];
+  activePacketId     = null;
+  renderPacketTray();
+  setCaseBarStatus('Deleted.', 'ok');
+}
+
+function caseExport() {
+  const name = document.getElementById('caseNameInput').value.trim() || 'case';
+  const data = JSON.stringify({
+    caseName: name,
+    instructions: packetInstructions.map(e => ({
+      caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
+    }))
+  }, null, 2);
+  const dateSlug = new Date().toISOString().slice(0, 10);
+  downloadTXT(data, `CACI-case-${name}-${dateSlug}.json`);
+}
+
+function caseImport(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data || !Array.isArray(data.instructions)) {
+        setCaseBarStatus('Invalid case file format.', 'err'); return;
+      }
+      packetInstructions = [];
+      packetIdCounter    = 0;
+      activePacketId     = null;
+      for (const item of data.instructions) {
+        if (!item.caciNum || !item.parsedState || !Array.isArray(item.parsedState.fields)) continue;
+        try {
+          const freshState = parseInstruction(lookupCACIText(item.caciNum));
+          applyFieldValues(freshState, item.parsedState.fields);
+          packetInstructions.push({ id: ++packetIdCounter, caciNum: item.caciNum, label: item.label || '', parsedState: freshState });
+        } catch (err) { console.warn(`Case import: skipped CACI ${item.caciNum} —`, err.message); }
+      }
+      if (data.caseName) document.getElementById('caseNameInput').value = data.caseName;
+      renderPacketTray();
+      setCaseBarStatus(`✓ Imported ${packetInstructions.length} instruction(s)`, 'ok');
+    } catch (err) { setCaseBarStatus('Import failed: ' + err.message, 'err'); }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('caseSaveBtn').addEventListener('click', caseSave);
+document.getElementById('caseDeleteBtn').addEventListener('click', caseDelete);
+document.getElementById('caseExportBtn').addEventListener('click', caseExport);
+document.getElementById('caseImportFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) { caseImport(file); e.target.value = ''; }
+});
+document.getElementById('caseSelect').addEventListener('change', (e) => {
+  const name = e.target.value;
+  if (!name) {
+    packetInstructions = [];
+    activePacketId     = null;
+    document.getElementById('caseNameInput').value = '';
+    renderPacketTray();
+  } else {
+    caseLoad(name);
+  }
+});
+
+populateCaseSelect();
