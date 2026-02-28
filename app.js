@@ -938,6 +938,8 @@ document.getElementById('loadDraftBtn').addEventListener('click', () => {
   try {
     const text = lookupCACIText(num);
     draftState = parseInstruction(text);
+    activePacketId = null;
+    renderPacketTray();
     renderDraftForm(draftState);
     updateDraftPreview();
     document.getElementById('draftWorkspace').classList.remove('hidden');
@@ -952,6 +954,27 @@ document.getElementById('loadDraftBtn').addEventListener('click', () => {
 
 document.getElementById('draftCaciNum').addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('loadDraftBtn').click();
+});
+
+document.getElementById('addToPacketBtn').addEventListener('click', () => {
+  if (!draftState) return;
+  const caciNum  = document.getElementById('draftCaciNum').value.trim();
+  if (!caciNum) return;
+  const statusEl = document.getElementById('addToPacketStatus');
+  if (activePacketId !== null) {
+    statusEl.textContent = 'Already in packet';
+    statusEl.className   = 'status';
+    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+    return;
+  }
+  const label = document.getElementById('addToPacketLabel').value.trim();
+  packetInstructions.push({ id: ++packetIdCounter, caciNum, label, parsedState: draftState });
+  activePacketId = packetIdCounter;
+  document.getElementById('addToPacketLabel').value = '';
+  renderPacketTray();
+  statusEl.textContent = '\u2713 Added to packet';
+  statusEl.className   = 'status ok';
+  setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 2500);
 });
 
 function getDraftText() {

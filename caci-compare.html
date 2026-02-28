@@ -486,6 +486,10 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
                 <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
                 <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
                 <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
+                <input type="text" id="addToPacketLabel" placeholder="Label…"
+                       style="width:90px;padding:3px 7px;font-size:.78em;border:1px solid var(--border);border-radius:3px">
+                <button class="btn-ghost" id="addToPacketBtn">Add to Packet</button>
+                <span id="addToPacketStatus" class="status" style="font-size:.78em"></span>
               </div>
             </div>
             <div id="draftLockWarning" class="hidden" style="font-family:var(--sans);font-size:.75em;color:var(--yellow);background:var(--yellow-bg);border:1px solid #fbbf24;border-radius:4px;padding:5px 10px;margin-bottom:8px;">⚠ Manual edits will be lost if you unlock the form</div>
