@@ -1391,7 +1391,11 @@ function caseSave() {
   }));
   try {
     const index = loadCaseIndex();
-    index[name] = { instructions };
+    // [VF integration] include verdict form state alongside instructions
+    index[name] = {
+      instructions,
+      verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : []
+    };
     saveCaseIndex(index);
     populateCaseSelect();
     document.getElementById('caseSelect').value = name;
@@ -1418,6 +1422,8 @@ function caseLoad(name) {
   document.getElementById('caseNameInput').value = name;
   renderPacketTray();
   if (packetInstructions.length) packetLoad(packetInstructions[0].id);
+  // [VF integration] restore verdict form state
+  if (typeof setVFState === 'function') setVFState(saved.verdictForms || []);
 }
 
 function caseDelete() {

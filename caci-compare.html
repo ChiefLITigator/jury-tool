@@ -255,6 +255,61 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 #draftUnfilledStatus { font-family: var(--sans); font-size: .78em; min-height: 20px; margin-bottom: 8px; }
 #draftUnfilledStatus.warn { color: var(--yellow); font-weight: 600; }
 #draftUnfilledStatus.ok   { color: var(--green); }
+
+/* ─ Verdict Form Builder ─ */
+.vf-tab-body { display: flex; gap: 0; align-items: flex-start; min-height: 80vh; }
+.vf-palette { flex: 0 0 240px; min-width: 200px; border-right: 1px solid var(--border); padding-right: 16px; margin-right: 16px; }
+.vf-builder-col { flex: 0 0 380px; min-width: 300px; border-right: 1px solid var(--border); padding-right: 16px; margin-right: 16px; overflow-y: auto; max-height: calc(100vh - 80px); }
+.vf-preview-col { flex: 1; min-width: 0; }
+.vf-panel-heading { font-family: var(--sans); font-size: .7em; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
+.vf-subheading { font-family: var(--sans); font-size: .68em; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 14px 0 6px; }
+.vf-palette-group { margin-bottom: 10px; }
+.vf-palette-group-title { font-family: var(--sans); font-size: .75em; font-weight: 700; color: var(--navy); cursor: pointer; padding: 5px 0; display: flex; align-items: center; justify-content: space-between; }
+.vf-palette-group-body { display: flex; flex-direction: column; gap: 4px; padding-left: 6px; }
+.vf-palette-item { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 5px 7px; background: #f9fafb; border: 1px solid var(--border); border-radius: 4px; font-family: var(--sans); font-size: .75em; color: var(--text); }
+.vf-palette-item-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vf-palette-item-type { font-size: .68em; color: var(--muted); white-space: nowrap; }
+.vf-q-block { display: flex; align-items: flex-start; gap: 8px; padding: 9px 10px; background: #f9fafb; border: 1px solid var(--border); border-radius: 5px; margin-bottom: 6px; cursor: default; }
+.vf-q-block.dragging { opacity: .4; }
+.vf-q-block.drag-over { border-color: var(--navy); background: #eff6ff; }
+.vf-q-drag { cursor: grab; color: var(--muted); font-size: 1.1em; padding-top: 2px; flex-shrink: 0; }
+.vf-q-body { flex: 1; min-width: 0; }
+.vf-q-type-badge { display: inline-block; font-family: var(--sans); font-size: .65em; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 10px; background: #e5e7eb; color: var(--muted); margin-bottom: 4px; }
+.vf-q-preview-text { font-family: var(--serif); font-size: .83em; color: var(--text); line-height: 1.5; }
+.vf-q-routing { font-family: var(--sans); font-size: .72em; color: var(--muted); margin-top: 3px; }
+.vf-q-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.vf-q-actions button { padding: 3px 8px; font-size: .75em; }
+.vf-inline-editor { background: #f0f4ff; border: 1px solid #bfdbfe; border-radius: 5px; padding: 12px 14px; margin-bottom: 8px; }
+.vf-inline-editor label { font-family: var(--sans); font-size: .72em; font-weight: 700; color: #374151; margin-bottom: 3px; }
+.vf-inline-editor textarea, .vf-inline-editor input[type="text"] { font-family: var(--serif); font-size: .85em; }
+.vf-inline-editor .vf-routing-row { display: flex; gap: 10px; margin-top: 8px; }
+.vf-inline-editor .vf-routing-row > div { flex: 1; }
+.vf-parties-panel, .vf-caption-panel { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.vf-party-row, .vf-caption-row { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; font-family: var(--sans); font-size: .8em; }
+.vf-party-row label, .vf-caption-row label { flex: 0 0 80px; font-weight: 600; color: #374151; }
+.vf-party-row input, .vf-caption-row input { flex: 1; }
+.vf-preview-box { font-family: var(--serif); font-size: .88em; line-height: 1.85; background: #f9fafb; border: 1px solid var(--border); border-radius: 4px; padding: 20px 24px; min-height: 400px; max-height: calc(100vh - 120px); overflow-y: auto; }
+.vf-preview-caption { text-align: center; margin-bottom: 1.5em; font-size: .9em; }
+.vf-preview-title { text-align: center; font-weight: bold; text-decoration: underline; text-transform: uppercase; margin-bottom: 1.5em; }
+.vf-preview-question { margin-bottom: 1.2em; }
+.vf-preview-q-num { font-weight: bold; }
+.vf-preview-yn { margin: 0.3em 0 0.2em 2em; letter-spacing: .05em; }
+.vf-preview-routing { margin: 0.2em 0 0 2em; font-style: italic; color: #4b5563; font-size: .9em; }
+.vf-preview-damage-row { display: flex; justify-content: space-between; margin: 0.2em 0 0.2em 2em; }
+.vf-preview-damage-label { flex: 1; }
+.vf-preview-damage-blank { flex: 0 0 140px; text-align: right; }
+.vf-preview-sig { margin-top: 2.5em; border-top: 1px solid var(--border); padding-top: 1.5em; }
+.vf-form-selector { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+.vf-form-selector select { font-family: var(--sans); font-size: .82em; }
+.vf-form-selector input[type="text"] { font-family: var(--sans); font-size: .82em; padding: 5px 8px; }
+
+/* ─ VF print ─ */
+@media print {
+  body.printing-vf * { display: none !important; }
+  body.printing-vf #vfPreview,
+  body.printing-vf #vfPreview * { display: revert !important; }
+  body.printing-vf #vfPreview { max-height: none !important; overflow: visible !important; background: white !important; border: none !important; }
+}
 </style>
 </head>
 <body>
@@ -268,6 +323,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div class="tab-nav">
   <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
   <button class="tab-btn" data-tab="draft">Draft Instruction</button>
+  <button class="tab-btn" data-tab="vf">Verdict Form Builder</button>
 </div>
 
 <div id="caseBar" class="case-bar hidden">
@@ -508,6 +564,50 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 </div><!-- /draft-tab-body -->
 </div><!-- /tab-draft -->
 
+<div id="tab-vf" class="tab-panel hidden">
+  <div class="vf-tab-body">
+
+    <!-- Left: Component Palette -->
+    <div class="vf-palette" id="vfPalette">
+      <div class="vf-panel-heading">Components</div>
+      <div class="vf-form-selector" id="vfFormSelector"></div>
+      <div id="vfPaletteList"></div>
+      <div style="margin-top:12px">
+        <button class="btn-secondary" id="vfAddCustomBtn" style="width:100%;font-size:.82em">+ Custom Question</button>
+      </div>
+    </div>
+
+    <!-- Middle: Form Builder -->
+    <div class="vf-builder-col" id="vfBuilderCol">
+      <div class="vf-panel-heading">Form Builder</div>
+      <div id="vfQuestionList"></div>
+      <div class="vf-parties-panel" id="vfPartiesPanel">
+        <div class="vf-subheading">Party Names</div>
+        <div id="vfPartyFields"></div>
+        <button class="btn-ghost" id="vfAddPartyBtn" style="font-size:.78em;margin-top:4px">+ Add Party</button>
+      </div>
+      <div class="vf-caption-panel" id="vfCaptionPanel">
+        <div class="vf-subheading">Case Caption</div>
+        <div id="vfCaptionFields"></div>
+      </div>
+    </div>
+
+    <!-- Right: Live Preview -->
+    <div class="vf-preview-col">
+      <div class="vf-panel-heading" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Preview</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-ghost" id="vfPrintBtn">Print</button>
+          <button class="btn-ghost" id="vfExportTxtBtn">Export TXT</button>
+          <button class="btn-ghost" id="vfExportDocxBtn">Export DOCX</button>
+        </div>
+      </div>
+      <div class="vf-preview-box" id="vfPreview"></div>
+    </div>
+
+  </div>
+</div>
+
 </div><!-- /wrap -->
 
 <!-- Packet print area — populated at print time, hidden otherwise -->
@@ -528,5 +628,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="app.js"></script>
 <script src="node_modules/docx/dist/index.iife.js"></script>
 <script src="docx-export.js"></script>
+<script src="vf-data.js"></script>
+<script src="vf-app.js"></script>
 </body>
 </html>
