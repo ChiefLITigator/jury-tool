@@ -485,6 +485,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
                 <button class="btn-ghost" id="copyDraftBtn">Copy</button>
                 <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
                 <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
+                <button class="btn-ghost" id="exportDraftDocxBtn">Export DOCX</button>
                 <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
                 <input type="text" id="addToPacketLabel" placeholder="Label…"
                        style="width:90px;padding:3px 7px;font-size:.78em;border:1px solid var(--border);border-radius:3px">
@@ -525,5 +526,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="caci-data.js"></script>
 <script src="draft-parser.js"></script>
 <script src="app.js"></script>
+<script src="node_modules/docx/dist/index.iife.js"></script>
+<script src="docx-export.js"></script>
 </body>
 </html>

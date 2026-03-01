@@ -524,7 +524,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + tab));
-    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft');
+    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft' && tab !== 'vf');
     // Pre-populate draft number from main tab if blank
     if (tab === 'draft') {
       const mainNum = document.getElementById('caciNumber').value.trim();
@@ -1101,6 +1101,31 @@ document.getElementById('exportDraftBtn').addEventListener('click', () => {
   const dateSlug = new Date().toISOString().slice(0, 10);
   const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
   downloadTXT(getDraftText(), filename);
+});
+
+// ── Draft tab: Export DOCX helper functions ──────────────────
+
+// Returns the heading string from the draft preview heading element
+function getDraftHeading() {
+  const el = document.querySelector('#draftPreview .draft-preview-heading');
+  return el ? el.textContent.trim() : '';
+}
+
+// Returns the body text with paragraphs separated by \n\n
+function getDraftBodyText() {
+  const paras = document.querySelectorAll('#draftPreview .draft-para');
+  return [...paras].map(p => p.textContent.trim()).join('\n\n');
+}
+
+document.getElementById('exportDraftDocxBtn').addEventListener('click', () => {
+  const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
+  const dateSlug = new Date().toISOString().slice(0, 10);
+  const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
+  exportDOCX({
+    type:    'instruction',
+    heading: getDraftHeading(),
+    body:    getDraftBodyText()
+  }, filename);
 });
 
 // ═══════════════════════════════════════════════════════════════════════
