@@ -14,13 +14,16 @@
 
 ## Next Features (Priority Order)
 
-1. **Cases / Projects** — save and reload a named set of selected instructions and toggle states per case, stored in localStorage
-2. **Batch Mode** — compile multiple instructions into a single combined draft in one pass
-3. **Fill-In Field Tracking** — highlight all unfilled bracketed fields before locking, so nothing gets missed
-4. **SB 800 Notice Form Builder** — separate tool for generating pre-litigation SB 800 notices from a form interface
-5. **Verdict Form Builder** — separate tool for drafting special verdict forms tied to selected CACI instructions
+1. **Insurance Policy Reviewer** - separate tool for reviewing insurance policy text and classifying it; start with declarations page
+2. **SB 800 Notice Form Builder** — separate tool for generating pre-litigation SB 800 notices from a form interface
+3. **TBD**
 
 ## Packaging (Do Last)
 
 - Electron wrapper to convert finished app into a double-clickable desktop application for firm distribution
 - Bundle all local data files inside the installer — no server, no internet required
+
+## NOTE ON CURRENT CAPABILITIES IN IMPLEMENTING FEATURES
+- python is installed
+- ran pip install anthropic pdfplumber pytesseract python-dotenv pymupdf python-docx openpyxl reportlab rapidfuzz regex pandas sqlite-utils rich watchdog httpx
+- html is also okay as an option

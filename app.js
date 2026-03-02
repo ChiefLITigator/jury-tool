@@ -524,7 +524,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + tab));
-    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft');
+    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft' && tab !== 'vf');
     // Pre-populate draft number from main tab if blank
     if (tab === 'draft') {
       const mainNum = document.getElementById('caciNumber').value.trim();
@@ -1103,6 +1103,31 @@ document.getElementById('exportDraftBtn').addEventListener('click', () => {
   downloadTXT(getDraftText(), filename);
 });
 
+// ── Draft tab: Export DOCX helper functions ──────────────────
+
+// Returns the heading string from the draft preview heading element
+function getDraftHeading() {
+  const el = document.querySelector('#draftPreview .draft-preview-heading');
+  return el ? el.textContent.trim() : '';
+}
+
+// Returns the body text with paragraphs separated by \n\n
+function getDraftBodyText() {
+  const paras = document.querySelectorAll('#draftPreview .draft-para');
+  return [...paras].map(p => p.textContent.trim()).join('\n\n');
+}
+
+document.getElementById('exportDraftDocxBtn').addEventListener('click', () => {
+  const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
+  const dateSlug = new Date().toISOString().slice(0, 10);
+  const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
+  exportDOCX({
+    type:    'instruction',
+    heading: getDraftHeading(),
+    body:    getDraftBodyText()
+  }, filename);
+});
+
 // ═══════════════════════════════════════════════════════════════════════
 // PACKET TRAY
 // ═══════════════════════════════════════════════════════════════════════
@@ -1366,7 +1391,11 @@ function caseSave() {
   }));
   try {
     const index = loadCaseIndex();
-    index[name] = { instructions };
+    // [VF integration] include verdict form state alongside instructions
+    index[name] = {
+      instructions,
+      verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : []
+    };
     saveCaseIndex(index);
     populateCaseSelect();
     document.getElementById('caseSelect').value = name;
@@ -1393,6 +1422,8 @@ function caseLoad(name) {
   document.getElementById('caseNameInput').value = name;
   renderPacketTray();
   if (packetInstructions.length) packetLoad(packetInstructions[0].id);
+  // [VF integration] restore verdict form state
+  if (typeof setVFState === 'function') setVFState(saved.verdictForms || []);
 }
 
 function caseDelete() {
@@ -1416,7 +1447,8 @@ function caseExport() {
     caseName: name,
     instructions: packetInstructions.map(e => ({
       caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
-    }))
+    })),
+    verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : [],
   }, null, 2);
   const dateSlug = new Date().toISOString().slice(0, 10);
   downloadTXT(data, `CACI-case-${name}-${dateSlug}.json`);
@@ -1443,6 +1475,7 @@ function caseImport(file) {
       }
       if (data.caseName) document.getElementById('caseNameInput').value = data.caseName;
       renderPacketTray();
+      if (typeof setVFState === 'function') setVFState(data.verdictForms || []);
       setCaseBarStatus(`✓ Imported ${packetInstructions.length} instruction(s)`, 'ok');
     } catch (err) { setCaseBarStatus('Import failed: ' + err.message, 'err'); }
   };
