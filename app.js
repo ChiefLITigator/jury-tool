@@ -1447,7 +1447,8 @@ function caseExport() {
     caseName: name,
     instructions: packetInstructions.map(e => ({
       caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
-    }))
+    })),
+    verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : [],
   }, null, 2);
   const dateSlug = new Date().toISOString().slice(0, 10);
   downloadTXT(data, `CACI-case-${name}-${dateSlug}.json`);
@@ -1474,6 +1475,7 @@ function caseImport(file) {
       }
       if (data.caseName) document.getElementById('caseNameInput').value = data.caseName;
       renderPacketTray();
+      if (typeof setVFState === 'function') setVFState(data.verdictForms || []);
       setCaseBarStatus(`✓ Imported ${packetInstructions.length} instruction(s)`, 'ok');
     } catch (err) { setCaseBarStatus('Import failed: ' + err.message, 'err'); }
   };
