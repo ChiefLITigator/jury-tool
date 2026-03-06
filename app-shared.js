@@ -153,3 +153,62 @@ document.getElementById('print-settings-toggle').addEventListener('click', () =>
 });
 
 updatePrintSettings(); // apply defaults on load
+
+// ═══════════════════════════════════════════════════════════════════════
+// PDF EXPORT ENGINE
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Build a complete HTML document for printing as PDF.
+ * sections: [{heading: string, body: string (HTML)}]
+ * type: 'instruction' | 'vf'
+ */
+function buildPrintHTML(sections, type) {
+  const fontKey = document.getElementById('ps-font').value;
+  const font    = PS_FONTS[fontKey] || PS_FONTS.serif;
+  const size    = document.getElementById('ps-size').value;
+  const spacing = document.getElementById('ps-spacing').value;
+  const align   = document.getElementById('ps-align').value;
+  const margins = document.getElementById('ps-margins').value;
+
+  const bodyParts = sections.map((section, i) => {
+    const breakStyle = i === 0 ? '' : 'page-break-before:always;';
+    return `<div class="pdf-section" style="${breakStyle}margin:0;padding:0">
+      <div class="pdf-heading">${esc(section.heading)}</div>
+      <div class="pdf-body">${section.body}</div>
+    </div>`;
+  }).join('\n');
+
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
+@page { size: letter portrait; margin: ${margins}; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: ${font}; font-size: ${size}; line-height: ${spacing}; text-align: ${align}; color: #111827; background: white; }
+.pdf-heading { font-size: 1.05em; font-weight: bold; margin-bottom: 1em; text-align: left; }
+.pdf-para { text-indent: 2em; margin: 0 0 0.75em 0; }
+</style></head><body>${bodyParts}</body></html>`;
+}
+
+/**
+ * Print-to-PDF via hidden iframe. Triggers the browser's print dialog.
+ */
+function exportPDF(htmlContent, filename) {
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+  document.body.appendChild(iframe);
+  const fallback = setTimeout(() => {
+    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+  }, 60000);
+  iframe.addEventListener('load', () => {
+    iframe.contentWindow.addEventListener('afterprint', () => {
+      clearTimeout(fallback);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    });
+    iframe.contentWindow.print();
+  });
+  iframe.srcdoc = htmlContent;
+}
+
+// Close all export pickers when clicking outside
+document.addEventListener('click', () => {
+  document.querySelectorAll('.export-picker').forEach(p => p.classList.add('hidden'));
+});

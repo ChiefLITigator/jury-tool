@@ -131,31 +131,30 @@ document.getElementById('closeCompileOverlay').addEventListener('click', () => {
   document.getElementById('packetCompileOverlay').classList.add('hidden');
 });
 
-document.getElementById('printPacketBtn').addEventListener('click', () => {
-  const printArea = document.getElementById('packetPrintArea');
-  let html = '';
-  for (let i = 0; i < packetInstructions.length; i++) {
-    const entry      = packetInstructions[i];
-    const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
-    const title      = titleMatch ? titleMatch[1].trim() : '';
-    const heading    = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
-    const body       = compileInstruction(entry.parsedState);
-    const bodyHtml   = body.split(/\n+/).filter(p => p.trim())
-      .map(p => `<p class="draft-para">${esc(p.trim())}</p>`).join('');
-    html += `<div><div class="draft-preview-heading">${esc(heading)}</div><div class="draft-preview-body">${bodyHtml}</div></div>`;
-    if (i < packetInstructions.length - 1) html += '<div class="packet-page-break"></div>';
-  }
-  printArea.innerHTML = html;
-  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  setPrintHeader('CACI Instruction Packet   |   ' + date);
-  window.addEventListener('afterprint', function cleanup() {
-    printArea.innerHTML = '';
-    window.removeEventListener('afterprint', cleanup);
-  });
-  doPrint('printing-packet');
+document.getElementById('exportPacketBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('exportPacketPicker').classList.toggle('hidden');
 });
 
-document.getElementById('exportPacketBtn').addEventListener('click', () => {
+document.getElementById('exportPacketPicker').addEventListener('click', e => {
+  const fmt = e.target.dataset.fmt;
+  if (!fmt) return;
+  document.getElementById('exportPacketPicker').classList.add('hidden');
   const dateSlug = new Date().toISOString().slice(0, 10);
-  downloadTXT(compilePacket(), `CACI-packet-${dateSlug}.txt`);
+  if (fmt === 'pdf') {
+    const sections = packetInstructions.map(entry => {
+      const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
+      const title   = titleMatch ? titleMatch[1].trim() : '';
+      const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
+      const body    = compileInstruction(entry.parsedState);
+      const bodyHtml = body.split(/\n+/).filter(p => p.trim())
+        .map(p => `<p class="pdf-para">${esc(p.trim())}</p>`).join('');
+      return { heading, body: bodyHtml };
+    });
+    exportPDF(buildPrintHTML(sections, 'instruction'), `CACI-packet-${dateSlug}.pdf`);
+  } else if (fmt === 'docx') {
+    exportDOCX({ type: 'instruction', heading: 'CACI Instruction Packet', body: compilePacket() }, `CACI-packet-${dateSlug}.docx`);
+  } else if (fmt === 'txt') {
+    downloadTXT(compilePacket(), `CACI-packet-${dateSlug}.txt`);
+  }
 });

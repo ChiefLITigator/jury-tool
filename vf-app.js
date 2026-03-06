@@ -939,33 +939,32 @@ function renderAll() {
     });
   }
 
-  // Print button
-  const printBtn = document.getElementById('vfPrintBtn');
-  if (printBtn) {
-    printBtn.addEventListener('click', () => doPrint('printing-vf'));
-  }
-
-  // Export TXT button
-  const exportTxtBtn = document.getElementById('vfExportTxtBtn');
-  if (exportTxtBtn) {
-    exportTxtBtn.addEventListener('click', () => {
-      const form     = activeWorkingForm();
-      const slug     = form ? form.name.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/-+/g, '-') : 'verdict-form';
-      const dateSlug = new Date().toISOString().slice(0, 10);
-      downloadTXT(renderVFPlainText(), `VF-${slug}-${dateSlug}.txt`);
+  // Export picker
+  const vfExportBtn = document.getElementById('vfExportBtn');
+  if (vfExportBtn) {
+    vfExportBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      document.getElementById('exportVfPicker').classList.toggle('hidden');
     });
   }
 
-  // Export DOCX button
-  const exportDocxBtn = document.getElementById('vfExportDocxBtn');
-  if (exportDocxBtn) {
-    exportDocxBtn.addEventListener('click', () => {
-      const content = buildVFDocxContent();
-      if (!content) return;
+  const exportVfPicker = document.getElementById('exportVfPicker');
+  if (exportVfPicker) {
+    exportVfPicker.addEventListener('click', e => {
+      const fmt = e.target.dataset.fmt;
+      if (!fmt) return;
+      exportVfPicker.classList.add('hidden');
       const form     = activeWorkingForm();
       const slug     = form ? form.name.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/-+/g, '-') : 'verdict-form';
       const dateSlug = new Date().toISOString().slice(0, 10);
-      exportDOCX(content, `VF-${slug}-${dateSlug}.docx`);
+      if (fmt === 'pdf') {
+        const previewHtml = document.getElementById('vfPreview').innerHTML;
+        exportPDF(buildPrintHTML([{ heading: form ? form.name : 'Verdict Form', body: previewHtml }], 'vf'), `VF-${slug}-${dateSlug}.pdf`);
+      } else if (fmt === 'docx') {
+        const content = buildVFDocxContent();
+        if (!content) return;
+        exportDOCX(content, `VF-${slug}-${dateSlug}.docx`);
+      }
     });
   }
 
