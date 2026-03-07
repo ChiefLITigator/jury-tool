@@ -88,7 +88,7 @@ function classifyBracket(content) {
   // Fill-in keywords — always a text input, regardless of slashes.
   // Check BEFORE the slash/dropdown test so e.g. [specify/describe] is
   // never mis-classified as a dropdown.
-  if (/^(specify|insert|describe|name\s+of|briefly|brief\s+|state\s+the|denial\s+of|summary\s+of)\b/i.test(c) && !c.includes('[')) return 'text';
+  if (/^(specify|insert|describe|name\s+of|briefly|brief\s+|state\s+the|denial\s+of|summary\s+of)\b/i.test(c)) return 'text';
 
   // Drafting-instruction verbs → note (textarea the user fills in)
   if (/^(add\b|include\b)/i.test(c)) return 'note';

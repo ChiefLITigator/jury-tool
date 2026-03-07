@@ -147,11 +147,9 @@ document.getElementById('exportPacketPicker').addEventListener('click', e => {
       const title   = titleMatch ? titleMatch[1].trim() : '';
       const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
       const body    = compileInstruction(entry.parsedState);
-      const bodyHtml = body.split(/\n+/).filter(p => p.trim())
-        .map(p => `<p class="pdf-para">${esc(p.trim())}</p>`).join('');
-      return { heading, body: bodyHtml };
+      return { heading, body };
     });
-    exportPDF(buildPrintHTML(sections, 'instruction'), `CACI-packet-${dateSlug}.pdf`);
+    exportPDF(sections, `CACI-packet-${dateSlug}.pdf`);
   } else if (fmt === 'docx') {
     exportDOCX({ type: 'instruction', heading: 'CACI Instruction Packet', body: compilePacket() }, `CACI-packet-${dateSlug}.docx`);
   } else if (fmt === 'txt') {

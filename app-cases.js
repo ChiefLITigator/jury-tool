@@ -59,6 +59,15 @@ function applyFieldValues(freshState, savedFields) {
   }
 }
 
+function clearAllWorkspace() {
+  packetInstructions = [];
+  activePacketId     = null;
+  draftState         = null;
+  document.getElementById('draftWorkspace').classList.add('hidden');
+  if (typeof setVFState === 'function') setVFState([]);
+  renderPacketTray();
+}
+
 function caseSave() {
   const name = document.getElementById('caseNameInput').value.trim();
   if (!name) { setCaseBarStatus('Enter a case name first.', 'err'); return; }
@@ -111,9 +120,7 @@ function caseDelete() {
   populateCaseSelect();
   document.getElementById('caseSelect').value = '';
   document.getElementById('caseNameInput').value = '';
-  packetInstructions = [];
-  activePacketId     = null;
-  renderPacketTray();
+  clearAllWorkspace();
   setCaseBarStatus('Deleted.', 'ok');
 }
 
@@ -138,9 +145,8 @@ function caseImport(file) {
       if (!data || !Array.isArray(data.instructions)) {
         setCaseBarStatus('Invalid case file format.', 'err'); return;
       }
-      packetInstructions = [];
-      packetIdCounter    = 0;
-      activePacketId     = null;
+      clearAllWorkspace();
+      packetIdCounter = 0;
       for (const item of data.instructions) {
         if (!item.caciNum || !item.parsedState || !Array.isArray(item.parsedState.fields)) continue;
         try {
@@ -168,10 +174,8 @@ document.getElementById('caseImportFile').addEventListener('change', (e) => {
 document.getElementById('caseSelect').addEventListener('change', (e) => {
   const name = e.target.value;
   if (!name) {
-    packetInstructions = [];
-    activePacketId     = null;
     document.getElementById('caseNameInput').value = '';
-    renderPacketTray();
+    clearAllWorkspace();
   } else {
     caseLoad(name);
   }

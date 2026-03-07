@@ -539,10 +539,9 @@ document.getElementById('exportDraftPicker').addEventListener('click', e => {
   const dateSlug = new Date().toISOString().slice(0, 10);
   if (fmt === 'pdf') {
     const heading  = getDraftHeading() || (num ? `CACI ${num}` : 'CACI Instruction');
-    const bodyHtml = [...document.querySelectorAll('#draftPreview .draft-para')]
-      .map(p => `<p class="pdf-para">${esc(p.textContent.trim())}</p>`).join('');
+    const body     = getDraftBodyText();
     const filename = num ? `CACI-${num}-${dateSlug}.pdf` : `CACI-draft-${dateSlug}.pdf`;
-    exportPDF(buildPrintHTML([{ heading, body: bodyHtml }], 'instruction'), filename);
+    exportPDF([{ heading, body }], filename);
   } else if (fmt === 'docx') {
     const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
     exportDOCX({ type: 'instruction', heading: getDraftHeading(), body: getDraftBodyText() }, filename);

@@ -159,53 +159,63 @@ updatePrintSettings(); // apply defaults on load
 // ═══════════════════════════════════════════════════════════════════════
 
 /**
- * Build a complete HTML document for printing as PDF.
- * sections: [{heading: string, body: string (HTML)}]
- * type: 'instruction' | 'vf'
+ * Export sections as a PDF file using pdfmake (silent Blob download).
+ * sections: [{heading: string, body: string (plain text, paragraphs separated by \n\n)}]
+ * filename: string e.g. 'CACI-302.pdf'
  */
-function buildPrintHTML(sections, type) {
-  const fontKey = document.getElementById('ps-font').value;
-  const font    = PS_FONTS[fontKey] || PS_FONTS.serif;
-  const size    = document.getElementById('ps-size').value;
-  const spacing = document.getElementById('ps-spacing').value;
-  const align   = document.getElementById('ps-align').value;
-  const margins = document.getElementById('ps-margins').value;
+function exportPDF(sections, filename) {
+  if (typeof pdfMake === 'undefined') {
+    alert('PDF library not loaded. Check your internet connection and reload.');
+    return;
+  }
 
-  const bodyParts = sections.map((section, i) => {
-    const breakStyle = i === 0 ? '' : 'page-break-before:always;';
-    return `<div class="pdf-section" style="${breakStyle}margin:0;padding:0">
-      <div class="pdf-heading">${esc(section.heading)}</div>
-      <div class="pdf-body">${section.body}</div>
-    </div>`;
-  }).join('\n');
+  const fontKey    = document.getElementById('ps-font').value;
+  const sizeStr    = document.getElementById('ps-size').value;
+  const spacingStr = document.getElementById('ps-spacing').value;
+  const alignVal   = document.getElementById('ps-align').value;
+  const marginsVal = document.getElementById('ps-margins').value;
 
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
-@page { size: letter portrait; margin: ${margins}; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: ${font}; font-size: ${size}; line-height: ${spacing}; text-align: ${align}; color: #111827; background: white; }
-.pdf-heading { font-size: 1.05em; font-weight: bold; margin-bottom: 1em; text-align: left; }
-.pdf-para { text-indent: 2em; margin: 0 0 0.75em 0; }
-</style></head><body>${bodyParts}</body></html>`;
-}
+  const PDF_FONTS  = { serif: 'Times', sans: 'Roboto', mono: 'Courier' };
+  const fontPdf    = PDF_FONTS[fontKey] || 'Times';
+  const sizeNum    = parseFloat(sizeStr)    || 11;
+  const spacingNum = parseFloat(spacingStr) || 1.5;
 
-/**
- * Print-to-PDF via hidden iframe. Triggers the browser's print dialog.
- */
-function exportPDF(htmlContent, filename) {
-  const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
-  document.body.appendChild(iframe);
-  const fallback = setTimeout(() => {
-    if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-  }, 60000);
-  iframe.addEventListener('load', () => {
-    iframe.contentWindow.addEventListener('afterprint', () => {
-      clearTimeout(fallback);
-      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-    });
-    iframe.contentWindow.print();
+  const MARGIN_PTS = { '1in': 72, '1.5in': 108, '0.5in': 36 };
+  const m          = MARGIN_PTS[marginsVal] || 72;
+
+  const content = [];
+  sections.forEach((section, i) => {
+    const headingPara = {
+      text:         section.heading,
+      bold:         true,
+      alignment:    'center',
+      fontSize:     sizeNum + 1,
+      marginBottom: 12,
+    };
+    if (i > 0) headingPara.pageBreak = 'before';
+    content.push(headingPara);
+
+    const blocks = section.body.split(/\n\n/).filter(b => b.trim());
+    for (const block of blocks) {
+      content.push({
+        text:         block.trim(),
+        alignment:    alignVal,
+        marginBottom: 6,
+      });
+    }
   });
-  iframe.srcdoc = htmlContent;
+
+  pdfMake.createPdf({
+    pageSize:        'LETTER',
+    pageOrientation: 'portrait',
+    pageMargins:     [m, m, m, m],
+    defaultStyle: {
+      font:       fontPdf,
+      fontSize:   sizeNum,
+      lineHeight: spacingNum,
+    },
+    content,
+  }).download(filename);
 }
 
 // Close all export pickers when clicking outside

@@ -883,7 +883,13 @@ function getVFSerializedState() {
 }
 
 function setVFState(data) {
-  if (!Array.isArray(data) || !data.length) return;
+  if (!Array.isArray(data) || !data.length) {
+    vfForms         = [];
+    activeVfFormId  = null;
+    vfOpenEditorUid = null;
+    renderAll();
+    return;
+  }
   vfForms        = JSON.parse(JSON.stringify(data));
   vfOpenEditorUid = null;
 
@@ -958,8 +964,9 @@ function renderAll() {
       const slug     = form ? form.name.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/-+/g, '-') : 'verdict-form';
       const dateSlug = new Date().toISOString().slice(0, 10);
       if (fmt === 'pdf') {
-        const previewHtml = document.getElementById('vfPreview').innerHTML;
-        exportPDF(buildPrintHTML([{ heading: form ? form.name : 'Verdict Form', body: previewHtml }], 'vf'), `VF-${slug}-${dateSlug}.pdf`);
+        const heading = form ? form.name : 'Verdict Form';
+        const body    = renderVFPlainText();
+        exportPDF([{ heading, body }], `VF-${slug}-${dateSlug}.pdf`);
       } else if (fmt === 'docx') {
         const content = buildVFDocxContent();
         if (!content) return;
