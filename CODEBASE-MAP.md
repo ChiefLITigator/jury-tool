@@ -1,6 +1,6 @@
 # CODEBASE MAP
 ## California Civil Litigation Tool Suite
-## Last updated: 2026-03-05
+## Last updated: 2026-03-07
 
 Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
@@ -45,9 +45,11 @@ caci-compare.html              — single-page app shell, all tabs live here
   ├── app-packet.js            — 6th: packet tray
   ├── app-cases.js             — 7th: localStorage case system
   ├── node_modules/docx/...    — 8th: window.docx (UMD bundle, docx v9)
-  ├── docx-export.js           — 9th: exposes exportDOCX()
-  ├── vf-data.js               — 10th: exposes window.vfDB
-  └── vf-app.js                — 11th: all VF builder logic
+  ├── pdfmake.min.js           — 9th: window.pdfMake (CDN, v0.2.7)
+  ├── vfs_fonts.min.js         — 10th: registers bundled fonts for pdfmake (CDN)
+  ├── docx-export.js           — 11th: exposes exportDOCX()
+  ├── vf-data.js               — 12th: exposes window.vfDB
+  └── vf-app.js                — 13th: all VF builder logic
 
 Standalone utilities (Node.js CLI + browser module, no HTML):
   └── pleading-shell.js        — generates blank CA pleading paper DOCX shells
@@ -128,6 +130,7 @@ Reads from caciDB (set by caci-data.js). No module system — all globals.
 | `const PS_FONTS` | Font family map for print settings |
 | `updatePrintSettings()` | Injects `@media print` / `@page` style tag from form values |
 | Print settings event listeners | `print-settings-toggle`, `ps-*` change listeners, initial call |
+| `exportPDF(sections, filename)` | pdfmake silent Blob download; `sections: [{heading, body}]`, body split on `\n\n` per paragraph |
 
 ### Two lookup functions — know which to use:
 - `lookupCACITextForDraft(num)` — bracket structure preserved → use for draft/parse pipeline

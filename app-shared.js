@@ -153,3 +153,72 @@ document.getElementById('print-settings-toggle').addEventListener('click', () =>
 });
 
 updatePrintSettings(); // apply defaults on load
+
+// ═══════════════════════════════════════════════════════════════════════
+// PDF EXPORT ENGINE
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Export sections as a PDF file using pdfmake (silent Blob download).
+ * sections: [{heading: string, body: string (plain text, paragraphs separated by \n\n)}]
+ * filename: string e.g. 'CACI-302.pdf'
+ */
+function exportPDF(sections, filename) {
+  if (typeof pdfMake === 'undefined') {
+    alert('PDF library not loaded. Check your internet connection and reload.');
+    return;
+  }
+
+  const fontKey    = document.getElementById('ps-font').value;
+  const sizeStr    = document.getElementById('ps-size').value;
+  const spacingStr = document.getElementById('ps-spacing').value;
+  const alignVal   = document.getElementById('ps-align').value;
+  const marginsVal = document.getElementById('ps-margins').value;
+
+  const PDF_FONTS  = { serif: 'Times', sans: 'Roboto', mono: 'Courier' };
+  const fontPdf    = PDF_FONTS[fontKey] || 'Times';
+  const sizeNum    = parseFloat(sizeStr)    || 11;
+  const spacingNum = parseFloat(spacingStr) || 1.5;
+
+  const MARGIN_PTS = { '1in': 72, '1.5in': 108, '0.5in': 36 };
+  const m          = MARGIN_PTS[marginsVal] || 72;
+
+  const content = [];
+  sections.forEach((section, i) => {
+    const headingPara = {
+      text:         section.heading,
+      bold:         true,
+      alignment:    'center',
+      fontSize:     sizeNum + 1,
+      marginBottom: 12,
+    };
+    if (i > 0) headingPara.pageBreak = 'before';
+    content.push(headingPara);
+
+    const blocks = section.body.split(/\n\n/).filter(b => b.trim());
+    for (const block of blocks) {
+      content.push({
+        text:         block.trim(),
+        alignment:    alignVal,
+        marginBottom: 6,
+      });
+    }
+  });
+
+  pdfMake.createPdf({
+    pageSize:        'LETTER',
+    pageOrientation: 'portrait',
+    pageMargins:     [m, m, m, m],
+    defaultStyle: {
+      font:       fontPdf,
+      fontSize:   sizeNum,
+      lineHeight: spacingNum,
+    },
+    content,
+  }).download(filename);
+}
+
+// Close all export pickers when clicking outside
+document.addEventListener('click', () => {
+  document.querySelectorAll('.export-picker').forEach(p => p.classList.add('hidden'));
+});

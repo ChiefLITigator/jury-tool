@@ -144,6 +144,12 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 #print-settings-panel .ps-group label { display: block; font-family: var(--sans); font-size: .68em; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 3px; }
 #print-settings-panel select { font-family: var(--sans); font-size: .8em; padding: 3px 7px; border: 1px solid var(--border); border-radius: 3px; background: white; cursor: pointer; }
 
+/* ─ Export Picker ─ */
+.export-picker-wrap { position: relative; display: inline-block; }
+.export-picker { position: absolute; top: calc(100% + 4px); right: 0; background: #fff; border: 1px solid var(--border); border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,.12); z-index: 100; min-width: 110px; overflow: hidden; }
+.export-picker button { display: block; width: 100%; text-align: left; padding: 8px 14px; background: none; border: none; border-radius: 0; font-family: var(--sans); font-size: .82em; font-weight: 600; color: var(--text); cursor: pointer; white-space: nowrap; }
+.export-picker button:hover { background: #f3f4f6; }
+
 /* ─ Print ─ */
 #print-header { display: none; }
 @media print {
@@ -497,9 +503,13 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
     <div id="packetList"><p class="tray-empty">No instructions added yet.</p></div>
     <div id="packetCompileRow" class="hidden" style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
       <button class="btn-primary" id="compilePacketBtn" style="width:100%">Compile Packet</button>
-      <div style="display:flex;gap:6px">
-        <button class="btn-secondary" id="printPacketBtn" style="flex:1">Print</button>
-        <button class="btn-secondary" id="exportPacketBtn" style="flex:1">Export TXT</button>
+      <div class="export-picker-wrap" style="width:100%">
+        <button class="btn-secondary" id="exportPacketBtn" style="width:100%">Export ▾</button>
+        <div id="exportPacketPicker" class="export-picker hidden">
+          <button data-fmt="pdf">PDF</button>
+          <button data-fmt="docx">DOCX</button>
+          <button data-fmt="txt">TXT</button>
+        </div>
       </div>
     </div>
   </div>
@@ -539,9 +549,14 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
               <div class="card-label" style="margin:0">Completed Instruction</div>
               <div style="display:flex;gap:8px;align-items:center">
                 <button class="btn-ghost" id="copyDraftBtn">Copy</button>
-                <button class="btn-ghost" id="printDraftBtn">Print / Save PDF</button>
-                <button class="btn-ghost" id="exportDraftBtn">Export TXT</button>
-                <button class="btn-ghost" id="exportDraftDocxBtn">Export DOCX</button>
+                <div class="export-picker-wrap">
+                  <button class="btn-ghost" id="exportDraftBtn">Export ▾</button>
+                  <div id="exportDraftPicker" class="export-picker hidden">
+                    <button data-fmt="pdf">PDF</button>
+                    <button data-fmt="docx">DOCX</button>
+                    <button data-fmt="txt">TXT</button>
+                  </div>
+                </div>
                 <button class="btn-ghost" id="lockEditBtn">Lock &amp; Edit</button>
                 <input type="text" id="addToPacketLabel" placeholder="Label…"
                        style="width:90px;padding:3px 7px;font-size:.78em;border:1px solid var(--border);border-radius:3px">
@@ -597,9 +612,13 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <div class="vf-panel-heading" style="display:flex;justify-content:space-between;align-items:center">
         <span>Preview</span>
         <div style="display:flex;gap:6px">
-          <button class="btn-ghost" id="vfPrintBtn">Print</button>
-          <button class="btn-ghost" id="vfExportTxtBtn">Export TXT</button>
-          <button class="btn-ghost" id="vfExportDocxBtn">Export DOCX</button>
+          <div class="export-picker-wrap">
+            <button class="btn-ghost" id="vfExportBtn">Export ▾</button>
+            <div id="exportVfPicker" class="export-picker hidden">
+              <button data-fmt="pdf">PDF</button>
+              <button data-fmt="docx">DOCX</button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="vf-preview-box" id="vfPreview"></div>
@@ -631,6 +650,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="app-packet.js"></script>
 <script src="app-cases.js"></script>
 <script src="node_modules/docx/dist/index.iife.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
 <script src="docx-export.js"></script>
 <script src="vf-data.js"></script>
 <script src="vf-app.js"></script>

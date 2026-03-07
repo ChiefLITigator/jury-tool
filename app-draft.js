@@ -511,22 +511,6 @@ document.getElementById('copyDraftBtn').addEventListener('click', () => {
   });
 });
 
-// ── Draft tab: Print / Save PDF ──────────────────────────────
-document.getElementById('printDraftBtn').addEventListener('click', () => {
-  const num  = document.getElementById('draftCaciNum')?.value.trim() || '';
-  const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-  setPrintHeader('CACI Instruction' + (num ? ' No. ' + num : '') + '   |   ' + date);
-  doPrint('printing-draft');
-});
-
-// ── Draft tab: Export TXT ────────────────────────────────────
-document.getElementById('exportDraftBtn').addEventListener('click', () => {
-  const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
-  const dateSlug = new Date().toISOString().slice(0, 10);
-  const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
-  downloadTXT(getDraftText(), filename);
-});
-
 // ── Draft tab: Export DOCX helper functions ──────────────────
 
 // Returns the heading string from the draft preview heading element
@@ -541,13 +525,28 @@ function getDraftBodyText() {
   return [...paras].map(p => p.textContent.trim()).join('\n\n');
 }
 
-document.getElementById('exportDraftDocxBtn').addEventListener('click', () => {
+// ── Draft tab: Export picker ──────────────────────────────────
+document.getElementById('exportDraftBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('exportDraftPicker').classList.toggle('hidden');
+});
+
+document.getElementById('exportDraftPicker').addEventListener('click', e => {
+  const fmt = e.target.dataset.fmt;
+  if (!fmt) return;
+  document.getElementById('exportDraftPicker').classList.add('hidden');
   const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
   const dateSlug = new Date().toISOString().slice(0, 10);
-  const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
-  exportDOCX({
-    type:    'instruction',
-    heading: getDraftHeading(),
-    body:    getDraftBodyText()
-  }, filename);
+  if (fmt === 'pdf') {
+    const heading  = getDraftHeading() || (num ? `CACI ${num}` : 'CACI Instruction');
+    const body     = getDraftBodyText();
+    const filename = num ? `CACI-${num}-${dateSlug}.pdf` : `CACI-draft-${dateSlug}.pdf`;
+    exportPDF([{ heading, body }], filename);
+  } else if (fmt === 'docx') {
+    const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
+    exportDOCX({ type: 'instruction', heading: getDraftHeading(), body: getDraftBodyText() }, filename);
+  } else if (fmt === 'txt') {
+    const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
+    downloadTXT(getDraftText(), filename);
+  }
 });
