@@ -318,7 +318,7 @@ function makeCaption(fields) {
     cPara([cRun(plaintiffDesc)], LI),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
-    cPara([cRun('Plaintiff,')], RI),
+    cPara([cRun((f.plaintiff_label || 'Plaintiff') + ',')], RI),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
     cPara([cRun('vs.', { italics: true })], LI),
@@ -329,7 +329,7 @@ function makeCaption(fields) {
     ...(addlParties ? [cPara([cRun(addlParties)], LI)] : []),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
-    cPara([cRun('Defendant.')], RI),
+    cPara([cRun((f.defendant_label || 'Defendant') + '.')], RI),
     cPara([cRun('')], RI),
   ];
 

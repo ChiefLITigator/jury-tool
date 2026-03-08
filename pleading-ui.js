@@ -30,6 +30,7 @@ const DOC_FIELD_IDS = [
 // Optional Section B fields — included in options only if non-empty
 const OPTIONAL_FIELD_IDS = [
   'pl_attorney_role', 'pl_client_name',
+  'pl_plaintiff_label', 'pl_defendant_label',
   'pl_hearing_date', 'pl_hearing_time', 'pl_hearing_dept',
   'pl_complaint_filed', 'pl_trial_date',
 ];
@@ -53,8 +54,10 @@ const FIELD_MAP = {
   pl_court_county:      'court_county',
   pl_plaintiff_name:    'plaintiff_name',
   pl_plaintiff_desc:    'plaintiff_desc',
+  pl_plaintiff_label:   'plaintiff_label',
   pl_defendant_name:    'defendant_name',
   pl_defendant_desc:    'defendant_desc',
+  pl_defendant_label:   'defendant_label',
   pl_additional_parties:'additional_parties',
   pl_case_number:       'case_number',
   pl_judge_name:        'judge_name',
@@ -272,8 +275,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const caption = (cases[name] && cases[name].caption) || {};
         const CAPTION_IDS = [
           'pl_court_name', 'pl_court_county',
-          'pl_plaintiff_name', 'pl_plaintiff_desc',
-          'pl_defendant_name', 'pl_defendant_desc',
+          'pl_plaintiff_name', 'pl_plaintiff_desc', 'pl_plaintiff_label',
+          'pl_defendant_name', 'pl_defendant_desc', 'pl_defendant_label',
           'pl_additional_parties',
           'pl_case_number', 'pl_judge_name', 'pl_dept_number',
           'pl_attorney_role', 'pl_client_name',
