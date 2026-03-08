@@ -148,13 +148,13 @@ function parseInstruction(rawText) {
   const consumed = new Set();      // content bracket indices to skip as standalone fields
   for (let pi = 0; pi < brackets.length; pi++) {
     const pbr = brackets[pi];
-    if (/^\d+\.\s*\[\s*or\s*\]/i.test(pbr.content.trim())) {
+    if (/^\d+\.\s*\[\s*(?:or|and)\s*\]/i.test(pbr.content.trim())) {
       const numMatch = pbr.content.trim().match(/^(\d+)\./);
       const digit = numMatch ? numMatch[1] : null;
       if (digit) {
         for (let pj = pi + 1; pj < brackets.length; pj++) {
           const ct = brackets[pj].content.trim();
-          if (new RegExp('^' + digit + '\\.').test(ct) && !/^\d+\.\s*\[\s*or\s*\]/i.test(ct)) {
+          if (new RegExp('^' + digit + '\\.').test(ct) && !/^\d+\.\s*\[\s*(?:or|and)\s*\]/i.test(ct)) {
             altContentMap.set(pi, pj);
             consumed.add(pj);
             break;
@@ -217,7 +217,7 @@ function parseInstruction(rawText) {
           const cBr = brackets[altContentMap.get(i)];
           altText = cBr.content.trim().replace(/^\d+\.\s*/i, '').trim();
         } else {
-          altText = br.content.trim().replace(/^\d+\.\s*\[\s*or\s*\]\s*/i, '').trim();
+          altText = br.content.trim().replace(/^\d+\.\s*\[\s*(?:or|and)\s*\]\s*/i, '').trim();
         }
         // If the alt text is itself a single outer bracket, unwrap it
         const altBrs = findTopLevelBrackets(altText);
