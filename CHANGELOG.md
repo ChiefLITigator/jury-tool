@@ -38,6 +38,12 @@
 - ~~`package.json` test script was a dummy echo; `@napi-rs/canvas` version pinned to `"*"`~~ — FIXED (C5). Test script now runs all three batch test files; canvas pinned to `"0.1.94"`.
 - ~~`[N. [and]]` pattern not recognized in `classifyBracket` or the compare normalizer~~ — FIXED (C6, partial). `classifyBracket` step 4 and `flattenForCompare` normalizer updated to `(?:or|and)`. `parseInstruction` Pass 1/2 were not yet fixed (see D1).
 
+**Batch F fixes (2026-03-08 — pleading-shell.js, reference DOCX alignment):**
+- ~~Bottom margin was 630 DXA (0.4375") — too small, caused footer overlap~~ — FIXED (F1). Changed to 1170 DXA (0.8125") to match reference document.
+- ~~Court block used `lineRule: 'auto'` — lines could grow beyond double-spacing~~ — FIXED (F2). All court name paragraphs switched to `lineRule: 'exact'`; trailing blank line gets `after: 480 DXA` to match the pre-caption gap in the reference document.
+- ~~Caption table had no explicit cell margins — Word applied its own defaults~~ — FIXED (F3). Added `margins: { left: 10, right: 10, top: 0, bottom: 0 }` to Table constructor, matching reference DOCX (10 DXA left/right).
+- ~~Blank shell body area rendered 5+ paragraphs (centered title + blanks) instead of a single post-caption line~~ — FIXED (F4). Blank shell (no `body_text`) now emits one exact-spaced blank line, matching reference. `body_text` path (packet/VF exports) retained: renders centered title + blank + body lines, all with `lineRule: 'exact'`.
+
 **Batch D fixes (2026-03-08 — draft-parser.js, app-cases.js):**
 - ~~`parseInstruction` Pass 1 altContentMap signal detection and Pass 2 fallback stripping only matched `[or]`, not `[and]`~~ — FIXED (D1). Three regex sites inside `parseInstruction` updated to `(?:or|and)`: line 151 (Pass 1 signal detection), line 157 (Pass 1 guard filter), line 220 (Pass 2 fallback strip). All 36 tests pass. Completes the C6 parser gap fix.
 - ~~`caseExport` built filename directly from raw case name — special characters could produce invalid filenames~~ — FIXED (D2). `nameSlug` now sanitized: `name.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60)` before composing download filename.

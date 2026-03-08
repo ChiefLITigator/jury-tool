@@ -496,19 +496,27 @@ const patched = await injectPleadingHeader(docBuf);     // DataView/Uint8Array t
 return new Blob([patched], { type: '...docx' });
 ```
 
-**Margins:** plainPaper: `{top:1440,bottom:1440,left:1800,right:1440}` DXA. Pleading paper: `{top:1080,bottom:630,left:1440,right:720,header:720,footer:432}`.
+**Margins:** plainPaper: `{top:1440,bottom:1440,left:1800,right:1440}` DXA. Pleading paper: `{top:1080,bottom:1170,left:1440,right:720,header:720,footer:432}`.
 
 **body_text handling in buildBody:**
 
-Body area uses a local `bbp()` helper (`lineRule: 'exact'`, `line: 480` = exactly 24pt). The caption/court block above uses `bp()` (`lineRule: 'auto'`, `line: 480` = double-spaced, can grow).
-```js
-const BB  = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
-const bbp = (children, opts = {}) => bp(children, { ...BB, ...opts });
+Court block uses `lineRule: 'exact'` via a local `EXACT` const; final blank line has `after: 480`. Caption table has `margins: { left: 10, right: 10, top: 0, bottom: 0 }`.
 
+Body area (post-caption) always uses `lineRule: 'exact'`. Two paths:
+- **No `body_text`** (blank shell, Pleading tab): single exact-spaced blank line — matches reference DOCX.
+- **With `body_text`** (packet/VF Pleading DOCX exports): blank + centered bold `document_title` + blank + one paragraph per `\n`-split line.
+```js
+const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
+const docTitle = fields.document_title || '[DOCUMENT TITLE]';
 const bodyText = fields.body_text || '';
-...(bodyText
-  ? bodyText.split('\n').map(line => bbp([tr(line)]))
-  : [bbp([tr('')]), bbp([tr('')]), bbp([tr('')])])  // 3 blank lines if no body
+const bodyArea = bodyText
+  ? [
+      bp([tr('')], EXACT_SP),
+      bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
+      bp([tr('')], EXACT_SP),
+      ...bodyText.split('\n').map(line => bp([tr(line)], EXACT_SP)),
+    ]
+  : [bp([tr('')], EXACT_SP)];
 ```
 
 ---
