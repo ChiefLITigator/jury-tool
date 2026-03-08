@@ -330,6 +330,7 @@ function makeCaption(fields) {
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
     cPara([cRun('Defendant.')], RI),
+    cPara([cRun('')], RI),
   ];
 
   const caseNum   = f.case_number    || '[CASE NUMBER]';
@@ -346,6 +347,7 @@ function makeCaption(fields) {
   const RC = { indent: { left: 258 } };
 
   const rightChildren = [
+    cPara([cRun('')], RC),
     cPara([cRun('CASE NO.:  ' + caseNum)], RC),
     cPara([cRun('')], RC),
     cPara([cRun(judgeName + ',')], RC),
