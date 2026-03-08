@@ -33,13 +33,18 @@ function newBlankForm(name) {
   };
 }
 
+/** Escape regex metacharacters in a string (A5). */
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /** Replace [name of KEY] placeholders with party values wherever non-empty. */
 function substituteParties(text, parties) {
   let out = text;
   for (const key of Object.keys(parties)) {
     const val = parties[key];
     if (val) {
-      out = out.replace(new RegExp('\\[name of ' + key + '\\]', 'gi'), val);
+      out = out.replace(new RegExp('\\[name of ' + escapeRegex(key) + '\\]', 'gi'), val);
     }
   }
   return out;
@@ -140,19 +145,50 @@ function addQuestionFromPalette(groupId, sourceQid) {
   block.uid          = newUid;
   block.source_group = groupId;
   block.source_id    = sourceQid;
-  if (block.if_yes  != null) block.if_yes  = translateRouting(block.if_yes,  uidMap);
-  if (block.if_no   != null) block.if_no   = translateRouting(block.if_no,   uidMap);
-  if (block.if_done != null) block.if_done = translateRouting(block.if_done, uidMap);
+  if (block.if_yes  != null) block.if_yes  = translateRouting(block.if_yes,  uidMap, groupId);
+  if (block.if_no   != null) block.if_no   = translateRouting(block.if_no,   uidMap, groupId);
+  if (block.if_done != null) block.if_done = translateRouting(block.if_done, uidMap, groupId);
 
   form.questions.push(block);
+  normalizeRoutes(form);
   renderBuilder();
   renderPreview();
 }
 
-/** Map a source routing id to a uid; fall back to 'sign' if target not yet added. */
-function translateRouting(val, uidMap) {
+/**
+ * Map a source routing id to a uid (A1).
+ * If the target is not yet in the form, store a deferred sentinel
+ * "__src__:{groupId}:{sourceId}" instead of silently collapsing to "sign".
+ */
+function translateRouting(val, uidMap, groupId) {
   if (val === 'stop' || val === 'sign') return val;
-  return uidMap[val] || 'sign';
+  return uidMap[val] || '__src__:' + groupId + ':' + val;
+}
+
+/**
+ * Resolve any deferred "__src__:..." route sentinels to live UIDs (A1/A2).
+ * Called after every add, delete, reorder, import, and load operation.
+ * Sentinels that cannot yet resolve are left in place.
+ * Routes pointing to UIDs no longer in the form are left as-is;
+ * routingLabel() and routingText() surface them as [BROKEN].
+ */
+function normalizeRoutes(form) {
+  const qs = form.questions;
+  const srcMap = {};
+  for (const q of qs) {
+    if (q.source_group && q.source_id && q.source_group !== 'custom') {
+      srcMap[q.source_group + ':' + q.source_id] = q.uid;
+    }
+  }
+  for (const q of qs) {
+    for (const field of ['if_yes', 'if_no', 'if_done']) {
+      const val = q[field];
+      if (typeof val === 'string' && val.startsWith('__src__:')) {
+        const key = val.slice('__src__:'.length);
+        if (srcMap[key]) q[field] = srcMap[key];
+      }
+    }
+  }
 }
 
 function addCustomQuestion() {
@@ -204,10 +240,11 @@ function uidToDisplayNum(uid, questions) {
 }
 
 function routingLabel(val, questions) {
-  if (val === 'sign') return 'Sign';
+  if (!val || val === 'sign') return 'Sign';
   if (val === 'stop') return 'Stop';
+  if (typeof val === 'string' && val.startsWith('__src__:')) return '[PENDING]';
   const n = uidToDisplayNum(val, questions);
-  return n != null ? 'Q' + n : '?';
+  return n != null ? 'Q' + n : '[BROKEN]';
 }
 
 function renderBuilder() {
@@ -287,6 +324,7 @@ function renderBuilder() {
       const [moved] = f.questions.splice(vfDragSrcIndex, 1);
       f.questions.splice(target, 0, moved);
       vfDragSrcIndex = null;
+      normalizeRoutes(f);
       closeEditorIfOpen();
       renderBuilder();
       renderPreview();
@@ -307,6 +345,7 @@ function renderBuilder() {
       if (!f) return;
       closeEditorIfOpen();
       f.questions = f.questions.filter(q => q.uid !== btn.dataset.del);
+      normalizeRoutes(f);
       renderBuilder();
       renderPreview();
     });
@@ -333,7 +372,7 @@ function closeEditorIfOpen() {
   renderBuilder();
 }
 
-function buildRoutingOptions(excludeUid, questions, selected) {
+function buildRoutingOptions(excludeUid, questions, selected, includeStop = true) {
   let opts = '';
   questions.forEach((q, idx) => {
     if (q.uid === excludeUid) return;
@@ -341,7 +380,9 @@ function buildRoutingOptions(excludeUid, questions, selected) {
     opts += `<option value="${escHtml(q.uid)}"${sel}>Q${idx + 1}: ${escHtml(q.text.substring(0, 40))}</option>`;
   });
   opts += `<option value="sign"${selected === 'sign' ? ' selected' : ''}>Sign (end of form)</option>`;
-  opts += `<option value="stop"${selected === 'stop' ? ' selected' : ''}>Stop (directed verdict)</option>`;
+  if (includeStop) {
+    opts += `<option value="stop"${selected === 'stop' ? ' selected' : ''}>Stop (directed verdict)</option>`;
+  }
   return opts;
 }
 
@@ -408,12 +449,12 @@ function buildInlineEditorHTML(q, form) {
       <button class="btn-ghost" id="vfed-padd-${uid}" style="font-size:.78em;margin-top:4px">+ Add party</button>`;
   }
 
-  // if_done routing for non-yes_no types
+  // if_done routing for non-yes_no types ("stop" not supported for these — A4)
   if (q.type !== 'yes_no') {
     typeFields += `
       <div style="margin-top:8px">
         <label style="display:block">When done →</label>
-        <select data-ed-field="if_done" style="width:200px">${buildRoutingOptions(uid, qs, q.if_done || 'sign')}</select>
+        <select data-ed-field="if_done" style="width:200px">${buildRoutingOptions(uid, qs, q.if_done || 'sign', false)}</select>
       </div>`;
   }
 
@@ -548,6 +589,42 @@ function wireEditorEvents() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// SHARED ROUTING TEXT HELPER (A3)
+// Used by renderPreview, renderVFPlainText, and buildVFDocxContent
+// so all three output paths stay in sync.
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Build the routing instruction text for a question.
+ * Returns a string ready for display/export, or '' if no routing applies.
+ * Broken/unresolved routes are surfaced as "[ROUTE BROKEN]" (A2).
+ * For non-yes/no types, stored "stop" is treated as "sign" on render (A4).
+ */
+function routingText(q, qs, num) {
+  function targetLabel(val, isYesNo) {
+    if (!val || val === 'sign') return 'have the presiding juror sign and date this form';
+    if (val === 'stop') {
+      if (!isYesNo) return 'have the presiding juror sign and date this form'; // A4: treat as sign
+      const st = (q.stop_text || 'stop here and do not answer any further questions').replace(/\.$/, '');
+      return st;
+    }
+    if (typeof val === 'string' && (val.startsWith('__src__:') || !qs.some(x => x.uid === val))) {
+      return 'answer question [ROUTE BROKEN]';
+    }
+    const n = uidToDisplayNum(val, qs);
+    return n != null ? 'answer question ' + n : 'answer question [ROUTE BROKEN]';
+  }
+  const parts = [];
+  if (q.type === 'yes_no') {
+    if (q.if_yes != null) parts.push(`If your answer to question ${num} is Yes, ${targetLabel(q.if_yes, true)}.`);
+    if (q.if_no  != null) parts.push(`If your answer is No, ${targetLabel(q.if_no, true)}.`);
+  } else if (q.if_done != null) {
+    parts.push(`After completing this question, ${targetLabel(q.if_done, false)}.`);
+  }
+  return parts.join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // LIVE PREVIEW
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -582,34 +659,8 @@ function renderPreview() {
 
     if (q.type === 'yes_no') {
       html += '<div class="vf-preview-yn">Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______</div>';
-
-      // Build routing text matching CACI format
-      const parts = [];
-      if (q.if_yes) {
-        if (q.if_yes === 'sign') {
-          parts.push(`If your answer to question ${num} is Yes, have the presiding juror sign and date this form.`);
-        } else if (q.if_yes === 'stop') {
-          const st = q.stop_text || 'stop here and do not answer any further questions.';
-          parts.push(`If your answer to question ${num} is Yes, ${st}`);
-        } else {
-          const yn = uidToDisplayNum(q.if_yes, qs);
-          if (yn) parts.push(`If your answer to question ${num} is Yes, answer question ${yn}.`);
-        }
-      }
-      if (q.if_no) {
-        if (q.if_no === 'stop') {
-          const st = q.stop_text || 'stop here and do not answer any further questions.';
-          parts.push(`If your answer is No, ${st}`);
-        } else if (q.if_no === 'sign') {
-          parts.push('If your answer is No, have the presiding juror sign and date this form.');
-        } else {
-          const nn = uidToDisplayNum(q.if_no, qs);
-          if (nn) parts.push(`If your answer is No, answer question ${nn}.`);
-        }
-      }
-      if (parts.length) {
-        html += `<div class="vf-preview-routing">${escHtml(parts.join(' '))}</div>`;
-      }
+      const rt = routingText(q, qs, num);
+      if (rt) html += `<div class="vf-preview-routing">${escHtml(rt)}</div>`;
 
     } else if (q.type === 'damages') {
       for (const item of (q.line_items || [])) {
@@ -643,6 +694,12 @@ function renderPreview() {
       for (let i = 0; i < 3; i++) {
         html += '<div style="margin:0.4em 0 0.1em 2em;color:var(--border)">_______________________________________________</div>';
       }
+    }
+
+    // Routing text for non-yes_no question types (A3)
+    if (q.type !== 'yes_no') {
+      const rt = routingText(q, qs, num);
+      if (rt) html += `<div class="vf-preview-routing">${escHtml(rt)}</div>`;
     }
 
     html += '</div>';
@@ -784,24 +841,8 @@ function renderVFPlainText() {
 
     if (q.type === 'yes_no') {
       lines.push('    Yes  ______          No  ______');
-      const parts = [];
-      if (q.if_yes) {
-        if (q.if_yes === 'sign')      parts.push(`If your answer to question ${num} is Yes, have the presiding juror sign and date this form.`);
-        else if (q.if_yes === 'stop') parts.push(`If your answer to question ${num} is Yes, ${q.stop_text || 'stop here.'}`);
-        else {
-          const yn = uidToDisplayNum(q.if_yes, qs);
-          if (yn) parts.push(`If your answer to question ${num} is Yes, answer question ${yn}.`);
-        }
-      }
-      if (q.if_no) {
-        if (q.if_no === 'stop')       parts.push(`If your answer is No, ${q.stop_text || 'stop here and do not answer any further questions.'}`);
-        else if (q.if_no === 'sign')  parts.push('If your answer is No, have the presiding juror sign and date this form.');
-        else {
-          const nn = uidToDisplayNum(q.if_no, qs);
-          if (nn) parts.push(`If your answer is No, answer question ${nn}.`);
-        }
-      }
-      if (parts.length) lines.push('    ' + parts.join(' '));
+      const rt = routingText(q, qs, num);
+      if (rt) lines.push('    ' + rt);
 
     } else if (q.type === 'damages') {
       for (const item of (q.line_items || [])) lines.push(`    ${item.label}    $________________`);
@@ -815,6 +856,11 @@ function renderVFPlainText() {
       lines.push('    _______________________________________________');
       lines.push('    _______________________________________________');
       lines.push('    _______________________________________________');
+    }
+    // Routing text for non-yes_no question types (A3)
+    if (q.type !== 'yes_no') {
+      const rt = routingText(q, qs, num);
+      if (rt) lines.push('    ' + rt);
     }
     lines.push('');
   });
@@ -842,27 +888,9 @@ function buildVFDocxContent() {
       const text = substituteParties(q.text || '', parties);
       const obj  = { displayNumber: num, type: q.type, text };
 
-      if (q.type === 'yes_no') {
-        const parts = [];
-        if (q.if_yes) {
-          if (q.if_yes === 'sign')      parts.push(`If your answer to question ${num} is Yes, have the presiding juror sign and date this form.`);
-          else if (q.if_yes === 'stop') parts.push(`If your answer to question ${num} is Yes, ${q.stop_text || 'stop here.'}`);
-          else {
-            const yn = uidToDisplayNum(q.if_yes, qs);
-            if (yn) parts.push(`If your answer to question ${num} is Yes, answer question ${yn}.`);
-          }
-        }
-        if (q.if_no) {
-          if (q.if_no === 'stop')       parts.push(`If your answer is No, ${q.stop_text || 'stop here and do not answer any further questions.'}`);
-          else if (q.if_no === 'sign')  parts.push('If your answer is No, have the presiding juror sign and date this form.');
-          else {
-            const nn = uidToDisplayNum(q.if_no, qs);
-            if (nn) parts.push(`If your answer is No, answer question ${nn}.`);
-          }
-        }
-        obj.routing_text = parts.join(' ');
+      obj.routing_text = routingText(q, qs, num);
 
-      } else if (q.type === 'damages') {
+      if (q.type === 'damages') {
         obj.line_items = (q.line_items || []).map(li => ({ label: li.label }));
       } else if (q.type === 'percentage') {
         obj.parties = (q.parties || []).map(p => ({ label: p.label }));
@@ -879,18 +907,24 @@ function buildVFDocxContent() {
 // ═══════════════════════════════════════════════════════════════════════
 
 function getVFSerializedState() {
-  return JSON.parse(JSON.stringify(vfForms));
+  return { forms: JSON.parse(JSON.stringify(vfForms)), activeFormId: activeVfFormId };
 }
 
 function setVFState(data) {
-  if (!Array.isArray(data) || !data.length) {
-    vfForms         = [];
-    activeVfFormId  = null;
-    vfOpenEditorUid = null;
-    renderAll();
-    return;
+  // Normalize: support both old plain-array format and new {forms, activeFormId} format (A7)
+  let forms, savedActiveId;
+  if (Array.isArray(data)) {
+    forms = data;
+    savedActiveId = null;
+  } else if (data && Array.isArray(data.forms)) {
+    forms = data.forms;
+    savedActiveId = data.activeFormId || null;
+  } else {
+    forms = [];
+    savedActiveId = null;
   }
-  vfForms        = JSON.parse(JSON.stringify(data));
+
+  vfForms         = forms.length ? JSON.parse(JSON.stringify(forms)) : [];
   vfOpenEditorUid = null;
 
   // Advance counters past restored ids so new ones never collide
@@ -903,7 +937,23 @@ function setVFState(data) {
     }
   }
 
-  activeVfFormId = vfForms[0].id;
+  // Normalize routes for all restored forms (resolves any __src__: sentinels)
+  for (const form of vfForms) normalizeRoutes(form);
+
+  // Restore active form; fall back to first form if saved id is absent or invalid (A7)
+  if (savedActiveId && vfForms.some(f => f.id === savedActiveId)) {
+    activeVfFormId = savedActiveId;
+  } else {
+    activeVfFormId = vfForms.length ? vfForms[0].id : null;
+  }
+
+  // Ensure at least one blank form exists — mirrors init behavior (A6)
+  if (!vfForms.length) {
+    const f = newBlankForm('New Verdict Form');
+    vfForms.push(f);
+    activeVfFormId = f.id;
+  }
+
   renderAll();
 }
 
@@ -964,13 +1014,59 @@ function renderAll() {
       const slug     = form ? form.name.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/-+/g, '-') : 'verdict-form';
       const dateSlug = new Date().toISOString().slice(0, 10);
       if (fmt === 'pdf') {
-        const heading = form ? form.name : 'Verdict Form';
-        const body    = renderVFPlainText();
-        exportPDF([{ heading, body }], `VF-${slug}-${dateSlug}.pdf`);
+        try {
+          const full    = renderVFPlainText();
+          const marker  = 'SPECIAL VERDICT FORM\n';
+          const mIdx    = full.indexOf(marker);
+          const heading = 'SPECIAL VERDICT FORM';
+          const body    = mIdx >= 0 ? full.slice(mIdx + marker.length).trimStart() : full;
+          exportPDF([{ heading, body }], `VF-${slug}-${dateSlug}.pdf`);
+        } catch (err) {
+          console.error('[vf-app] PDF export failed:', err);
+        }
       } else if (fmt === 'docx') {
         const content = buildVFDocxContent();
         if (!content) return;
         exportDOCX(content, `VF-${slug}-${dateSlug}.docx`);
+      } else if (fmt === 'pleading') {
+        if (!form) return;
+        (async () => {
+          try {
+            // Load saved attorney profile; strip 'pl_' prefix to get field keys
+            const profileRaw = localStorage.getItem('pleading_attorney_profile');
+            const profile    = profileRaw ? JSON.parse(profileRaw) : {};
+            const fields     = {};
+            for (const [k, v] of Object.entries(profile)) {
+              if (k.startsWith('pl_')) fields[k.slice(3)] = v;
+            }
+            // Overlay caption from the currently-selected case (only fills missing keys)
+            const caseSel = document.getElementById('caseSelect');
+            if (caseSel && caseSel.value) {
+              const cases   = JSON.parse(localStorage.getItem('caci_cases') || '{}');
+              const caption = (cases[caseSel.value] && cases[caseSel.value].caption) || {};
+              for (const [k, v] of Object.entries(caption)) {
+                if (!fields[k]) fields[k] = v;
+              }
+            }
+            // Document title from form name; body is the verdict questions only
+            // (strip caption preamble that renderVFPlainText prepends)
+            fields.document_title = form.name || 'SPECIAL VERDICT FORM';
+            const full   = renderVFPlainText();
+            const marker = 'SPECIAL VERDICT FORM\n';
+            const mIdx   = full.indexOf(marker);
+            fields.body_text = mIdx >= 0 ? full.slice(mIdx + marker.length).trimStart() : full;
+            const paperCheck = document.getElementById('vfPleadingCheck');
+            const blob = await generatePleadingShell({ fields, plainPaper: !(paperCheck && paperCheck.checked) });
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href     = url;
+            a.download = `VF-${slug}-pleading-${dateSlug}.docx`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } catch (err) {
+            console.error('[vf-app] Pleading DOCX failed:', err);
+          }
+        })();
       }
     });
   }
@@ -980,6 +1076,42 @@ function renderAll() {
     const f = newBlankForm('New Verdict Form');
     vfForms.push(f);
     activeVfFormId = f.id;
+  }
+
+  // Pre-fill VF caption from saved case caption when a case is selected.
+  // Mirrors pleading-ui.js: read-only, one-way, only fills fields that are
+  // currently empty. Does not create or overwrite forms.
+  const caseSelectVF = document.getElementById('caseSelect');
+  if (caseSelectVF) {
+    caseSelectVF.addEventListener('change', e => {
+      const name = e.target.value;
+      if (!name) return;
+      const form = activeWorkingForm();
+      if (!form) return;
+      try {
+        const cases   = JSON.parse(localStorage.getItem('caci_cases') || '{}');
+        const caption = (cases[name] && cases[name].caption) || {};
+        if (!form.caption) form.caption = {};
+        const cap = form.caption;
+
+        if (!cap.court      && caption.court_name)   cap.court      = caption.court_name;
+        if (!cap.dept       && caption.dept_number)  cap.dept       = caption.dept_number;
+        if (!cap.caseNumber && caption.case_number)  cap.caseNumber = caption.case_number;
+
+        // caseName: "plaintiff v. defendant", or whichever is present, or blank
+        if (!cap.caseName) {
+          const p = caption.plaintiff_name || '';
+          const d = caption.defendant_name || '';
+          if (p && d)      cap.caseName = p + ' v. ' + d;
+          else if (p || d) cap.caseName = p || d;
+          // both absent: leave blank
+        }
+
+        renderCaptionFields();
+      } catch (err) {
+        console.warn('[vf-app] caption pre-fill failed:', err);
+      }
+    });
   }
 
   renderAll();

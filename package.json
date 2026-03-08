@@ -4,13 +4,14 @@
   "description": "",
   "main": "parse-caci.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test-batch-a.js && node test-batch-b.js && node test-batch-c.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@napi-rs/canvas": "0.1.94",
     "docx": "^9.6.0",
     "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^5.4.624"

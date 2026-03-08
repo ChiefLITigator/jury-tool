@@ -133,7 +133,8 @@ function getUnfilledFields(parsedState) {
     const f = fields.get(key);
     if (!f) continue;
     if (f.type === 'text'     && f.value === '')                      unfilled.push(f);
-    if (f.type === 'dropdown' && f.selected === -1 && !f.custom)      unfilled.push(f);
+    if (f.type === 'dropdown' && ((f.selected === -1 && !f.custom) ||
+        (f.custom && (f.customValue || '').trim() === '')))            unfilled.push(f); // B2
     if (f.type === 'note'     && f.value === '')                      unfilled.push(f);
   }
   return unfilled;
@@ -152,7 +153,9 @@ function applyUnfilledHighlights(state) {
   for (const f of getUnfilledFields(state)) {
     let el;
     if      (f.type === 'text')     el = formEl.querySelector(`input[data-key="${f.key}"][data-ftype="text"]`);
-    else if (f.type === 'dropdown') el = formEl.querySelector(`select[data-key="${f.key}"]`);
+    else if (f.type === 'dropdown') el = f.custom                                              // B2
+      ? formEl.querySelector(`input[data-ftype="custom"][data-key="${f.key}"]`)
+      : formEl.querySelector(`select[data-key="${f.key}"]`);
     else if (f.type === 'note')     el = formEl.querySelector(`textarea[data-key="${f.key}"]`);
     if (el) { el.style.borderColor = '#fbbf24'; el.style.background = '#fffbeb'; }
   }
@@ -182,7 +185,7 @@ function renderDraftForm(state) {
       html += `<div class="draft-field">
         <label for="${id}">${esc(f.label)}</label>
         <input type="text" id="${id}" data-key="${f.key}" data-ftype="text"
-               value="${esc(f.value)}" placeholder="${esc(f.label)}…">
+               value="${escAttr(f.value)}" placeholder="${escAttr(f.label)}…">
       </div>`;
     }
     html += '</div>';
@@ -211,7 +214,7 @@ function renderDraftForm(state) {
           <label>${esc(f.label)}</label>
           <div style="display:flex;gap:6px;align-items:center">
             <input type="text" data-key="${f.key}" data-ftype="custom"
-                   value="${esc(f.customValue)}" placeholder="Type custom value\u2026"
+                   value="${escAttr(f.customValue)}" placeholder="Type custom value\u2026"
                    style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:4px;font-family:var(--serif);font-size:.85em;color:var(--text)">
             <button type="button" class="btn-ghost" style="white-space:nowrap"
                     onclick="restoreDraftDropdown('${f.key}')">&#8592; back</button>
@@ -465,6 +468,26 @@ document.getElementById('addToPacketBtn').addEventListener('click', () => {
   setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 2500);
 });
 
+/**
+ * Reset lock/edit mode to the default unlocked state (B1).
+ * Called before every instruction load, packet load, case load,
+ * case import, and clear-all path so stale locked text cannot
+ * bleed into a new instruction.
+ */
+function resetDraftLockState() {
+  const ws      = document.getElementById('draftWorkspace');
+  if (!ws) return;
+  const preview  = document.getElementById('draftPreview');
+  const editArea = document.getElementById('draftEditArea');
+  const lockBtn  = document.getElementById('lockEditBtn');
+  const warning  = document.getElementById('draftLockWarning');
+  ws.classList.remove('draft-locked');
+  if (editArea) { editArea.value = ''; editArea.classList.add('hidden'); }
+  if (preview)  preview.classList.remove('hidden');
+  if (lockBtn)  lockBtn.textContent = 'Lock & Edit';
+  if (warning)  warning.classList.add('hidden');
+}
+
 function getDraftText() {
   const ws = document.getElementById('draftWorkspace');
   if (ws.classList.contains('draft-locked')) {
@@ -545,10 +568,14 @@ document.getElementById('exportDraftPicker').addEventListener('click', e => {
   let heading, body;
   if (locked) {
     const fullText   = getDraftText();
-    const firstNL    = fullText.indexOf('\n');
     const firstBlank = fullText.indexOf('\n\n');
-    heading = firstNL    !== -1 ? fullText.slice(0, firstNL).trim() : fullText.trim();
-    body    = firstBlank !== -1 ? fullText.slice(firstBlank + 2)    : '';
+    if (firstBlank !== -1) {
+      heading = fullText.slice(0, firstBlank).trim();
+      body    = fullText.slice(firstBlank + 2).trim();
+    } else {
+      heading = fullText.trim();
+      body    = '';
+    }
   } else {
     heading = getDraftHeading();
     body    = getDraftBodyText();

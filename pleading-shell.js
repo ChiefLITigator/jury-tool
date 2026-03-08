@@ -39,22 +39,69 @@ function crc32(buf) {
 }
 
 // ─ ZIP UTILITIES ─────────────────────────────────────────────────────────────
-// Pure-Node ZIP reader. Returns array of { name: string, data: Buffer }.
-function readZipEntries(zipBuf) {
+// ZIP reader. Returns Promise<Array<{ name: string, data: Buffer }>>.
+// Node path: require('zlib').inflateRawSync — unchanged.
+// Browser path: DecompressionStream('deflate-raw') — no native dependencies.
+
+async function inflateRawBrowser(compData) {
+  const input  = compData instanceof Uint8Array ? compData
+               : new Uint8Array(compData.buffer, compData.byteOffset, compData.byteLength);
+  const ds     = new DecompressionStream('deflate-raw');
+  const writer = ds.writable.getWriter();
+  const reader = ds.readable.getReader();
+  writer.write(input);
+  writer.close();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const total = chunks.reduce((n, c) => n + c.length, 0);
+  const out   = new Uint8Array(total);
+  let   off   = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  return out;
+}
+
+function concatU8(arrays) {
+  let total = 0;
+  for (const a of arrays) total += a.length;
+  const res = new Uint8Array(total);
+  let offset = 0;
+  for (const a of arrays) {
+    res.set(a, offset);
+    offset += a.length;
+  }
+  return res;
+}
+
+async function readZipEntries(zipBuf) {
   const entries = [];
+  const u8 = zipBuf instanceof Uint8Array ? zipBuf : new Uint8Array(zipBuf);
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
   let pos = 0;
-  while (pos < zipBuf.length - 4) {
-    if (zipBuf.readUInt32LE(pos) === 0x04034b50) {
-      const compression  = zipBuf.readUInt16LE(pos + 8);
-      const compSize     = zipBuf.readUInt32LE(pos + 18);
-      const fnLen        = zipBuf.readUInt16LE(pos + 26);
-      const extraLen     = zipBuf.readUInt16LE(pos + 28);
-      const name         = zipBuf.slice(pos + 30, pos + 30 + fnLen).toString('utf8');
-      const dataStart    = pos + 30 + fnLen + extraLen;
-      const compData     = zipBuf.slice(dataStart, dataStart + compSize);
-      const zlib         = require('zlib');
-      const data = compression === 8 ? zlib.inflateRawSync(compData) : compData;
-      entries.push({ name, data: Buffer.from(data) });
+  while (pos < u8.length - 4) {
+    if (dv.getUint32(pos, true) === 0x04034b50) {
+      const compression = dv.getUint16(pos + 8, true);
+      const compSize    = dv.getUint32(pos + 18, true);
+      const fnLen       = dv.getUint16(pos + 26, true);
+      const extraLen    = dv.getUint16(pos + 28, true);
+      const nameBytes   = u8.subarray(pos + 30, pos + 30 + fnLen);
+      const name        = typeof TextDecoder !== 'undefined' ? new TextDecoder().decode(nameBytes) : Buffer.from(nameBytes).toString('utf8');
+      const dataStart   = pos + 30 + fnLen + extraLen;
+      const compData    = u8.subarray(dataStart, dataStart + compSize);
+      let data;
+      if (compression === 8) {
+        if (IS_NODE) {
+          data = require('zlib').inflateRawSync(compData);
+        } else {
+          data = await inflateRawBrowser(compData);
+        }
+      } else {
+        data = compData;
+      }
+      entries.push({ name, data: IS_NODE && !Buffer.isBuffer(data) ? Buffer.from(data) : data });
       pos = dataStart + compSize;
     } else {
       pos++;
@@ -68,85 +115,85 @@ function readZipEntries(zipBuf) {
 function writeZip(entries) {
   const useDeflate = IS_NODE;
   const zlib = IS_NODE ? require('zlib') : null;
-
   const localParts = [];
   const cdEntries  = [];
   let   offset     = 0;
 
   for (const { name, data } of entries) {
-    const nameBytes = Buffer.from(name, 'utf8');
-    const dataBuf   = Buffer.isBuffer(data) ? data : Buffer.from(data);
+    const nameBytes = typeof TextEncoder !== 'undefined' ? new TextEncoder().encode(name) : Buffer.from(name, 'utf8');
+    const dataU8    = data instanceof Uint8Array ? data : new Uint8Array(data);
+
     let payload, compression;
     if (useDeflate) {
-      const compressed = zlib.deflateRawSync(dataBuf, { level: 6 });
-      if (compressed.length < dataBuf.length) {
+      const compressed = zlib.deflateRawSync(dataU8, { level: 6 });
+      if (compressed.length < dataU8.length) {
         payload = compressed; compression = 8;
       } else {
-        payload = dataBuf; compression = 0;
+        payload = dataU8; compression = 0;
       }
     } else {
-      payload = dataBuf; compression = 0;
+      payload = dataU8; compression = 0;
     }
-    const crc = crc32(dataBuf);
+    const crc = crc32(dataU8);
 
-    // Local file header (30 bytes + filename)
-    const lh = Buffer.alloc(30 + nameBytes.length);
-    lh.writeUInt32LE(0x04034b50, 0);          // signature
-    lh.writeUInt16LE(20, 4);                   // version needed
-    lh.writeUInt16LE(0, 6);                    // flags
-    lh.writeUInt16LE(compression, 8);
-    lh.writeUInt16LE(0, 10);                   // mod time
-    lh.writeUInt16LE(0, 12);                   // mod date
-    lh.writeUInt32LE(crc, 14);
-    lh.writeUInt32LE(payload.length, 18);      // compressed size
-    lh.writeUInt32LE(dataBuf.length, 22);      // uncompressed size
-    lh.writeUInt16LE(nameBytes.length, 26);
-    lh.writeUInt16LE(0, 28);                   // extra length
-    nameBytes.copy(lh, 30);
+    const lh = new Uint8Array(30 + nameBytes.length);
+    const lhDv = new DataView(lh.buffer, lh.byteOffset, lh.byteLength);
+    lhDv.setUint32(0, 0x04034b50, true);
+    lhDv.setUint16(4, 20, true);
+    lhDv.setUint16(6, 0, true);
+    lhDv.setUint16(8, compression, true);
+    lhDv.setUint16(10, 0, true);
+    lhDv.setUint16(12, 0, true);
+    lhDv.setUint32(14, crc, true);
+    lhDv.setUint32(18, payload.length, true);
+    lhDv.setUint32(22, dataU8.length, true);
+    lhDv.setUint16(26, nameBytes.length, true);
+    lhDv.setUint16(28, 0, true);
+    lh.set(nameBytes, 30);
 
     localParts.push(lh, payload);
-    cdEntries.push({ nameBytes, compression, crc,
-                     compSize: payload.length, uncompSize: dataBuf.length, offset });
+    cdEntries.push({ nameBytes, compression, crc, compSize: payload.length, uncompSize: dataU8.length, offset });
     offset += lh.length + payload.length;
   }
 
-  // Central directory
   const cdParts = cdEntries.map(c => {
-    const cd = Buffer.alloc(46 + c.nameBytes.length);
-    cd.writeUInt32LE(0x02014b50, 0);           // signature
-    cd.writeUInt16LE(20, 4);                   // version made by
-    cd.writeUInt16LE(20, 6);                   // version needed
-    cd.writeUInt16LE(0, 8);                    // flags
-    cd.writeUInt16LE(c.compression, 10);
-    cd.writeUInt16LE(0, 12);                   // mod time
-    cd.writeUInt16LE(0, 14);                   // mod date
-    cd.writeUInt32LE(c.crc, 16);
-    cd.writeUInt32LE(c.compSize, 20);
-    cd.writeUInt32LE(c.uncompSize, 24);
-    cd.writeUInt16LE(c.nameBytes.length, 28);
-    cd.writeUInt16LE(0, 30);                   // extra length
-    cd.writeUInt16LE(0, 32);                   // comment length
-    cd.writeUInt16LE(0, 34);                   // disk start
-    cd.writeUInt16LE(0, 36);                   // internal attr
-    cd.writeUInt32LE(0, 38);                   // external attr
-    cd.writeUInt32LE(c.offset, 42);
-    c.nameBytes.copy(cd, 46);
+    const cd = new Uint8Array(46 + c.nameBytes.length);
+    const cdDv = new DataView(cd.buffer, cd.byteOffset, cd.byteLength);
+    cdDv.setUint32(0, 0x02014b50, true);
+    cdDv.setUint16(4, 20, true);
+    cdDv.setUint16(6, 20, true);
+    cdDv.setUint16(8, 0, true);
+    cdDv.setUint16(10, c.compression, true);
+    cdDv.setUint16(12, 0, true);
+    cdDv.setUint16(14, 0, true);
+    cdDv.setUint32(16, c.crc, true);
+    cdDv.setUint32(20, c.compSize, true);
+    cdDv.setUint32(24, c.uncompSize, true);
+    cdDv.setUint16(28, c.nameBytes.length, true);
+    cdDv.setUint16(30, 0, true);
+    cdDv.setUint16(32, 0, true);
+    cdDv.setUint16(34, 0, true);
+    cdDv.setUint16(36, 0, true);
+    cdDv.setUint32(38, 0, true);
+    cdDv.setUint32(42, c.offset, true);
+    cd.set(c.nameBytes, 46);
     return cd;
   });
-  const cdBuf = Buffer.concat(cdParts);
+  const cdBuf = concatU8(cdParts);
 
-  // End of central directory
-  const eocd = Buffer.alloc(22);
-  eocd.writeUInt32LE(0x06054b50, 0);
-  eocd.writeUInt16LE(0, 4);
-  eocd.writeUInt16LE(0, 6);
-  eocd.writeUInt16LE(cdEntries.length, 8);
-  eocd.writeUInt16LE(cdEntries.length, 10);
-  eocd.writeUInt32LE(cdBuf.length, 12);
-  eocd.writeUInt32LE(offset, 16);
-  eocd.writeUInt16LE(0, 20);
+  const eocd = new Uint8Array(22);
+  const eocdDv = new DataView(eocd.buffer, eocd.byteOffset, eocd.byteLength);
+  eocdDv.setUint32(0, 0x06054b50, true);
+  eocdDv.setUint16(4, 0, true);
+  eocdDv.setUint16(6, 0, true);
+  eocdDv.setUint16(8, cdEntries.length, true);
+  eocdDv.setUint16(10, cdEntries.length, true);
+  eocdDv.setUint32(12, cdBuf.length, true);
+  eocdDv.setUint32(16, offset, true);
+  eocdDv.setUint16(20, 0, true);
 
-  return Buffer.concat([...localParts, cdBuf, eocd]);
+  const finalU8 = concatU8([...localParts, cdBuf, eocd]);
+  return IS_NODE ? Buffer.from(finalU8) : finalU8;
 }
 
 // ─ DOCX HELPERS ──────────────────────────────────────────────────────────────
@@ -369,28 +416,37 @@ function buildBody(fields) {
   const f = fields;
 
   // Attorney block (single-spaced)
-  const attyName  = f.attorney_name     || '[Attorney Name], Esq.';
-  const sbn       = f.state_bar_number  || 'XXXXXX';
-  const firmName  = f.firm_name         || '[Firm Name]';
-  const addr1     = f.firm_address_1    || '[Street Address]';
-  const addr2     = f.firm_address_2    || '[City, State ZIP]';
-  const phone     = f.firm_phone        || '[XXX-XXX-XXXX]';
-  const fax       = f.firm_fax          || '';
-  const email     = f.firm_email        || '[attorney@firm.com]';
-  const attyRole  = f.attorney_role     || 'Plaintiff';
-  const clientNm  = f.client_name       || '';
+  const atty1Name = f.attorney_1_name || '[Attorney Name]';
+  const atty1Bar  = f.attorney_1_bar  || 'XXXXXX';
+  const atty2Name = f.attorney_2_name || '';
+  const atty2Bar  = f.attorney_2_bar  || '';
+  const atty3Name = f.attorney_3_name || '';
+  const atty3Bar  = f.attorney_3_bar  || '';
+  const firmName  = f.firm_name       || '[Firm Name]';
+  const addr1     = f.firm_address_1  || '[Street Address]';
+  const addr2     = f.firm_address_2  || '';
+  const phone     = f.firm_phone      || '[XXX-XXX-XXXX]';
+  const fax       = f.firm_fax        || '';
+  const attyRole  = f.attorney_role   || '';
+  const clientNm  = f.client_name     || '';
 
   const attyBlock = [
-    ap([tr(attyName + ' (SBN ' + sbn + ')')]),
+    // Attorney 1 (required)
+    ap([tr(atty1Name + ', ESQ. (SBN ' + atty1Bar + ')')]),
+    // Attorney 2 (optional — omit line if name blank)
+    ...(atty2Name ? [ap([tr(atty2Name + ', ESQ. (SBN ' + atty2Bar + ')')])] : []),
+    // Attorney 3 (optional — omit line if name blank)
+    ...(atty3Name ? [ap([tr(atty3Name + ', ESQ. (SBN ' + atty3Bar + ')')])] : []),
+    // Firm block
     ap([tr(firmName, { bold: true })]),
     ap([tr(addr1)]),
-    ap([tr(addr2)]),
-    ap([tr('Tel:  ' + phone)]),
-    ...(fax ? [ap([tr('Fax:  ' + fax)])] : []),
-    ap([tr('Email:  ' + email)]),
+    ...(addr2 ? [ap([tr(addr2)])] : []),
+    ap([tr(fax ? 'Tel: ' + phone + ' / Fax: ' + fax : 'Tel: ' + phone)]),
     ap([tr('')]),
-    ap([tr('Attorneys for ' + attyRole)]),
-    ap([tr(clientNm)]),
+    // Attorneys for (optional — omit if blank)
+    ...(attyRole ? [ap([tr('Attorneys for ' + attyRole)])] : []),
+    // Client name in all caps (optional — omit if blank)
+    ...(clientNm ? [ap([tr(clientNm)])] : []),
   ];
 
   // Court name (centered, bold, with blank lines before and between)
@@ -409,12 +465,14 @@ function buildBody(fields) {
 
   // Post-caption body area
   const docTitle = fields.document_title || '[DOCUMENT TITLE]';
+  const bodyText = fields.body_text || '';
   const bodyArea = [
     bp([tr('')]),
     bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER }),
     bp([tr('')]),
-    bp([tr('')]),
-    bp([tr('')]),
+    ...(bodyText
+      ? bodyText.split('\n').map(line => bp([tr(line)]))
+      : [bp([tr('')]), bp([tr('')]), bp([tr('')])]),
   ];
 
   return [...attyBlock, ...courtBlock, captionTable, ...bodyArea];
@@ -423,19 +481,17 @@ function buildBody(fields) {
 // ─ HEADER INJECTION ──────────────────────────────────────────────────────────
 // After generating the DOCX, replaces word/header1.xml with PLEADING_HEADER_XML.
 // The reference header has no external relationships — no .rels changes needed.
-function injectPleadingHeader(zipBuf) {
-  const entries  = readZipEntries(zipBuf);
-  const xmlBuf   = Buffer.from(PLEADING_HEADER_XML, 'utf8');
+async function injectPleadingHeader(zipBuf) {
+  const entries  = await readZipEntries(zipBuf);
+  const xmlU8    = typeof TextEncoder !== 'undefined' ? new TextEncoder().encode(PLEADING_HEADER_XML) : Buffer.from(PLEADING_HEADER_XML, 'utf8');
   let   injected = 0;
   for (const entry of entries) {
     if (/^word\/header\d+\.xml$/.test(entry.name)) {
-      entry.data = xmlBuf;
+      entry.data = xmlU8;
       injected++;
     }
   }
-  if (!injected) {
-    console.warn('Warning: no header entry found in generated DOCX; header not injected.');
-  }
+  if (!injected) console.warn('Warning: no header entry found in generated DOCX; header not injected.');
   return writeZip(entries);
 }
 
@@ -498,15 +554,14 @@ async function generatePleadingShell(options = {}) {
   if (IS_NODE) {
     docBuf = await Packer.toBuffer(doc);
   } else {
-    // Browser + pleading paper: ZIP patching requires Node zlib — not supported in browser.
-    docBuf = Buffer.from(await Packer.toBuffer(doc));
+    const blob = await Packer.toBlob(doc);
+    docBuf     = new Uint8Array(await blob.arrayBuffer());
   }
 
-  // Inject the reference pleading header via ZIP patching (pleading paper only)
-  const patched = plainPaper ? docBuf : injectPleadingHeader(docBuf);
+  const patched = plainPaper ? docBuf : await injectPleadingHeader(docBuf);
 
   if (IS_NODE) {
-    return patched;
+    return Buffer.isBuffer(patched) ? patched : Buffer.from(patched);
   } else {
     return new Blob([patched], {
       type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -533,16 +588,15 @@ async function runCLI() {
   const fields = {};
 
   // Attorney block
-  fields.attorney_name    = await ask('1.  Attorney name (include Esq.)',        'David S. Bederman, Esq.');
-  fields.state_bar_number = await ask('    State Bar No.',                        '285262');
-  fields.firm_name        = await ask('2.  Firm name',                            'ABIR COHEN TREYZON SALO LLP');
-  fields.firm_address_1   = await ask('3.  Street address',                       '16001 Ventura Blvd., Suite 200');
-  fields.firm_address_2   = await ask('4.  City, State ZIP',                      'Encino CA 91436');
-  fields.firm_phone       = await ask('5.  Phone',                                '424-288-4367');
-  fields.firm_fax         = await ask('6.  Fax (Enter to skip)',                  '424-288-4368');
-  fields.firm_email       = await ask('7.  Email',                                'dbederman@actslaw.com');
-  fields.attorney_role    = await ask('8.  Attorney role (Plaintiff/Defendant)',  'Plaintiff');
-  fields.client_name      = await ask('    Client name (all caps)',               'JAMES HYPE');
+  fields.attorney_1_name  = await ask('1.  Attorney 1 name',                      'David S. Bederman');
+  fields.attorney_1_bar   = await ask('    State Bar No.',                         '285262');
+  fields.firm_name        = await ask('2.  Firm name',                             'ABIR COHEN TREYZON SALO LLP');
+  fields.firm_address_1   = await ask('3.  Street address',                        '16001 Ventura Blvd., Suite 200');
+  fields.firm_address_2   = await ask('4.  City, State ZIP',                       'Encino CA 91436');
+  fields.firm_phone       = await ask('5.  Phone',                                 '424-288-4367');
+  fields.firm_fax         = await ask('6.  Fax (Enter to skip)',                   '424-288-4368');
+  fields.attorney_role    = await ask('7.  Attorney role (Plaintiff/Defendant)',   'Plaintiff');
+  fields.client_name      = await ask('    Client name (all caps, Enter to skip)', 'JAMES HYPE');
 
   // Court
   fields.court_name   = await ask('9.  Court name',
@@ -576,7 +630,7 @@ async function runCLI() {
 
   // Summary
   console.log('\n─── Summary ───────────────────────────────');
-  console.log(`Attorney:   ${fields.attorney_name}, SBN ${fields.state_bar_number}`);
+  console.log(`Attorney:   ${fields.attorney_1_name}, SBN ${fields.attorney_1_bar}`);
   console.log(`Firm:       ${fields.firm_name}`);
   console.log(`Case No.:   ${fields.case_number}`);
   console.log(`Title:      ${fields.document_title}`);

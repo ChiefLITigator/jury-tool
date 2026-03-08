@@ -1,6 +1,6 @@
 # CODEBASE MAP
 ## California Civil Litigation Tool Suite
-## Last updated: 2026-03-07
+## Last updated: 2026-03-08
 
 Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
@@ -12,25 +12,49 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 
 | File | Lines | ~Tokens | Status | Load for session? |
 |------|-------|---------|--------|-------------------|
-| caci-compare.html | 638 | ~8,300 | Active | Only if touching HTML/CSS/tabs |
-| app-shared.js | 155 | ~1,700 | Active | Yes — shared utilities, CACI lookup, print |
-| app-compare.js | 465 | ~5,200 | Active | Yes — diff engine, compare tab |
-| app-draft.js | 553 | ~6,100 | Active | Yes — instruction drafter |
-| app-packet.js | 161 | ~1,800 | Active | Yes — packet tray |
-| app-cases.js | 180 | ~2,000 | Active | Yes — localStorage case system |
+| caci-compare.html | ~930 | ~8,500 | Active | Only if touching HTML/CSS/tabs |
+| app-shared.js | 225 | ~1,700 | Active | Yes — shared utilities, CACI lookup, print |
+| app-compare.js | 476 | ~5,300 | Active | Yes — diff engine, compare tab |
+| app-draft.js | 595 | ~6,300 | Active | Yes — instruction drafter |
+| app-packet.js | 192 | ~1,800 | Active | Yes — packet tray |
+| app-cases.js | 238 | ~2,300 | Active | Yes — localStorage case system |
+| app-browse.js | 203 | ~1,200 | Active | When touching browse/search panel |
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
-| vf-app.js | 980 | ~10,500 | Active | When touching VF tab |
+| vf-app.js | 1118 | ~11,000 | Active | When touching VF tab |
 | docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
-| pleading-shell.js | ~605 | ~5,500 | Active | When touching pleading shell |
-| pleading-ui.js | ~110 | ~1,000 | Active | When touching Pleading tab UI |
+| pleading-shell.js | 664 | ~5,500 | Active | When touching pleading shell |
+| pleading-ui.js | 291 | ~1,400 | Active | When touching Pleading tab UI |
 | vf-data.js | 42 | ~400 | Stable | NEVER — data file |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
 | parse-caci.js | 208 | ~1,900 | Utility | Only if re-parsing CACI PDF |
 | verify-caci.js | 114 | ~1,100 | Utility | Only if verifying data |
 | test-caci.js | 111 | ~1,100 | Utility | Only if running tests |
+| test-batch-a.js | 226 | ~1,800 | Test | Only if running/editing VF routing tests |
+| test-batch-b.js | 189 | ~1,600 | Test | Only if running/editing case persistence tests |
+| test-batch-c.js | 234 | ~1,900 | Test | Only if running/editing diff/escAttr/parser tests |
+| CHANGELOG.md | — | — | Docs | Never — reference only |
 
 **Rule:** Total context per session should stay under ~40,000 tokens.
 Logic files only. Data files never.
+
+---
+
+## REVIEW DOCUMENT
+
+**CODEBASE-REVIEW.md** exists as a companion to this file, optimized for Claude.ai chat sessions.
+It contains function signatures, global variables, event listeners, cross-file dependencies, and
+key code snippets for all active logic files — enough for Claude.ai to give code-grounded answers
+without opening files.
+
+Keep CODEBASE-REVIEW.md current whenever making significant changes:
+- New functions or changed signatures → update the relevant section
+- New global variables → update globals
+- New event listeners → update listeners
+- Cross-file dependency changes → update dependencies
+- Bug-prone logic changes → update snippets
+
+**Claude Code has discretion to update CODEBASE-REVIEW.md in the ordinary course of work without
+being explicitly asked, as long as the update accurately reflects the current state of the code.**
 
 ---
 
@@ -45,14 +69,15 @@ caci-compare.html              — single-page app shell, all tabs live here
   ├── app-draft.js             — 5th: instruction drafter
   ├── app-packet.js            — 6th: packet tray
   ├── app-cases.js             — 7th: localStorage case system
-  ├── node_modules/docx/...    — 8th: window.docx (UMD bundle, docx v9)
-  ├── pdfmake.min.js           — 9th: window.pdfMake (CDN, v0.2.7)
-  ├── vfs_fonts.min.js         — 10th: registers bundled fonts for pdfmake (CDN)
-  ├── docx-export.js           — 11th: exposes exportDOCX()
-  ├── vf-data.js               — 12th: exposes window.vfDB
-  ├── vf-app.js                — 13th: all VF builder logic
-  ├── pleading-shell.js        — 14th: exposes window.generatePleadingShell(options)
-  └── pleading-ui.js           — 15th: Pleading Shell tab UI controller
+  ├── app-browse.js            — 8th: CACI browse/search panel
+  ├── node_modules/docx/...    — 9th: window.docx (UMD bundle, docx v9)
+  ├── pdfmake.min.js           — 10th: window.pdfMake (CDN, v0.2.7)
+  ├── vfs_fonts.min.js         — 11th: registers bundled fonts for pdfmake (CDN)
+  ├── docx-export.js           — 12th: exposes exportDOCX()
+  ├── vf-data.js               — 13th: exposes window.vfDB
+  ├── vf-app.js                — 14th: all VF builder logic
+  ├── pleading-shell.js        — 15th: exposes window.generatePleadingShell(options)
+  └── pleading-ui.js           — 16th: Pleading Shell tab UI controller
 ```
 
 **No build step. No bundler. No framework. All vanilla JS.**
@@ -71,8 +96,8 @@ No inline JavaScript (all logic is in .js files).
 - `data-tab="vf"` — verdict form builder (`#tab-vf`)
 - `data-tab="pleading"` — pleading shell generator (`#tab-pleading`)
 
-**Case bar** (`#caseBar`): shown on draft tab and VF tab only. Hidden on compare and pleading tabs.
-Note: case persistence (caseSave/caseLoad) does not include pleading Section B fields.
+**Case bar** (`#caseBar`): shown on draft, VF, and pleading tabs. Hidden on compare tab only.
+Note: case persistence (caseSave/caseLoad) includes pleading Section B caption fields (added 2026-03-08). Old saves without `caption` are loaded as `caption || {}`.
 
 **Print settings panel** (`#print-settings-wrap`): shared across tabs.
 Controls font, size, spacing, alignment, margins for print/PDF output.
@@ -108,7 +133,10 @@ Shared:
 <script src="app-draft.js"></script>
 <script src="app-packet.js"></script>
 <script src="app-cases.js"></script>
+<script src="app-browse.js"></script>
 <script src="node_modules/docx/dist/index.iife.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
 <script src="docx-export.js"></script>
 <script src="vf-data.js"></script>
 <script src="vf-app.js"></script>
@@ -118,14 +146,15 @@ Shared:
 
 ---
 
-## app-shared.js  (155 lines)
+## app-shared.js  (225 lines)
 
 **Purpose:** Shared utilities used across multiple app files.
 Reads from caciDB (set by caci-data.js). No module system — all globals.
 
 | Function / Const | Description |
 |-----------------|-------------|
-| `const esc` | HTML-escape helper — used by compare, draft, and packet renderers |
+| `const esc` | HTML-escape for text content — escapes `& < >` only |
+| `const escAttr` | HTML-escape for attribute values — escapes `& < > " '` (superset of esc) |
 | `lookupCACITextForDraft(num)` | PDF cleanup only, bracket structure preserved → use for draft/parse pipeline |
 | `lookupCACIText(num)` | Same + `flattenForCompare()` → use for compare tab only |
 | `downloadTXT(text, filename)` | Creates blob and triggers download |
@@ -136,30 +165,36 @@ Reads from caciDB (set by caci-data.js). No module system — all globals.
 | Print settings event listeners | `print-settings-toggle`, `ps-*` change listeners, initial call |
 | `exportPDF(sections, filename)` | pdfmake silent Blob download; `sections: [{heading, body}]`, body split on `\n\n` per paragraph |
 
+**escAttr vs esc:** Use `escAttr` for HTML attribute values (`value="..."`, `placeholder="..."`). Use `esc` for text node content. `escAttr` is a strict superset.
+
 ### Two lookup functions — know which to use:
 - `lookupCACITextForDraft(num)` — bracket structure preserved → use for draft/parse pipeline
 - `lookupCACIText(num)` — same + `flattenForCompare()` → use for compare tab only
 
 ---
 
-## app-compare.js  (465 lines)
+## app-compare.js  (476 lines)
 
 **Purpose:** Diff engine and all compare tab logic.
 
 | Lines | Section | Key Functions |
 |-------|---------|---------------|
-| 1–67 | TOKENIZER | `tokenize()`, `stripInstructionHeading()`, `flattenForCompare()` |
-| 68–124 | LCS DIFF | `computeDiff(a,b)`, `computeChunkedDiff(a,b,sz)` |
-| 125–191 | THREE-WAY DIFF | `threeWayDiff(tA, tCaci, tB)` |
-| 192–203 | COUNTING | `counts(ops)` |
-| 204–256 | HTML RENDERING | `renderFull()`, `renderLeft()`, `renderRight()`, `colHtml()` |
-| 257–277 | SCROLL SYNC | `attachScrollSync()` |
-| 278–365 | MAIN COMPARE | `runCompare()` — orchestrates 2-way and 3-way diff |
-| 366–end | EVENT LISTENERS | loadCaci, resetCaci, compareBtn, tab navigation, print/export compare |
+| 1–70 | TOKENIZER | `tokenize()`, `stripInstructionHeading()`, `flattenForCompare()` |
+| 71–127 | LCS DIFF | `computeDiff(a,b)`, `computeChunkedDiff(a,b,sz)` |
+| 128–194 | THREE-WAY DIFF | `threeWayDiff(tA, tCaci, tB)` |
+| 195–210 | COUNTING | `counts(ops)` — skips PARA_SENTINEL tokens |
+| 211–265 | HTML RENDERING | `renderFull()`, `renderLeft()`, `renderRight()`, `colHtml()` |
+| 266–286 | SCROLL SYNC | `attachScrollSync()` |
+| 287–375 | MAIN COMPARE | `runCompare()` — orchestrates 2-way and 3-way diff |
+| 376–end | EVENT LISTENERS | loadCaci, resetCaci, compareBtn, tab navigation, print/export compare |
+
+**Paragraph sentinel:** `const PARA_SENTINEL = '\u00b6'` (pilcrow). `tokenize()` inserts sentinels at `\n{2,}` boundaries before collapsing whitespace. `counts()` skips sentinels so paragraph breaks don't inflate word-change statistics. `renderFull/Left/Right` convert sentinels to `</p><p class="diff-para">`.
+
+**`flattenForCompare` normalizer:** Closes unclosed `[N. [or]]` and `[N. [and]]` brackets (PDF extraction sometimes drops closing `]`). Filter step also removes both `[or]` and `[and]` signals.
 
 ---
 
-## app-draft.js  (553 lines)
+## app-draft.js  (595 lines)
 
 **Purpose:** Instruction drafter — all draft form and preview logic.
 
@@ -172,11 +207,13 @@ let draftState = null;   // current parsed instruction (or null)
 |-------|---------|---------------|
 | 1–13 | STATE | `let draftState = null` |
 | 14–68 | COMPILER | `resolveDropdown()`, `substituteInner()`, `compileInstruction(state)` |
-| 69–163 | UNFILLED TRACKING | `getUnfilledFields()`, `applyUnfilledHighlights()` |
-| 164–303 | FORM RENDERER | `renderDraftForm(state)`, `onDraftChange(e)` |
-| 304–352 | CUSTOM DROPDOWN | `activateDraftCustom()`, `restoreDraftDropdown()` |
-| 353–418 | PREVIEW | `updateDraftPreview()` |
-| 419–end | EVENT LISTENERS + HELPERS | loadDraftBtn, draftCaciNum, addToPacketBtn, lockEditBtn, copyDraftBtn, print/export draft, `getDraftText()`, `getDraftHeading()`, `getDraftBodyText()` |
+| 69–175 | UNFILLED TRACKING | `getUnfilledFields()`, `applyUnfilledHighlights()` |
+| 176–320 | FORM RENDERER | `renderDraftForm(state)`, `onDraftChange(e)` |
+| 321–370 | CUSTOM DROPDOWN | `activateDraftCustom()`, `restoreDraftDropdown()` |
+| 371–440 | PREVIEW | `updateDraftPreview()` |
+| 441–end | EVENT LISTENERS + HELPERS | loadDraftBtn, draftCaciNum, addToPacketBtn, lockEditBtn, copyDraftBtn, print/export draft, `getDraftText()`, `getDraftHeading()`, `getDraftBodyText()`, `resetDraftLockState()` |
+
+**`resetDraftLockState()`:** Removes `draft-locked` class from `#draftWorkspace`, clears `#draftEditArea` textarea, restores `#draftPreview` visibility, resets `#lockEditBtn` text and `#draftLockWarning` visibility. Called by `packetLoad()` (app-packet.js), `clearAllWorkspace()` (app-cases.js), and `caseLoad()` (app-cases.js) before every load path to prevent stale textarea content bleeding into a new instruction.
 
 **Export picker locked-state bug fix (2026-03-07):** When the workspace is locked
 (`draft-locked` class), `getDraftHeading()` and `getDraftBodyText()` read from
@@ -198,7 +235,7 @@ User types CACI# → lookupCACITextForDraft() → raw text
 
 ---
 
-## app-packet.js  (161 lines)
+## app-packet.js  (191 lines)
 
 **Purpose:** Packet tray — manage and compile multi-instruction packets.
 
@@ -218,15 +255,30 @@ let activePacketId     = null; // which packet entry is currently in draft form
 | `compilePacket()` | Joins all instructions into a single text block with separators |
 | Event listeners | packetAddBtn, packetCaciNum keydown, compilePacketBtn, closeCompileOverlay, printPacketBtn, exportPacketBtn |
 
+**exportPacketPicker — "Pleading DOCX" format:**
+Loads saved attorney profile (localStorage `pleading_attorney_profile`, strips `pl_` prefix),
+overlays the current case caption (only-if-missing), sets `document_title = 'PROPOSED JURY INSTRUCTIONS'`,
+sets `body_text = compilePacket()`, calls `generatePleadingShell({ fields, plainPaper })`.
+Respects `#packetPleadingCheck` (independent from Pleading tab checkbox). Async IIFE pattern; errors logged to console.
+
 ---
 
-## app-cases.js  (180 lines)
+## app-cases.js  (238 lines)
 
 **Purpose:** localStorage case persistence system.
 
 ### Global State:
 ```javascript
 const CASE_KEY = 'caci_cases';   // localStorage key
+const CAPTION_FIELD_MAP = [      // 12 Pleading Section B fields → no-prefix key
+  ['pl_court_name', 'court_name'], ['pl_court_county', 'court_county'],
+  ['pl_plaintiff_name', 'plaintiff_name'], ['pl_plaintiff_desc', 'plaintiff_desc'],
+  ['pl_defendant_name', 'defendant_name'], ['pl_defendant_desc', 'defendant_desc'],
+  ['pl_additional_parties', 'additional_parties'],
+  ['pl_case_number', 'case_number'], ['pl_judge_name', 'judge_name'],
+  ['pl_dept_number', 'dept_number'],
+  ['pl_attorney_role', 'attorney_role'], ['pl_client_name', 'client_name']
+];
 ```
 
 | Function | Description |
@@ -235,13 +287,17 @@ const CASE_KEY = 'caci_cases';   // localStorage key
 | `saveCaseIndex(obj)` | Writes the case index to localStorage |
 | `populateCaseSelect()` | Populates `#caseSelect` with sorted case names |
 | `setCaseBarStatus(msg, cls)` | Sets status message in case bar |
-| `serializeParsedState(ps)` | Converts fields Map → array for JSON storage |
+| `readCaptionFromDOM()` | Reads all 12 Section B DOM inputs → `{court_name, ...}` object |
+| `applyCaptionToDOM(caption)` | Writes caption object to 12 Section B DOM inputs |
+| `clearCaptionDOM()` | Clears all 12 Section B DOM inputs |
+| `serializeParsedState(ps)` | Converts fields Map → `{fields:[...entries()]}` for JSON storage (rawText/segments excluded — re-derived on load) |
 | `applyFieldValues(fresh, saved)` | Restores field values onto a freshly-parsed state |
-| `caseSave()` | Saves current packet + VF state under a case name |
-| `caseLoad(name)` | Restores packet instructions and VF state from localStorage |
+| `clearAllWorkspace()` | Resets packet/draft/VF; calls `resetDraftLockState()` and `clearCaptionDOM()` |
+| `caseSave()` | Saves current packet + VF state + caption under a case name |
+| `caseLoad(name)` | Restores packet + VF state + caption; calls `resetDraftLockState()`; auto-loads first packet |
 | `caseDelete()` | Deletes a case from localStorage |
-| `caseExport()` | Downloads case as JSON file (includes verdictForms) |
-| `caseImport(file)` | Reads a JSON file and restores packet + VF state |
+| `caseExport()` | Downloads case as JSON file (includes verdictForms + caption) |
+| `caseImport(file)` | Reads JSON, restores packet + VF state + caption; auto-loads first packet |
 | Event listeners | caseSaveBtn, caseDeleteBtn, caseExportBtn, caseImportFile, caseSelect |
 
 ### localStorage Schema:
@@ -255,16 +311,59 @@ const CASE_KEY = 'caci_cases';   // localStorage key
         caciNum: "302",
         label: "Plaintiff 1",
         parsedState: {
+          // rawText and segments are NOT stored (re-derived from caciDB on load)
           fields: [  // serialized Map as array of [key, fieldObj] pairs
             ["key_string", { type, key, label, value/checked/selected, ... }]
           ]
         }
       }
     ],
-    verdictForms: [ ...vf state objects... ]  // saved by caseSave(), restored by caseLoad()
+    verdictForms: [ ...vf state objects... ],  // saved by caseSave(), restored by caseLoad()
+    caption: {                                 // Pleading Section B snapshot
+      court_name, court_county,
+      plaintiff_name, plaintiff_desc,
+      defendant_name, defendant_desc,
+      additional_parties,
+      case_number, judge_name, dept_number,
+      attorney_role, client_name             // added 2026-03-08; absent on older saves
+    }  // absent on cases saved before this feature; read as caption || {}
   }
 }
 ```
+
+---
+
+## app-browse.js  (203 lines)
+
+**Purpose:** CACI browse and search panel. Lets users find instructions by
+keyword or series without knowing the CACI number. Self-contained — no shared
+mutable state with other modules.
+
+**Reads globals:** `caciDB` (caci-data.js), `esc` (app-shared.js).
+
+**DOM additions** (in caci-compare.html):
+- `#caciSearchToggleBtn` — "Browse / Search CACI" button, right-aligned in the tab bar
+- `#caciSearchPanel` — floating dropdown panel, positioned absolutely below the tab nav
+- `#caciModeSearch`, `#caciModeBrowse` — mode toggle buttons
+- `#caciSearchBody`, `#caciSearchInput`, `#caciSearchResults` — search mode UI
+- `#caciBrowseBody`, `#caciBrowseList` — browse mode UI
+
+| Function | Description |
+|----------|-------------|
+| `buildCaciIndex()` | Scans caciDB keys (skips `_*` keys), extracts `{num, title}` from first line of each entry, sorts numerically. Called once at DOMContentLoaded. |
+| `pickResult(num)` | Populates the active tab's CACI input and closes the panel. Compare tab: `#caciNumber`. Draft tab: `#draftCaciNum` (+ `#packetCaciNum` if empty). No-op on VF/Pleading tabs. |
+| `openPanel()` / `closePanel()` | Show/hide the panel. Open resets search input and focuses it. |
+| `renderSearchResults(query)` | Case-insensitive match against num and title. Up to 20 results. Debounced 250 ms via `searchTimer`. |
+| `renderBrowseList()` | Groups index by century (floor to nearest 100). Series header label: first 3 words of the first instruction's title. Rendered once at init; expand/collapse toggled in-place. |
+| `switchMode(mode)` | Toggles `.active` on mode buttons; toggles `.hidden` on body divs. |
+| DOMContentLoaded listener | Builds index, renders both lists, wires all event handlers. |
+
+**Panel behavior:**
+- Hidden by default; opened by the toggle button
+- Hidden entirely (panel closes + button refuses to open) on VF and Pleading tabs
+- Closes on click outside (document click listener, checks `panel.contains(target)`)
+- Mode (search/browse) remembered within the session (`browseMode` variable)
+- Browse expand state remembered within the session (`browseOpenCenturies` object)
 
 ---
 
@@ -369,14 +468,32 @@ by the preceding `node_modules/docx/dist/index.iife.js` script tag).
 
 ---
 
-## vf-app.js  (~980 lines)
+## vf-app.js  (1118 lines)
 
 **Purpose:** Verdict Form Builder — all VF tab logic.
 Isolated from app-draft.js/app-cases.js (no shared mutable state except via the two bridge functions below).
 
 **Exposes to app-cases.js (case persistence bridge):**
-- `getVFSerializedState()` — called by `caseSave()` in app-cases.js
-- `setVFState(data)` — called by `caseLoad()` in app-cases.js
+- `getVFSerializedState()` — returns `{ forms: workingForm[], activeFormId: string }`. Called by `caseSave()`.
+- `setVFState(data)` — accepts new `{forms, activeFormId}` object **or** legacy plain array; restores `activeVfFormId` if the saved ID is still valid. Always ensures at least one blank form. Called by `caseLoad()` and `clearAllWorkspace()`.
+
+**VF routing sentinel system (A1):**
+When a question is imported from a palette group, outbound routes to sibling questions in the same group are stored as deferred sentinels `"__src__:{groupId}:{sourceId}"` (e.g. `"__src__:VF-400:q2"`). `normalizeRoutes(form)` resolves all sentinels in a form to live UIDs by scanning `form.questions`; it is called after every mutation (add, delete, reorder, setVFState). Unresolvable sentinels show as `[PENDING]` in the builder and `[ROUTE BROKEN]` in all output paths. UIDs deleted after routing is set show as `[BROKEN]`/`[ROUTE BROKEN]`.
+
+**`caseSelect` change listener (inside `vfInit` IIFE):**
+Reads `cases[name].caption` from localStorage when a case is selected and pre-fills
+the active working form's caption fields if they are currently empty (same one-way,
+only-if-empty pattern as pleading-ui.js). Mapping: `court_name → court`,
+`dept_number → dept`, `case_number → caseNumber`,
+`plaintiff_name + " v. " + defendant_name → caseName` (handles both/one/neither).
+Calls `renderCaptionFields()` after updating. Does not create or overwrite forms.
+
+**VF Export — "Pleading DOCX" format (in exportVfPicker click handler):**
+Loads the saved attorney profile from localStorage (strips `pl_` prefix from keys),
+overlays the current case caption (only-if-missing), sets `document_title` from
+the form name, sets `body_text` from `renderVFPlainText()` with the caption
+preamble stripped (starts after "SPECIAL VERDICT FORM\n"), then calls
+`generatePleadingShell({ fields, plainPaper })`. Respects `#vfPleadingCheck` (independent from Pleading tab checkbox).
 
 **Architecture:** Three-column layout
 - Left: component palette (groups of question blocks from vfDB)
@@ -433,7 +550,7 @@ from array order. Never store display numbers — always compute them.
 
 ---
 
-## pleading-shell.js  (~600 lines)
+## pleading-shell.js  (664 lines)
 
 **Purpose:** Generates blank California pleading paper DOCX shells
 with bracketed placeholders for all caption fields.
@@ -447,12 +564,14 @@ AND as browser module (`window.generatePleadingShell(options)`).
 ```javascript
 {
   fields: {
-    // Attorney block
-    attorney_name, state_bar_number, firm_name,
-    firm_address_1, firm_address_2,
-    firm_phone, firm_fax, firm_email,
-    attorney_role,    // "Plaintiff" | "Defendant"
-    client_name,      // displayed under "Attorneys for X"
+    // Attorney block (Section A — persisted)
+    attorney_1_name, attorney_1_bar,          // required
+    attorney_2_name, attorney_2_bar,          // optional — omit line if name blank
+    attorney_3_name, attorney_3_bar,          // optional — omit line if name blank
+    firm_name, firm_address_1, firm_address_2,
+    firm_phone, firm_fax,                     // fax optional — omit portion if blank
+    attorney_role,    // optional — from Section B; omit "Attorneys for" line if blank
+    client_name,      // optional — from Section B; all caps; omit line if blank
 
     // Court (defaults provided)
     court_name,       // default: "IN THE SUPERIOR COURT..."
@@ -467,7 +586,8 @@ AND as browser module (`window.generatePleadingShell(options)`).
     case_number, judge_name, dept_number,
     document_title,       // bold in output
     hearing_date, hearing_time, hearing_dept,   // omit if empty
-    complaint_filed, trial_date                 // omit if empty
+    complaint_filed, trial_date,                // omit if empty
+    body_text,            // optional — replaces blank body paragraphs; split on \n per line
   },
   plainPaper: true,   // optional — plain paper mode (browser-safe)
 }
@@ -486,50 +606,58 @@ Exposes `window.generatePleadingShell(options)`. Called by `pleading-ui.js`.
 - `options.plainPaper === true` → plain paper margins (top 1", right 1", bottom 1", left 1.25"),
   header injection skipped (no line numbers, no bar). **Browser-safe.**
   Browser path uses `Packer.toBlob(doc)` and returns early — no Buffer, no ZIP patching.
-- `options.plainPaper` false/absent → pleading paper format. **Node CLI only.**
-  `injectPleadingHeader` calls `require('zlib')` via `readZipEntries` — fails in browser.
+- `options.plainPaper` false/absent → pleading paper format. **Works in both Node and browser.**
+  `injectPleadingHeader` patches the DOCX ZIP using `DataView`/`Uint8Array` — no `Buffer` required.
 
-**`#pleadingPaperCheck` in browser UI:** Ships **unchecked** by default so the first
-Generate click always takes the plain paper (browser-safe) path. Checking the box
-and clicking Generate in a browser will produce a JS error (caught and shown in UI).
+**Pleading paper checkboxes — three independent controls (all default checked):**
+- `#pleadingPaperCheck` — Pleading tab, controls `generateShell()` in pleading-ui.js
+- `#packetPleadingCheck` — Packet tray, controls packet Pleading DOCX in app-packet.js
+- `#vfPleadingCheck` — VF preview header, controls VF Pleading DOCX in vf-app.js
+
+All three ship **checked** by default. Checking = pleading paper format (line numbers + bar).
+Browser pleading-paper path uses `DataView`/`Uint8Array` for ZIP patching — no `Buffer` polyfill needed.
+Unchecked = plain paper (browser-safe, early-return path).
 
 ---
 
-## pleading-ui.js  (~110 lines)
+## pleading-ui.js  (291 lines)
 
 **Purpose:** Pleading Shell tab UI controller. Self-contained — no shared mutable state
 with other app files. Does not read `draftState`, `packetInstructions`, or `vfForms`.
 
 | Function | Description |
 |----------|-------------|
-| `loadProfile()` | Reads `PLEADING_PROFILE_KEY` from localStorage, populates Section A inputs |
-| `saveProfile()` | Reads Section A inputs, writes to localStorage, shows status |
+| `loadProfilesIndex()` | Reads `PLEADING_PROFILES_KEY` from localStorage; migrates legacy single-profile to "Default" on first load |
+| `saveProfilesIndex(profiles)` | Writes entire profiles object to localStorage |
+| `populateProfileSelect(profiles,selectedName)` | Rebuilds `#profileSelect` dropdown |
+| `applyProfileFields(profile)` | Writes profile values to Section A inputs; clears inputs with no matching key |
+| `readProfileFields()` | Reads Section A inputs into a profile object |
+| `saveProfile()` | Saves current fields under profile name (`#profileNameInput` if filled, else dropdown selection); always writes legacy key too |
+| `deleteProfile()` | Removes selected profile; refuses if only 1 profile; loads next available |
 | `generateShell()` | Reads all live inputs, builds options, calls `generatePleadingShell()`, downloads DOCX |
-| DOMContentLoaded listener | Calls `loadProfile()`, wires Save Profile and Generate buttons |
+| DOMContentLoaded listener | Loads profiles index, populates dropdown, wires all buttons, adds `caseSelect` listener |
+| `caseSelect` change listener | Pre-fills Section B inputs that are currently empty from case caption. Fires after app-cases.js. No write-back. |
 
 **Constants:**
-- `PLEADING_PROFILE_KEY = 'pleading_attorney_profile'` — localStorage key for Section A
-- `PROFILE_FIELD_IDS` — Section A input IDs (persisted)
-- `DOC_FIELD_IDS` — Section B required input IDs (not persisted)
-- `OPTIONAL_FIELD_IDS` — Section B optional input IDs; omitted from options when blank
+- `PLEADING_PROFILES_KEY = 'pleading_attorney_profiles'` — named profiles store
+- `PLEADING_PROFILE_KEY = 'pleading_attorney_profile'` — legacy compat (mirrors active profile; read by export handlers in app-packet.js and vf-app.js)
+- `PROFILE_FIELD_IDS` — Section A input IDs (persisted): attorney 1/2/3 names+bars, firm fields
+- `DOC_FIELD_IDS` — Section B required input IDs (not persisted): court, parties, case info, document title
+- `OPTIONAL_FIELD_IDS` — omitted from options when blank: attorney_role, client_name, hearing fields, dates
 - `FIELD_MAP` — maps HTML input IDs to `generatePleadingShell options.fields` keys
 
 ### localStorage Schema (pleading tab):
 ```javascript
-// Key: 'pleading_attorney_profile'
-// Value: JSON object
-{
-  "pl_attorney_name":    "...",
-  "pl_state_bar_number": "...",
-  "pl_firm_name":        "...",
-  "pl_firm_address_1":   "...",
-  "pl_firm_address_2":   "...",
-  "pl_firm_phone":       "...",
-  "pl_firm_fax":         "...",
-  "pl_firm_email":       "...",
-  "pl_attorney_role":    "...",
-  "pl_client_name":      "..."
-}
+// Key: 'pleading_attorney_profiles'  — named profile store
+{ "Default": { "pl_attorney_1_name": "...", "pl_firm_name": "...", ... },
+  "Work":    { "pl_attorney_1_name": "...", ... } }
+
+// Key: 'pleading_attorney_profile'  — always mirrors active profile (legacy compat)
+{ "pl_attorney_1_name": "...", "pl_attorney_1_bar": "...",
+  "pl_attorney_2_name": "...", "pl_attorney_2_bar": "...",   // optional
+  "pl_attorney_3_name": "...", "pl_attorney_3_bar": "...",   // optional
+  "pl_firm_name": "...", "pl_firm_address_1": "...", "pl_firm_address_2": "...",
+  "pl_firm_phone": "...", "pl_firm_fax": "..." }
 ```
 
 ---
@@ -543,14 +671,9 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN BUGS (PENDING FIX)
 
-*No known open bugs as of 2026-03-07.*
+*No known open bugs as of 2026-03-08.*
 
-**Previously fixed:**
-- ~~caseExport drops verdict form state~~ — FIXED. Both `caseExport()` and `caseImport()`
-  now correctly include `verdictForms` via `getVFSerializedState()` / `setVFState()`.
-- ~~Draft export picker uses pre-edit text when locked~~ — FIXED. PDF and DOCX branches
-  now check `draft-locked` and derive heading/body from `getDraftText()` (reads textarea)
-  instead of `getDraftHeading()`/`getDraftBodyText()` (read hidden `#draftPreview`).
+> See CHANGELOG.md for full fix history.
 
 ---
 
