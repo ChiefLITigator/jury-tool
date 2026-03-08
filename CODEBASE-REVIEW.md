@@ -499,11 +499,16 @@ return new Blob([patched], { type: '...docx' });
 **Margins:** plainPaper: `{top:1440,bottom:1440,left:1800,right:1440}` DXA. Pleading paper: `{top:1080,bottom:630,left:1440,right:720,header:720,footer:432}`.
 
 **body_text handling in buildBody:**
+
+Body area uses a local `bbp()` helper (`lineRule: 'exact'`, `line: 480` = exactly 24pt). The caption/court block above uses `bp()` (`lineRule: 'auto'`, `line: 480` = double-spaced, can grow).
 ```js
+const BB  = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
+const bbp = (children, opts = {}) => bp(children, { ...BB, ...opts });
+
 const bodyText = fields.body_text || '';
 ...(bodyText
-  ? bodyText.split('\n').map(line => bp([tr(line)]))
-  : [bp([tr('')]), bp([tr('')]), bp([tr('')])])  // 3 blank lines if no body
+  ? bodyText.split('\n').map(line => bbp([tr(line)]))
+  : [bbp([tr('')]), bbp([tr('')]), bbp([tr('')])])  // 3 blank lines if no body
 ```
 
 ---

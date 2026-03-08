@@ -36,4 +36,16 @@
 - ~~`setStatus()` used `innerHTML` — XSS risk from CACI lookup error messages~~ — FIXED (C3). Changed to `textContent`.
 - ~~`write_in` questions in DOCX export emitted 4 empty paragraphs instead of visible writing lines~~ — FIXED (C4). Now emits 3 paragraphs of `'_'.repeat(60)`.
 - ~~`package.json` test script was a dummy echo; `@napi-rs/canvas` version pinned to `"*"`~~ — FIXED (C5). Test script now runs all three batch test files; canvas pinned to `"0.1.94"`.
-- ~~`[N. [and]]` pattern not recognized in classifyBracket or normalizer — only `[N. [or]]` was handled~~ — FIXED (parser gap). Both `draft-parser.js` and `app-compare.js` updated to handle `(?:or|and)` in all relevant regex patterns.
+- ~~`[N. [and]]` pattern not recognized in `classifyBracket` or the compare normalizer~~ — FIXED (C6, partial). `classifyBracket` step 4 and `flattenForCompare` normalizer updated to `(?:or|and)`. `parseInstruction` Pass 1/2 were not yet fixed (see D1).
+
+**Batch D fixes (2026-03-08 — draft-parser.js, app-cases.js):**
+- ~~`parseInstruction` Pass 1 altContentMap signal detection and Pass 2 fallback stripping only matched `[or]`, not `[and]`~~ — FIXED (D1). Three regex sites inside `parseInstruction` updated to `(?:or|and)`: line 151 (Pass 1 signal detection), line 157 (Pass 1 guard filter), line 220 (Pass 2 fallback strip). All 36 tests pass. Completes the C6 parser gap fix.
+- ~~`caseExport` built filename directly from raw case name — special characters could produce invalid filenames~~ — FIXED (D2). `nameSlug` now sanitized: `name.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60)` before composing download filename.
+
+**Batch E fixes (2026-03-08 — pleading-shell.js):**
+- ~~Caption block text was 10pt (docx `size: 20`) — smaller than body text, did not meet court standard~~ — FIXED (E1). `const SZ = 24` (12pt) throughout caption.
+- ~~Attorney block automatically appended ", ESQ." to all attorney names regardless of preference~~ — FIXED (E2). ESQ. suffix removed; names output as entered.
+- ~~Body area below caption used `bp()` double-spacing (`lineRule: 'auto'`, `line: 480`) — "at-least" rule allows lines to grow~~ — FIXED (E3). Local `bbp()` helper scoped to `buildBody()` uses `lineRule: 'exact'`, `line: 480` (exactly 24pt). Caption/court block above intentionally left on `bp()` double-spacing.
+- ~~`makeFirstPageFooter` was a byte-for-byte duplicate of `makeDefaultFooter` — edit one, forget the other~~ — FIXED (E4). `makeFirstPageFooter` removed; both `default` and `first` footer sites now call `makeDefaultFooter(fields)`.
+- ~~`ph()` helper (gray placeholder TextRun) defined but never called anywhere in the file~~ — FIXED (E5). Dead function removed.
+- ~~CLI prompt numbering skipped 8 — prompts jumped from 7 to 9 (field 8 was deleted at some point)~~ — FIXED (E6). Renumbered: 9→8, 10→9 … 23→22 (sequential 1-22).

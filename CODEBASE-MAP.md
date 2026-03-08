@@ -22,7 +22,7 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
 | vf-app.js | 1118 | ~11,000 | Active | When touching VF tab |
 | docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
-| pleading-shell.js | 664 | ~5,500 | Active | When touching pleading shell |
+| pleading-shell.js | 631 | ~5,200 | Active | When touching pleading shell |
 | pleading-ui.js | 291 | ~1,400 | Active | When touching Pleading tab UI |
 | vf-data.js | 42 | ~400 | Stable | NEVER — data file |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
@@ -594,7 +594,7 @@ AND as browser module (`window.generatePleadingShell(options)`).
 ```
 
 **Page layout:** California pleading paper standard
-- 8.5" × 11", Times New Roman 12pt body, 10pt caption
+- 8.5" × 11", Times New Roman 12pt body, 12pt caption
 - Left margin: 1.0", right: 0.5", top: 0.75", bottom: 0.438"
 - Line numbers 1–28 with double vertical bar (injected from template XML via ZIP patch)
 - Footer: horizontal rule + page number + document title
