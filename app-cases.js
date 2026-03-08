@@ -186,7 +186,8 @@ function caseExport() {
     caption: readCaptionFromDOM(), // B3
   }, null, 2);
   const dateSlug = new Date().toISOString().slice(0, 10);
-  downloadTXT(data, `CACI-case-${name}-${dateSlug}.json`);
+  const nameSlug = name.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  downloadTXT(data, `CACI-case-${nameSlug}-${dateSlug}.json`);
 }
 
 function caseImport(file) {
