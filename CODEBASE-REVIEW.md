@@ -320,7 +320,7 @@ if (f.type === 'alternative' && f.pairedOptionalKey) {
 | Signature | Returns |
 |-----------|---------|
 | `renderPacketTray()` | `void` |
-| `packetLoad(id)` | `void` — sets `activePacketId`, restores `draftState`, calls `renderDraftForm` |
+| `packetLoad(id)` | `void` — calls `resetDraftLockState()` first, sets `activePacketId`, restores `draftState`, calls `renderDraftForm` |
 | `packetRemove(id)` | `void` |
 | `getPacketUnfilledSummary()` | `[{caciNum,label,count}]` |
 | `compilePacket()` | `string` — sections joined by `\n\n---\n\n`; prefixed with unfilled warning if any |
