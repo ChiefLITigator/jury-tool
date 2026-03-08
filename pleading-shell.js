@@ -377,7 +377,7 @@ function makeCaption(fields) {
 
 // ─ BODY BUILDER ──────────────────────────────────────────────────────────────
 function buildBody(fields) {
-  const { AlignmentType } = getDocx();
+  const { AlignmentType, PageBreak } = getDocx();
   const f = fields;
 
   // Attorney block (single-spaced)
@@ -432,13 +432,14 @@ function buildBody(fields) {
 
   // Post-caption body area: exactly 24pt line spacing.
   // Blank shell: one blank line (matches source document structure).
-  // With body_text (packet/VF exports): centered title + blank + body lines.
+  // With body_text (packet/VF exports): page break after caption (cover page),
+  // then centered title + blank + body lines on page 2+.
   const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const docTitle = fields.document_title || '[DOCUMENT TITLE]';
   const bodyText = fields.body_text || '';
   const bodyArea = bodyText
     ? [
-        bp([tr('')], EXACT_SP),
+        bp([new PageBreak()], EXACT_SP),
         bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
         bp([tr('')], EXACT_SP),
         ...bodyText.split('\n').map(line => bp([tr(line)], EXACT_SP)),
