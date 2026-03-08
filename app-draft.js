@@ -537,14 +537,30 @@ document.getElementById('exportDraftPicker').addEventListener('click', e => {
   document.getElementById('exportDraftPicker').classList.add('hidden');
   const num      = document.getElementById('draftCaciNum')?.value.trim() || '';
   const dateSlug = new Date().toISOString().slice(0, 10);
+
+  // When locked, the preview is hidden — derive heading and body from getDraftText()
+  // so post-edit textarea content is exported. When unlocked, use the DOM helpers.
+  const ws     = document.getElementById('draftWorkspace');
+  const locked = ws.classList.contains('draft-locked');
+  let heading, body;
+  if (locked) {
+    const fullText   = getDraftText();
+    const firstNL    = fullText.indexOf('\n');
+    const firstBlank = fullText.indexOf('\n\n');
+    heading = firstNL    !== -1 ? fullText.slice(0, firstNL).trim() : fullText.trim();
+    body    = firstBlank !== -1 ? fullText.slice(firstBlank + 2)    : '';
+  } else {
+    heading = getDraftHeading();
+    body    = getDraftBodyText();
+  }
+
   if (fmt === 'pdf') {
-    const heading  = getDraftHeading() || (num ? `CACI ${num}` : 'CACI Instruction');
-    const body     = getDraftBodyText();
+    const h        = heading || (num ? `CACI ${num}` : 'CACI Instruction');
     const filename = num ? `CACI-${num}-${dateSlug}.pdf` : `CACI-draft-${dateSlug}.pdf`;
-    exportPDF([{ heading, body }], filename);
+    exportPDF([{ heading: h, body }], filename);
   } else if (fmt === 'docx') {
     const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
-    exportDOCX({ type: 'instruction', heading: getDraftHeading(), body: getDraftBodyText() }, filename);
+    exportDOCX({ type: 'instruction', heading, body }, filename);
   } else if (fmt === 'txt') {
     const filename = num ? `CACI-${num}-${dateSlug}.txt` : `CACI-draft-${dateSlug}.txt`;
     downloadTXT(getDraftText(), filename);

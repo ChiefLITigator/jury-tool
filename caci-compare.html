@@ -322,14 +322,15 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <div class="wrap">
 
 <header class="site-header">
-  <h1>CACI Jury Instruction Comparison Tool</h1>
-  <p>California Civil Jury Instructions — Redline Comparison &amp; AI-Assisted Legal Analysis</p>
+  <h1>California Trial Litigation Generation and Comparison Toolset</h1>
+  <p>Vibe Coded by ChiefLITigator</p>
 </header>
 
 <div class="tab-nav">
   <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
   <button class="tab-btn" data-tab="draft">Draft Instruction</button>
   <button class="tab-btn" data-tab="vf">Verdict Form Builder</button>
+  <button class="tab-btn" data-tab="pleading">Pleading Shell</button>
 </div>
 
 <div id="caseBar" class="case-bar hidden">
@@ -627,6 +628,190 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   </div>
 </div>
 
+<div id="tab-pleading" class="tab-panel hidden">
+
+  <!-- SECTION A: Attorney Profile (persisted in localStorage) -->
+  <div class="card">
+    <div class="card-label">Attorney Profile</div>
+    <p style="font-family:var(--sans);font-size:.78em;color:var(--muted);margin-bottom:16px">Saved to your browser. Auto-loads each time you open this tab.</p>
+
+    <div class="row gap-4" style="margin-bottom:12px">
+      <div class="col">
+        <label for="pl_attorney_name">Attorney Name</label>
+        <input type="text" id="pl_attorney_name" placeholder="Jane Smith, Esq.">
+      </div>
+      <div class="col">
+        <label for="pl_state_bar_number">State Bar Number</label>
+        <input type="text" id="pl_state_bar_number" placeholder="123456">
+      </div>
+    </div>
+    <div class="draft-field">
+      <label for="pl_firm_name">Firm Name</label>
+      <input type="text" id="pl_firm_name" placeholder="Smith &amp; Jones LLP">
+    </div>
+    <div class="draft-field">
+      <label for="pl_firm_address_1">Address Line 1</label>
+      <input type="text" id="pl_firm_address_1" placeholder="100 Main Street, Suite 200">
+    </div>
+    <div class="draft-field">
+      <label for="pl_firm_address_2">Address Line 2 (City, State, ZIP)</label>
+      <input type="text" id="pl_firm_address_2" placeholder="Los Angeles, CA 90001">
+    </div>
+    <div class="row gap-4" style="margin-bottom:12px">
+      <div class="col">
+        <label for="pl_firm_phone">Phone</label>
+        <input type="text" id="pl_firm_phone" placeholder="213-555-1234">
+      </div>
+      <div class="col">
+        <label for="pl_firm_fax">Fax</label>
+        <input type="text" id="pl_firm_fax" placeholder="213-555-1235 (optional)">
+      </div>
+    </div>
+    <div class="draft-field">
+      <label for="pl_firm_email">Email</label>
+      <input type="text" id="pl_firm_email" placeholder="jane@smithjones.com">
+    </div>
+    <div class="row gap-4" style="margin-bottom:12px">
+      <div class="col">
+        <label for="pl_attorney_role">Attorneys for</label>
+        <input type="text" id="pl_attorney_role" placeholder="Plaintiff">
+      </div>
+      <div class="col">
+        <label for="pl_client_name">Client Name</label>
+        <input type="text" id="pl_client_name" placeholder="JANE DOE">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
+      <button class="btn-secondary" id="saveProfileBtn">Save Profile</button>
+      <span id="pleadingProfileStatus" class="status"></span>
+    </div>
+  </div>
+
+  <!-- SECTION B: Document Fields (case-specific, not persisted) -->
+  <div class="card">
+    <div class="card-label">Document Fields</div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Court</div>
+      <div class="draft-field">
+        <label for="pl_court_name">Court Name</label>
+        <input type="text" id="pl_court_name" placeholder="IN THE SUPERIOR COURT OF THE STATE OF CALIFORNIA">
+      </div>
+      <div class="draft-field">
+        <label for="pl_court_county">County</label>
+        <input type="text" id="pl_court_county" placeholder="COUNTY OF LOS ANGELES">
+      </div>
+    </div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Parties</div>
+      <div class="row gap-4" style="margin-bottom:12px">
+        <div class="col">
+          <label for="pl_plaintiff_name">Plaintiff Name</label>
+          <input type="text" id="pl_plaintiff_name" placeholder="JANE DOE">
+        </div>
+        <div class="col">
+          <label for="pl_plaintiff_desc">Plaintiff Description</label>
+          <input type="text" id="pl_plaintiff_desc" placeholder="an individual,">
+        </div>
+      </div>
+      <div class="row gap-4" style="margin-bottom:12px">
+        <div class="col">
+          <label for="pl_defendant_name">Defendant Name</label>
+          <input type="text" id="pl_defendant_name" placeholder="JOHN SMITH">
+        </div>
+        <div class="col">
+          <label for="pl_defendant_desc">Defendant Description</label>
+          <input type="text" id="pl_defendant_desc" placeholder="an individual,">
+        </div>
+      </div>
+      <div class="draft-field">
+        <label for="pl_additional_parties">Additional Parties <span style="font-weight:400;color:var(--muted)">(optional — leave blank if none)</span></label>
+        <textarea id="pl_additional_parties" rows="2" placeholder="e.g. DOES 1–50, individuals,"></textarea>
+      </div>
+    </div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Case Info</div>
+      <div class="row gap-4" style="margin-bottom:0">
+        <div class="col">
+          <label for="pl_case_number">Case Number</label>
+          <input type="text" id="pl_case_number" placeholder="25STCV10354">
+        </div>
+        <div class="col">
+          <label for="pl_judge_name">Judge</label>
+          <input type="text" id="pl_judge_name" placeholder="Hon. Jane Smith">
+        </div>
+        <div class="col" style="flex:0 0 140px">
+          <label for="pl_dept_number">Department</label>
+          <input type="text" id="pl_dept_number" placeholder="67">
+        </div>
+      </div>
+    </div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Document</div>
+      <div class="draft-field">
+        <label for="pl_document_title">Document Title</label>
+        <input type="text" id="pl_document_title" placeholder="COMPLAINT FOR DAMAGES">
+      </div>
+    </div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Hearing <span style="font-weight:400;color:var(--muted)">(optional — omitted if blank)</span></div>
+      <div class="row gap-4" style="margin-bottom:0">
+        <div class="col">
+          <label for="pl_hearing_date">Hearing Date</label>
+          <input type="text" id="pl_hearing_date" placeholder="June 24, 2026">
+        </div>
+        <div class="col">
+          <label for="pl_hearing_time">Hearing Time</label>
+          <input type="text" id="pl_hearing_time" placeholder="8:30 a.m.">
+        </div>
+        <div class="col" style="flex:0 0 140px">
+          <label for="pl_hearing_dept">Hearing Dept</label>
+          <input type="text" id="pl_hearing_dept" placeholder="67">
+        </div>
+      </div>
+    </div>
+
+    <div class="draft-section" style="margin-bottom:0">
+      <div class="draft-section-label">Dates <span style="font-weight:400;color:var(--muted)">(optional — omitted if blank)</span></div>
+      <div class="row gap-4" style="margin-bottom:0">
+        <div class="col">
+          <label for="pl_complaint_filed">Complaint Filed</label>
+          <input type="text" id="pl_complaint_filed" placeholder="May 5, 2025">
+        </div>
+        <div class="col">
+          <label for="pl_trial_date">Trial Date</label>
+          <input type="text" id="pl_trial_date" placeholder="June 24, 2027">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Paper format checkbox -->
+  <div class="card" style="padding:14px 20px">
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+      <input type="checkbox" id="pleadingPaperCheck"
+             style="width:15px;height:15px;cursor:pointer;accent-color:var(--navy);flex-shrink:0">
+      <span style="font-family:var(--sans);font-size:.88em">
+        <strong>California pleading paper format</strong>
+        <span style="color:var(--muted)"> — line numbers 1–28, double vertical bar</span>
+        <span style="color:#b91c1c"> — Node CLI only, not available in browser</span>
+      </span>
+    </label>
+  </div>
+
+  <!-- Export button -->
+  <div style="margin-bottom:28px;display:flex;align-items:center;gap:14px">
+    <button class="btn-primary" id="generatePleadingBtn" style="padding:10px 32px;font-size:.95em">Generate Pleading Shell</button>
+    <span id="pleadingGenStatus" class="status"></span>
+  </div>
+
+</div><!-- /tab-pleading -->
+
 </div><!-- /wrap -->
 
 <!-- Packet print area — populated at print time, hidden otherwise -->
@@ -655,5 +840,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="docx-export.js"></script>
 <script src="vf-data.js"></script>
 <script src="vf-app.js"></script>
+<script src="pleading-shell.js"></script>
+<script src="pleading-ui.js"></script>
 </body>
 </html>

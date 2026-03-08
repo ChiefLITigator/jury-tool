@@ -444,6 +444,7 @@ function injectPleadingHeader(zipBuf) {
 // Returns Promise<Buffer> in Node, Promise<Blob> in browser.
 async function generatePleadingShell(options = {}) {
   const { fields = {} } = options;
+  const plainPaper = options.plainPaper === true;
 
   const {
     Document, Header, Paragraph, TextRun, Packer,
@@ -469,7 +470,9 @@ async function generatePleadingShell(options = {}) {
       properties: {
         page: {
           size:   { width: 12240, height: 15840 },    // 8.5" × 11"
-          margin: { top: 1080, bottom: 630, left: 1440, right: 720, header: 720, footer: 432 },
+          margin: plainPaper
+            ? { top: 1440, bottom: 1440, left: 1800, right: 1440 }
+            : { top: 1080, bottom: 630, left: 1440, right: 720, header: 720, footer: 432 },
         },
         titlePage: true,  // enables separate first-page footer
       },
@@ -485,15 +488,22 @@ async function generatePleadingShell(options = {}) {
     }],
   });
 
+  // Browser + plain paper: Packer.toBlob() is the correct browser API.
+  // Return early — no ZIP patching needed for plain paper.
+  if (!IS_NODE && plainPaper) {
+    return await Packer.toBlob(doc);
+  }
+
   let docBuf;
   if (IS_NODE) {
     docBuf = await Packer.toBuffer(doc);
   } else {
+    // Browser + pleading paper: ZIP patching requires Node zlib — not supported in browser.
     docBuf = Buffer.from(await Packer.toBuffer(doc));
   }
 
-  // Inject the reference pleading header via ZIP patching
-  const patched = injectPleadingHeader(docBuf);
+  // Inject the reference pleading header via ZIP patching (pleading paper only)
+  const patched = plainPaper ? docBuf : injectPleadingHeader(docBuf);
 
   if (IS_NODE) {
     return patched;
