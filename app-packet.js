@@ -44,6 +44,7 @@ function renderPacketTray() {
 function packetLoad(id) {
   const entry = packetInstructions.find(e => e.id === id);
   if (!entry) return;
+  if (typeof resetDraftLockState === 'function') resetDraftLockState(); // B1
   activePacketId = id;
   document.getElementById('draftCaciNum').value = entry.caciNum;
   draftState = entry.parsedState;
@@ -154,5 +155,38 @@ document.getElementById('exportPacketPicker').addEventListener('click', e => {
     exportDOCX({ type: 'instruction', heading: 'CACI Instruction Packet', body: compilePacket() }, `CACI-packet-${dateSlug}.docx`);
   } else if (fmt === 'txt') {
     downloadTXT(compilePacket(), `CACI-packet-${dateSlug}.txt`);
+  } else if (fmt === 'pleading') {
+    (async () => {
+      try {
+        // Load saved attorney profile; strip 'pl_' prefix to get field keys
+        const profileRaw = localStorage.getItem('pleading_attorney_profile');
+        const profile    = profileRaw ? JSON.parse(profileRaw) : {};
+        const fields     = {};
+        for (const [k, v] of Object.entries(profile)) {
+          if (k.startsWith('pl_')) fields[k.slice(3)] = v;
+        }
+        // Overlay caption from the currently-selected case (only fills missing keys)
+        const caseSel = document.getElementById('caseSelect');
+        if (caseSel && caseSel.value) {
+          const cases   = JSON.parse(localStorage.getItem('caci_cases') || '{}');
+          const caption = (cases[caseSel.value] && cases[caseSel.value].caption) || {};
+          for (const [k, v] of Object.entries(caption)) {
+            if (!fields[k]) fields[k] = v;
+          }
+        }
+        fields.document_title = 'PROPOSED JURY INSTRUCTIONS';
+        fields.body_text      = compilePacket();
+        const paperCheck = document.getElementById('packetPleadingCheck');
+        const blob = await generatePleadingShell({ fields, plainPaper: !(paperCheck && paperCheck.checked) });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `CACI-packet-pleading-${dateSlug}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('[packet] Pleading DOCX failed:', err);
+      }
+    })();
   }
 });

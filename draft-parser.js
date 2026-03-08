@@ -81,9 +81,10 @@ function classifyBracket(content) {
   // Grammatical suffix toggles — checked = suffix appears, unchecked = omit.
   if (/^(an|s|ed|ing|ly|it|he|she|his|her|they|their|him|them|its)$/i.test(c)) return 'connector';
 
-  // Alternative element — content begins with "N. [or]"; must precede the
-  // optional-block check so long alt-element text is not caught there first.
-  if (/^\d+\.\s*\[\s*or\s*\]/i.test(c)) return 'alternative';
+  // Alternative element — content begins with "N. [or]" or "N. [and]"; must
+  // precede the optional-block check so long alt-element text is not caught there first.
+  // [N. [and]] follows the same two-option pattern as [N. [or]] (C parser gap fix).
+  if (/^\d+\.\s*\[\s*(?:or|and)\s*\]/i.test(c)) return 'alternative';
 
   // Fill-in keywords — always a text input, regardless of slashes.
   // Check BEFORE the slash/dropdown test so e.g. [specify/describe] is
@@ -122,11 +123,10 @@ function classifyBracket(content) {
 
 function parseInstruction(rawText) {
   // Normalize unclosed alternative-element signal brackets.
-  // PDF extraction drops the closing ] from [N. [or] patterns, producing
-  // an unclosed outer bracket that swallows all subsequent content.
-  // [2. [or]  →  [2. [or]]
-  // [3. [ or ]  →  [3. [ or ]]
-  rawText = rawText.replace(/(\[\d+\.\s*\[\s*or\s*\])(?!\])/g, '$1]');
+  // PDF extraction drops the closing ] from [N. [or] / [N. [and]] patterns,
+  // producing an unclosed outer bracket that swallows all subsequent content.
+  // [2. [or]  →  [2. [or]]   [2. [and]  →  [2. [and]]
+  rawText = rawText.replace(/(\[\d+\.\s*\[\s*(?:or|and)\s*\])(?!\])/g, '$1]');
 
   const brackets = findTopLevelBrackets(rawText);
   const fields   = new Map();   // key → field definition (de-duplicated)

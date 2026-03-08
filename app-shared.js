@@ -4,7 +4,8 @@
 // SHARED UTILITIES
 // ═══════════════════════════════════════════════════════════════════════
 
-const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const esc     = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escAttr = s => esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); // C1: safe for HTML attributes
 
 // ═══════════════════════════════════════════════════════════════════════
 // CACI DATA (loaded from local file on startup)
@@ -66,7 +67,7 @@ text = text.replace(
 text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitespace
 
 // NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
-text = text.replace(/([^.!?:\]\n])\n\n([^\n])/g, '$1\n$2');
+text = text.replace(/([^.!?:\]"'\)\n])\n\n([^\n])/g, '$1\n$2');
 
 // Re-split numbered list items that were merged onto one line by PDF extraction
 text = text.replace(/(?<=\S)\s+(\d{1,2}\.\s+(?:That|The|A|An|Each|Whether|If|All|To|In|Any)\b)/g, '\n$1');

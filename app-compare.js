@@ -4,8 +4,14 @@
 // TOKENIZER
 // ═══════════════════════════════════════════════════════════════════════
 
+// Sentinel token inserted at paragraph boundaries so the diff preserves
+// paragraph structure through the LCS algorithm (C2).
+const PARA_SENTINEL = '\u00b6';
+
 function tokenize(text) {
-  return text.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+  // Mark paragraph boundaries with a sentinel before collapsing whitespace (C2)
+  const withSentinels = text.replace(/\n{2,}/g, ' ' + PARA_SENTINEL + ' ');
+  return withSentinels.replace(/[ \t]+/g, ' ').trim().split(' ').filter(Boolean);
 }
 
 /**
@@ -25,16 +31,16 @@ function stripInstructionHeading(text) {
  * - Puts numbered list items on their own lines
  */
 function flattenForCompare(text) {
-  // Normalize unclosed alternative signal brackets (same as draft-parser)
-  text = text.replace(/(\[\d+\.\s*\[\s*or\s*\])(?!\])/g, '$1]');
+  // Normalize unclosed alternative signal brackets (same as draft-parser; handles [and] too)
+  text = text.replace(/(\[\d+\.\s*\[\s*(?:or|and)\s*\])(?!\])/g, '$1]');
 
-  // Iteratively remove top-level [N. [or] ...] blocks
+  // Iteratively remove top-level [N. [or] ...] and [N. [and] ...] blocks
   for (let pass = 0; pass < 5; pass++) {
     const prev = text;
     const brackets = findTopLevelBrackets(text);
     for (let i = brackets.length - 1; i >= 0; i--) {
       const { start, end, content } = brackets[i];
-      if (/^\d+\.\s*\[\s*or\s*\]/i.test(content.trim())) {
+      if (/^\d+\.\s*\[\s*(?:or|and)\s*\]/i.test(content.trim())) {
         text = text.slice(0, start).trimEnd() + ' ' + text.slice(end).trimStart();
       }
     }
@@ -196,6 +202,7 @@ function threeWayDiff(tA, tCaci, tB) {
 function counts(ops) {
   let ins = 0, del = 0;
   for (const o of ops) {
+    if (o.text === PARA_SENTINEL) continue; // C2: don't count paragraph boundary tokens
     if (o.op === 'insert') ins++;
     else if (o.op === 'delete') del++;
   }
@@ -209,6 +216,7 @@ function counts(ops) {
 /** Full redline: equal plain, insert green, delete red, yellow conflicts */
 function renderFull(ops) {
   return ops.map(o => {
+    if (o.text === PARA_SENTINEL) return '</p><p class="diff-para">'; // C2
     const t = esc(o.text);
     switch (o.op) {
       case 'equal':  return t + ' ';
@@ -217,30 +225,33 @@ function renderFull(ops) {
       case 'yellow': return `<span class="yel">${t}</span> `;
       default:       return '';
     }
-  }).join('').trimEnd()
-    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
+  }).join('').trimEnd();
 }
 
 /** Left / base column: show equal + delete (red strikethrough), hide inserts */
 function renderLeft(ops) {
   return ops
     .filter(o => o.op !== 'insert')
-    .map(o => o.op === 'delete'
-      ? `<span class="del">${esc(o.text)}</span> `
-      : esc(o.text) + ' ')
-    .join('').trimEnd()
-    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
+    .map(o => {
+      if (o.text === PARA_SENTINEL) return '</p><p class="diff-para">'; // C2
+      return o.op === 'delete'
+        ? `<span class="del">${esc(o.text)}</span> `
+        : esc(o.text) + ' ';
+    })
+    .join('').trimEnd();
 }
 
 /** Right / modified column: show equal + insert (green), hide deletes */
 function renderRight(ops) {
   return ops
     .filter(o => o.op !== 'delete')
-    .map(o => o.op === 'insert'
-      ? `<span class="ins">${esc(o.text)}</span> `
-      : esc(o.text) + ' ')
-    .join('').trimEnd()
-    .replace(/(\s*\n\s*){2,}/g, '</p><p class="diff-para">');
+    .map(o => {
+      if (o.text === PARA_SENTINEL) return '</p><p class="diff-para">'; // C2
+      return o.op === 'insert'
+        ? `<span class="ins">${esc(o.text)}</span> `
+        : esc(o.text) + ' ';
+    })
+    .join('').trimEnd();
 }
 
 function colHtml(title, html, isBase = false) {
@@ -291,8 +302,8 @@ async function runCompare() {
   const resultsEl  = document.getElementById('results');
 
   function setStatus(msg, cls = '') {
-    statusEl.className = 'status ' + cls;
-    statusEl.innerHTML = msg;
+    statusEl.className   = 'status ' + cls;
+    statusEl.textContent = msg; // C3: plain text only, no HTML needed
   }
 
   // Validate
@@ -437,7 +448,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const tab = btn.dataset.tab;
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'tab-' + tab));
-    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft' && tab !== 'vf');
+    document.getElementById('caseBar').classList.toggle('hidden', tab !== 'draft' && tab !== 'vf' && tab !== 'pleading');
     // Pre-populate draft number from main tab if blank
     if (tab === 'draft') {
       const mainNum = document.getElementById('caciNumber').value.trim();

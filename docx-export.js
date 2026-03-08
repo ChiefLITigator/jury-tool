@@ -253,12 +253,12 @@ function exportDOCX(content, filename) {
         }
 
       } else if (q.type === 'write_in') {
-        // Several blank lines for writing
-        for (var bi = 0; bi < 4; bi++) {
+        // Visible writing lines — underscores match HTML preview / TXT output (C4)
+        for (var bi = 0; bi < 3; bi++) {
           items.push(new Paragraph({
-            indent:   { left: IN_HALF },
-            spacing:  { line: LINE15 },
-            children: [r('')]
+            indent:  { left: IN_HALF },
+            spacing: { line: LINE15, before: 60, after: 60 },
+            children: [r('_'.repeat(60))]
           }));
         }
         items.push(blank());

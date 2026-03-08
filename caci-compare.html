@@ -309,6 +309,29 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 .vf-form-selector select { font-family: var(--sans); font-size: .82em; }
 .vf-form-selector input[type="text"] { font-family: var(--sans); font-size: .82em; padding: 5px 8px; }
 
+/* ─ CACI Browse / Search ─ */
+.browse-nav-wrap { position: relative; margin-bottom: 20px; }
+.browse-nav-wrap .tab-nav { margin-bottom: 0; }
+.caci-search-toggle { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; font-family: var(--sans); font-size: .76em; font-weight: 600; padding: 5px 13px; cursor: pointer; margin-left: auto; align-self: center; white-space: nowrap; transition: background .15s, color .15s; }
+.caci-search-toggle:hover { background: #f3f4f6; color: var(--navy); }
+.caci-search-panel { position: absolute; top: calc(100% + 2px); right: 0; z-index: 300; width: 400px; max-height: 440px; background: #fff; border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.13); display: flex; flex-direction: column; overflow: hidden; }
+.caci-modebar { display: flex; border-bottom: 1px solid var(--border); background: #f3f4f6; flex-shrink: 0; }
+.caci-mode-btn { flex: 1; background: none; border: none; border-radius: 0; padding: 7px 0; font-family: var(--sans); font-size: .77em; font-weight: 600; color: var(--muted); cursor: pointer; transition: background .12s, color .12s; }
+.caci-mode-btn:hover { background: #e5e7eb; color: var(--text); }
+.caci-mode-btn.active { background: #fff; color: var(--navy); border-bottom: 2px solid var(--navy); margin-bottom: -1px; }
+#caciSearchBody, #caciBrowseBody { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.caci-input-wrap { padding: 8px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.caci-input-wrap input { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px; font-family: var(--sans); font-size: .83em; color: var(--text); background: #fff; }
+.caci-input-wrap input:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 2px rgba(26,39,68,.1); }
+.caci-list { flex: 1; overflow-y: auto; min-height: 0; }
+.caci-empty { font-family: var(--sans); font-size: .8em; color: var(--muted); padding: 12px 14px; font-style: italic; }
+.caci-result-item { display: block; width: 100%; text-align: left; padding: 6px 14px; background: none; border: none; border-radius: 0; font-family: var(--sans); font-size: .8em; color: var(--text); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.caci-result-item:hover { background: #eff6ff; color: var(--navy); }
+.caci-browse-hdr { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 7px 14px; background: #f9fafb; border: none; border-bottom: 1px solid var(--border); font-family: var(--sans); font-size: .76em; font-weight: 700; color: var(--navy); cursor: pointer; text-align: left; }
+.caci-browse-hdr:hover { background: #eff6ff; }
+.caci-chevron { font-size: .65em; color: var(--muted); flex-shrink: 0; }
+.caci-browse-items { background: #fff; }
+
 /* ─ VF print ─ */
 @media print {
   body.printing-vf * { display: none !important; }
@@ -326,11 +349,30 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   <p>Vibe Coded by ChiefLITigator</p>
 </header>
 
-<div class="tab-nav">
-  <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
-  <button class="tab-btn" data-tab="draft">Draft Instruction</button>
-  <button class="tab-btn" data-tab="vf">Verdict Form Builder</button>
-  <button class="tab-btn" data-tab="pleading">Pleading Shell</button>
+<div class="browse-nav-wrap">
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="compare">Comparison Tool</button>
+    <button class="tab-btn" data-tab="draft">Draft Instruction</button>
+    <button class="tab-btn" data-tab="vf">Verdict Form Builder</button>
+    <button class="tab-btn" data-tab="pleading">Pleading Shell</button>
+    <button id="caciSearchToggleBtn" class="caci-search-toggle">Browse / Search CACI</button>
+  </div>
+
+  <div id="caciSearchPanel" class="caci-search-panel hidden">
+    <div class="caci-modebar">
+      <button id="caciModeSearch" class="caci-mode-btn active">Search</button>
+      <button id="caciModeBrowse" class="caci-mode-btn">Browse</button>
+    </div>
+    <div id="caciSearchBody">
+      <div class="caci-input-wrap">
+        <input type="text" id="caciSearchInput" placeholder="Search by keyword or CACI number…" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="caciSearchResults" class="caci-list"></div>
+    </div>
+    <div id="caciBrowseBody" class="hidden">
+      <div id="caciBrowseList" class="caci-list"></div>
+    </div>
+  </div>
 </div>
 
 <div id="caseBar" class="case-bar hidden">
@@ -504,12 +546,17 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
     <div id="packetList"><p class="tray-empty">No instructions added yet.</p></div>
     <div id="packetCompileRow" class="hidden" style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
       <button class="btn-primary" id="compilePacketBtn" style="width:100%">Compile Packet</button>
+      <label style="display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:.82em;cursor:pointer;padding:2px 0">
+        <input type="checkbox" id="packetPleadingCheck" checked style="accent-color:var(--navy);cursor:pointer">
+        California pleading paper format
+      </label>
       <div class="export-picker-wrap" style="width:100%">
         <button class="btn-secondary" id="exportPacketBtn" style="width:100%">Export ▾</button>
         <div id="exportPacketPicker" class="export-picker hidden">
           <button data-fmt="pdf">PDF</button>
           <button data-fmt="docx">DOCX</button>
           <button data-fmt="txt">TXT</button>
+          <button data-fmt="pleading">Pleading DOCX</button>
         </div>
       </div>
     </div>
@@ -612,12 +659,17 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
     <div class="vf-preview-col">
       <div class="vf-panel-heading" style="display:flex;justify-content:space-between;align-items:center">
         <span>Preview</span>
-        <div style="display:flex;gap:6px">
+        <div style="display:flex;gap:10px;align-items:center">
+          <label style="display:flex;align-items:center;gap:5px;font-family:var(--sans);font-size:.79em;cursor:pointer;white-space:nowrap">
+            <input type="checkbox" id="vfPleadingCheck" checked style="accent-color:var(--navy);cursor:pointer">
+            Pleading paper
+          </label>
           <div class="export-picker-wrap">
             <button class="btn-ghost" id="vfExportBtn">Export ▾</button>
             <div id="exportVfPicker" class="export-picker hidden">
               <button data-fmt="pdf">PDF</button>
               <button data-fmt="docx">DOCX</button>
+              <button data-fmt="pleading">Pleading DOCX</button>
             </div>
           </div>
         </div>
@@ -633,16 +685,50 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   <!-- SECTION A: Attorney Profile (persisted in localStorage) -->
   <div class="card">
     <div class="card-label">Attorney Profile</div>
-    <p style="font-family:var(--sans);font-size:.78em;color:var(--muted);margin-bottom:16px">Saved to your browser. Auto-loads each time you open this tab.</p>
+    <p style="font-family:var(--sans);font-size:.78em;color:var(--muted);margin-bottom:12px">Saved to your browser. Switch profiles to load different firm configurations.</p>
+
+    <div class="row gap-4" style="margin-bottom:12px;align-items:flex-end">
+      <div class="col">
+        <label for="profileSelect">Profile</label>
+        <select id="profileSelect" style="width:100%;font-family:var(--sans);font-size:.88em;padding:6px 8px;border:1px solid var(--border);border-radius:4px;background:#fff"></select>
+      </div>
+      <div class="col">
+        <label for="profileNameInput">Save as new name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="profileNameInput" placeholder="e.g. Personal, Work">
+      </div>
+      <div style="flex-shrink:0;padding-bottom:1px">
+        <button class="btn-ghost" id="deleteProfileBtn" style="color:#c0392b">Delete</button>
+      </div>
+    </div>
 
     <div class="row gap-4" style="margin-bottom:12px">
       <div class="col">
-        <label for="pl_attorney_name">Attorney Name</label>
-        <input type="text" id="pl_attorney_name" placeholder="Jane Smith, Esq.">
+        <label for="pl_attorney_1_name">Attorney 1 Name</label>
+        <input type="text" id="pl_attorney_1_name" placeholder="Jane Smith">
       </div>
+      <div class="col" style="flex:0 0 160px">
+        <label for="pl_attorney_1_bar">State Bar No.</label>
+        <input type="text" id="pl_attorney_1_bar" placeholder="123456">
+      </div>
+    </div>
+    <div class="row gap-4" style="margin-bottom:12px">
       <div class="col">
-        <label for="pl_state_bar_number">State Bar Number</label>
-        <input type="text" id="pl_state_bar_number" placeholder="123456">
+        <label for="pl_attorney_2_name">Attorney 2 Name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="pl_attorney_2_name">
+      </div>
+      <div class="col" style="flex:0 0 160px">
+        <label for="pl_attorney_2_bar">State Bar No.</label>
+        <input type="text" id="pl_attorney_2_bar">
+      </div>
+    </div>
+    <div class="row gap-4" style="margin-bottom:12px">
+      <div class="col">
+        <label for="pl_attorney_3_name">Attorney 3 Name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="pl_attorney_3_name">
+      </div>
+      <div class="col" style="flex:0 0 160px">
+        <label for="pl_attorney_3_bar">State Bar No.</label>
+        <input type="text" id="pl_attorney_3_bar">
       </div>
     </div>
     <div class="draft-field">
@@ -663,22 +749,8 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
         <input type="text" id="pl_firm_phone" placeholder="213-555-1234">
       </div>
       <div class="col">
-        <label for="pl_firm_fax">Fax</label>
-        <input type="text" id="pl_firm_fax" placeholder="213-555-1235 (optional)">
-      </div>
-    </div>
-    <div class="draft-field">
-      <label for="pl_firm_email">Email</label>
-      <input type="text" id="pl_firm_email" placeholder="jane@smithjones.com">
-    </div>
-    <div class="row gap-4" style="margin-bottom:12px">
-      <div class="col">
-        <label for="pl_attorney_role">Attorneys for</label>
-        <input type="text" id="pl_attorney_role" placeholder="Plaintiff">
-      </div>
-      <div class="col">
-        <label for="pl_client_name">Client Name</label>
-        <input type="text" id="pl_client_name" placeholder="JANE DOE">
+        <label for="pl_firm_fax">Fax <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <input type="text" id="pl_firm_fax" placeholder="213-555-1235">
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-top:4px">
@@ -690,6 +762,20 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   <!-- SECTION B: Document Fields (case-specific, not persisted) -->
   <div class="card">
     <div class="card-label">Document Fields</div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Caption <span style="font-weight:400;color:var(--muted)">(optional — omitted if blank)</span></div>
+      <div class="row gap-4" style="margin-bottom:0">
+        <div class="col">
+          <label for="pl_attorney_role">Attorneys for</label>
+          <input type="text" id="pl_attorney_role" placeholder="Plaintiff">
+        </div>
+        <div class="col">
+          <label for="pl_client_name">Client Name (all caps)</label>
+          <input type="text" id="pl_client_name" placeholder="JANE DOE">
+        </div>
+      </div>
+    </div>
 
     <div class="draft-section">
       <div class="draft-section-label">Court</div>
@@ -794,12 +880,11 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   <!-- Paper format checkbox -->
   <div class="card" style="padding:14px 20px">
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
-      <input type="checkbox" id="pleadingPaperCheck"
+      <input type="checkbox" id="pleadingPaperCheck" checked
              style="width:15px;height:15px;cursor:pointer;accent-color:var(--navy);flex-shrink:0">
       <span style="font-family:var(--sans);font-size:.88em">
         <strong>California pleading paper format</strong>
         <span style="color:var(--muted)"> — line numbers 1–28, double vertical bar</span>
-        <span style="color:#b91c1c"> — Node CLI only, not available in browser</span>
       </span>
     </label>
   </div>
@@ -834,6 +919,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="app-draft.js"></script>
 <script src="app-packet.js"></script>
 <script src="app-cases.js"></script>
+<script src="app-browse.js"></script>
 <script src="node_modules/docx/dist/index.iife.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>

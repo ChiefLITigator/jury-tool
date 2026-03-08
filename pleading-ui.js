@@ -5,13 +5,16 @@
 // ═══════════════════════════════════════════════════════════════════════
 // Self-contained. Does not read draftState, packetInstructions, or vfForms.
 
-const PLEADING_PROFILE_KEY = 'pleading_attorney_profile';
+const PLEADING_PROFILES_KEY = 'pleading_attorney_profiles'; // { [name]: { "pl_...": value } }
+const PLEADING_PROFILE_KEY  = 'pleading_attorney_profile';  // legacy compat — always mirrors active profile
 
-// Section A: persisted in localStorage
+// Section A: persisted in localStorage per profile
 const PROFILE_FIELD_IDS = [
-  'pl_attorney_name', 'pl_state_bar_number', 'pl_firm_name',
-  'pl_firm_address_1', 'pl_firm_address_2', 'pl_firm_phone',
-  'pl_firm_fax', 'pl_firm_email', 'pl_attorney_role', 'pl_client_name',
+  'pl_attorney_1_name', 'pl_attorney_1_bar',
+  'pl_attorney_2_name', 'pl_attorney_2_bar',
+  'pl_attorney_3_name', 'pl_attorney_3_bar',
+  'pl_firm_name', 'pl_firm_address_1', 'pl_firm_address_2',
+  'pl_firm_phone', 'pl_firm_fax',
 ];
 
 // Section B: case-specific, not persisted
@@ -26,20 +29,24 @@ const DOC_FIELD_IDS = [
 
 // Optional Section B fields — included in options only if non-empty
 const OPTIONAL_FIELD_IDS = [
+  'pl_attorney_role', 'pl_client_name',
   'pl_hearing_date', 'pl_hearing_time', 'pl_hearing_dept',
   'pl_complaint_filed', 'pl_trial_date',
 ];
 
 // HTML input ID → generatePleadingShell options.fields key
 const FIELD_MAP = {
-  pl_attorney_name:     'attorney_name',
-  pl_state_bar_number:  'state_bar_number',
+  pl_attorney_1_name:   'attorney_1_name',
+  pl_attorney_1_bar:    'attorney_1_bar',
+  pl_attorney_2_name:   'attorney_2_name',
+  pl_attorney_2_bar:    'attorney_2_bar',
+  pl_attorney_3_name:   'attorney_3_name',
+  pl_attorney_3_bar:    'attorney_3_bar',
   pl_firm_name:         'firm_name',
   pl_firm_address_1:    'firm_address_1',
   pl_firm_address_2:    'firm_address_2',
   pl_firm_phone:        'firm_phone',
   pl_firm_fax:          'firm_fax',
-  pl_firm_email:        'firm_email',
   pl_attorney_role:     'attorney_role',
   pl_client_name:       'client_name',
   pl_court_name:        'court_name',
@@ -62,32 +69,118 @@ const FIELD_MAP = {
 
 // ─ PROFILE PERSISTENCE ───────────────────────────────────────────────────────
 
-function loadProfile() {
+/** Load all profiles from localStorage. Migrates legacy single-profile if needed. */
+function loadProfilesIndex() {
   try {
-    const raw = localStorage.getItem(PLEADING_PROFILE_KEY);
-    if (!raw) return;
-    const profile = JSON.parse(raw);
-    for (const id of PROFILE_FIELD_IDS) {
-      const el = document.getElementById(id);
-      if (el && profile[id] !== undefined) el.value = profile[id];
+    const raw = localStorage.getItem(PLEADING_PROFILES_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
     }
+
+    // Migration: wrap the old single profile as "Default"
+    const legacy = localStorage.getItem(PLEADING_PROFILE_KEY);
+    const profiles = { Default: legacy ? JSON.parse(legacy) : {} };
+    localStorage.setItem(PLEADING_PROFILES_KEY, JSON.stringify(profiles));
+    return profiles;
   } catch (e) {
-    console.warn('[pleading-ui] Failed to load profile:', e);
+    console.warn('[pleading-ui] Failed to load profiles index:', e);
+    return { Default: {} };
   }
 }
 
-function saveProfile() {
+function saveProfilesIndex(profiles) {
+  localStorage.setItem(PLEADING_PROFILES_KEY, JSON.stringify(profiles));
+}
+
+/** Populate the #profileSelect dropdown. */
+function populateProfileSelect(profiles, selectedName) {
+  const sel = document.getElementById('profileSelect');
+  sel.innerHTML = '';
+  for (const name of Object.keys(profiles)) {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = name;
+    if (name === selectedName) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+/** Write a profile's fields into the form inputs. */
+function applyProfileFields(profile) {
+  for (const id of PROFILE_FIELD_IDS) {
+    const el = document.getElementById(id);
+    if (el) el.value = (profile && profile[id] !== undefined) ? profile[id] : '';
+  }
+}
+
+/** Read the current form inputs into a profile object. */
+function readProfileFields() {
   const profile = {};
   for (const id of PROFILE_FIELD_IDS) {
     const el = document.getElementById(id);
     if (el) profile[id] = el.value;
   }
-  localStorage.setItem(PLEADING_PROFILE_KEY, JSON.stringify(profile));
+  return profile;
+}
 
+/**
+ * Save current fields to the named profile.
+ * If #profileNameInput has a value it becomes the profile name (allows creating new profiles).
+ * Also writes the legacy single-profile key so export handlers stay compatible.
+ */
+function saveProfile() {
+  const nameInputEl = document.getElementById('profileNameInput');
+  const selectEl    = document.getElementById('profileSelect');
+  const statusEl    = document.getElementById('pleadingProfileStatus');
+
+  const rawName = nameInputEl.value.trim();
+  const name    = rawName || selectEl.value || 'Default';
+
+  const profiles = loadProfilesIndex();
+  const fields   = readProfileFields();
+
+  profiles[name] = fields;
+  saveProfilesIndex(profiles);
+
+  // Legacy compat: mirror active profile so export handlers can read it
+  localStorage.setItem(PLEADING_PROFILE_KEY, JSON.stringify(fields));
+
+  // Clear the "save as" input, refresh dropdown
+  nameInputEl.value = '';
+  populateProfileSelect(profiles, name);
+
+  statusEl.textContent = `Profile "${name}" saved.`;
+  statusEl.className   = 'status ok';
+  setTimeout(() => { if (statusEl.textContent === `Profile "${name}" saved.`) statusEl.textContent = ''; }, 3000);
+}
+
+/** Delete the currently-selected profile. Refuses if it's the last one. */
+function deleteProfile() {
+  const selectEl = document.getElementById('profileSelect');
   const statusEl = document.getElementById('pleadingProfileStatus');
-  statusEl.textContent = 'Profile saved.';
-  statusEl.className = 'status ok';
-  setTimeout(() => { if (statusEl.textContent === 'Profile saved.') statusEl.textContent = ''; }, 3000);
+  const name     = selectEl.value;
+
+  const profiles = loadProfilesIndex();
+  const names    = Object.keys(profiles);
+
+  if (names.length <= 1) {
+    statusEl.textContent = 'Cannot delete the only profile.';
+    statusEl.className   = 'status err';
+    setTimeout(() => { if (statusEl.className === 'status err') statusEl.textContent = ''; }, 3000);
+    return;
+  }
+
+  delete profiles[name];
+  saveProfilesIndex(profiles);
+
+  const remaining = Object.keys(profiles)[0];
+  populateProfileSelect(profiles, remaining);
+  applyProfileFields(profiles[remaining]);
+  localStorage.setItem(PLEADING_PROFILE_KEY, JSON.stringify(profiles[remaining]));
+
+  statusEl.textContent = `Profile "${name}" deleted.`;
+  statusEl.className   = 'status ok';
+  setTimeout(() => { if (statusEl.textContent === `Profile "${name}" deleted.`) statusEl.textContent = ''; }, 3000);
 }
 
 // ─ GENERATION ────────────────────────────────────────────────────────────────
@@ -147,7 +240,52 @@ async function generateShell() {
 // ─ INIT ──────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadProfile();
+  // Load profiles and populate dropdown
+  const profiles     = loadProfilesIndex();
+  const profileNames = Object.keys(profiles);
+  const firstName    = profileNames[0] || 'Default';
+  populateProfileSelect(profiles, firstName);
+  applyProfileFields(profiles[firstName]);
+
+  // Switch profile when dropdown changes
+  document.getElementById('profileSelect').addEventListener('change', e => {
+    const selected = e.target.value;
+    const profs    = loadProfilesIndex();
+    applyProfileFields(profs[selected] || {});
+    // Mirror to legacy key so export handlers stay in sync
+    localStorage.setItem(PLEADING_PROFILE_KEY, JSON.stringify(profs[selected] || {}));
+  });
+
   document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+  document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
   document.getElementById('generatePleadingBtn').addEventListener('click', generateShell);
+
+  // Pre-fill Section B from saved case caption when a case is selected.
+  // Only fills fields that are currently empty; does not overwrite user-entered data.
+  const caseSelectEl = document.getElementById('caseSelect');
+  if (caseSelectEl) {
+    caseSelectEl.addEventListener('change', e => {
+      const name = e.target.value;
+      if (!name) return;
+      try {
+        const cases   = JSON.parse(localStorage.getItem('caci_cases') || '{}');
+        const caption = (cases[name] && cases[name].caption) || {};
+        const CAPTION_IDS = [
+          'pl_court_name', 'pl_court_county',
+          'pl_plaintiff_name', 'pl_plaintiff_desc',
+          'pl_defendant_name', 'pl_defendant_desc',
+          'pl_additional_parties',
+          'pl_case_number', 'pl_judge_name', 'pl_dept_number',
+          'pl_attorney_role', 'pl_client_name',
+        ];
+        for (const id of CAPTION_IDS) {
+          const el  = document.getElementById(id);
+          const key = FIELD_MAP[id];
+          if (el && !el.value && caption[key]) el.value = caption[key];
+        }
+      } catch (err) {
+        console.warn('[pleading-ui] caption pre-fill failed:', err);
+      }
+    });
+  }
 });

@@ -6,6 +6,50 @@
 
 const CASE_KEY = 'caci_cases';
 
+// Single source of truth for caption DOM field IDs ↔ storage keys (B3).
+const CAPTION_FIELD_MAP = [
+  ['pl_court_name',         'court_name'],
+  ['pl_court_county',       'court_county'],
+  ['pl_plaintiff_name',     'plaintiff_name'],
+  ['pl_plaintiff_desc',     'plaintiff_desc'],
+  ['pl_defendant_name',     'defendant_name'],
+  ['pl_defendant_desc',     'defendant_desc'],
+  ['pl_additional_parties', 'additional_parties'],
+  ['pl_case_number',        'case_number'],
+  ['pl_judge_name',         'judge_name'],
+  ['pl_dept_number',        'dept_number'],
+  ['pl_attorney_role',      'attorney_role'],
+  ['pl_client_name',        'client_name'],
+];
+
+/** Read current caption values from DOM inputs. */
+function readCaptionFromDOM() {
+  const caption = {};
+  for (const [id, key] of CAPTION_FIELD_MAP) {
+    const el = document.getElementById(id);
+    caption[key] = el ? el.value.trim() : '';
+  }
+  return caption;
+}
+
+/** Write saved caption values back to DOM inputs (backward-compat: skips absent keys). */
+function applyCaptionToDOM(caption) {
+  const cap = caption || {};
+  for (const [id, key] of CAPTION_FIELD_MAP) {
+    if (!(key in cap)) continue;
+    const el = document.getElementById(id);
+    if (el) el.value = cap[key];
+  }
+}
+
+/** Clear all caption DOM inputs. */
+function clearCaptionDOM() {
+  for (const [id] of CAPTION_FIELD_MAP) {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  }
+}
+
 function loadCaseIndex() {
   try {
     const raw = localStorage.getItem(CASE_KEY);
@@ -40,9 +84,9 @@ function setCaseBarStatus(msg, cls = '') {
   if (msg) setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 3000);
 }
 
-/** Serialize a parsedState for storage: convert fields Map → array of entries. */
+/** Serialize a parsedState for storage: only fields are needed on restore (B6). */
 function serializeParsedState(ps) {
-  return { rawText: ps.rawText, segments: ps.segments, fields: [...ps.fields.entries()] };
+  return { fields: [...ps.fields.entries()] };
 }
 
 /** Restore field values from a saved parsedState onto a freshly-parsed live state. */
@@ -60,10 +104,12 @@ function applyFieldValues(freshState, savedFields) {
 }
 
 function clearAllWorkspace() {
+  if (typeof resetDraftLockState === 'function') resetDraftLockState(); // B1
   packetInstructions = [];
   activePacketId     = null;
   draftState         = null;
   document.getElementById('draftWorkspace').classList.add('hidden');
+  clearCaptionDOM(); // B3
   if (typeof setVFState === 'function') setVFState([]);
   renderPacketTray();
 }
@@ -74,12 +120,14 @@ function caseSave() {
   const instructions = packetInstructions.map(e => ({
     caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
   }));
+  const caption = readCaptionFromDOM(); // B3
   try {
     const index = loadCaseIndex();
     // [VF integration] include verdict form state alongside instructions
     index[name] = {
       instructions,
-      verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : []
+      verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : [],
+      caption,
     };
     saveCaseIndex(index);
     populateCaseSelect();
@@ -94,9 +142,11 @@ function caseLoad(name) {
   const index = loadCaseIndex();
   const saved = index[name];
   if (!saved) return;
+  if (typeof resetDraftLockState === 'function') resetDraftLockState(); // B1
   packetInstructions = [];
   packetIdCounter    = 0;
   activePacketId     = null;
+  if (!Array.isArray(saved.instructions)) saved.instructions = []; // B4
   for (const item of saved.instructions) {
     try {
       const freshState = parseInstruction(lookupCACITextForDraft(item.caciNum));
@@ -105,6 +155,7 @@ function caseLoad(name) {
     } catch (err) { console.warn(`Case load: skipped CACI ${item.caciNum} —`, err.message); }
   }
   document.getElementById('caseNameInput').value = name;
+  applyCaptionToDOM(saved.caption); // B3
   renderPacketTray();
   if (packetInstructions.length) packetLoad(packetInstructions[0].id);
   // [VF integration] restore verdict form state
@@ -132,6 +183,7 @@ function caseExport() {
       caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
     })),
     verdictForms: (typeof getVFSerializedState === 'function') ? getVFSerializedState() : [],
+    caption: readCaptionFromDOM(), // B3
   }, null, 2);
   const dateSlug = new Date().toISOString().slice(0, 10);
   downloadTXT(data, `CACI-case-${name}-${dateSlug}.json`);
@@ -156,8 +208,10 @@ function caseImport(file) {
         } catch (err) { console.warn(`Case import: skipped CACI ${item.caciNum} —`, err.message); }
       }
       if (data.caseName) document.getElementById('caseNameInput').value = data.caseName;
+      if (data.caption) applyCaptionToDOM(data.caption); // B3
       renderPacketTray();
       if (typeof setVFState === 'function') setVFState(data.verdictForms || []);
+      if (packetInstructions.length) packetLoad(packetInstructions[0].id); // B5
       setCaseBarStatus(`✓ Imported ${packetInstructions.length} instruction(s)`, 'ok');
     } catch (err) { setCaseBarStatus('Import failed: ' + err.message, 'err'); }
   };
