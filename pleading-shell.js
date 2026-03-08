@@ -303,7 +303,7 @@ function makeCaption(fields) {
 
   const f = fields;
   const FONT = 'Times New Roman';
-  const SZ   = 20;  // 10pt
+  const SZ   = 24;  // 12pt
 
   function cell(children, borders, width) {
     return new TableCell({ width: { size: width, type: WidthType.DXA }, borders, children });
@@ -432,11 +432,11 @@ function buildBody(fields) {
 
   const attyBlock = [
     // Attorney 1 (required)
-    ap([tr(atty1Name + ', ESQ. (SBN ' + atty1Bar + ')')]),
+    ap([tr(atty1Name + ' (SBN ' + atty1Bar + ')')]),
     // Attorney 2 (optional — omit line if name blank)
-    ...(atty2Name ? [ap([tr(atty2Name + ', ESQ. (SBN ' + atty2Bar + ')')])] : []),
+    ...(atty2Name ? [ap([tr(atty2Name + ' (SBN ' + atty2Bar + ')')])] : []),
     // Attorney 3 (optional — omit line if name blank)
-    ...(atty3Name ? [ap([tr(atty3Name + ', ESQ. (SBN ' + atty3Bar + ')')])] : []),
+    ...(atty3Name ? [ap([tr(atty3Name + ' (SBN ' + atty3Bar + ')')])] : []),
     // Firm block
     ap([tr(firmName, { bold: true })]),
     ap([tr(addr1)]),
@@ -463,16 +463,19 @@ function buildBody(fields) {
   // Caption table
   const captionTable = makeCaption(fields);
 
-  // Post-caption body area
+  // Post-caption body area: 12pt, exactly 24pt line spacing
+  const BB = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
+  const bbp = (children, opts = {}) => bp(children, { ...BB, ...opts });
+
   const docTitle = fields.document_title || '[DOCUMENT TITLE]';
   const bodyText = fields.body_text || '';
   const bodyArea = [
-    bp([tr('')]),
-    bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER }),
-    bp([tr('')]),
+    bbp([tr('')]),
+    bbp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER }),
+    bbp([tr('')]),
     ...(bodyText
-      ? bodyText.split('\n').map(line => bp([tr(line)]))
-      : [bp([tr('')]), bp([tr('')]), bp([tr('')])]),
+      ? bodyText.split('\n').map(line => bbp([tr(line)]))
+      : [bbp([tr('')]), bbp([tr('')]), bbp([tr('')])]),
   ];
 
   return [...attyBlock, ...courtBlock, captionTable, ...bodyArea];
