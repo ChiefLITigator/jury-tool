@@ -363,6 +363,7 @@ function makeCaption(fields) {
 
   return new Table({
     width: { size: 8910, type: WidthType.DXA },
+    margins: { left: 10, right: 10, top: 0, bottom: 0 },
     rows: [
       new TableRow({
         children: [
@@ -417,30 +418,32 @@ function buildBody(fields) {
   const courtName   = f.court_name   || 'IN THE SUPERIOR COURT OF THE STATE OF CALIFORNIA';
   const courtCounty = f.court_county || 'COUNTY OF LOS ANGELES';
 
+  const EXACT = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const courtBlock = [
     bp([tr('')]),
-    bp([tr(courtName,   { bold: true })], { alignment: AlignmentType.CENTER }),
-    bp([tr('')]),
-    bp([tr(courtCounty, { bold: true })], { alignment: AlignmentType.CENTER }),
+    bp([tr(courtName,   { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT }),
+    bp([tr('')],                           { ...EXACT }),
+    bp([tr(courtCounty, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT }),
+    bp([tr('')],                           { spacing: { line: 480, lineRule: 'exact', before: 0, after: 480 } }),
   ];
 
   // Caption table
   const captionTable = makeCaption(fields);
 
-  // Post-caption body area: 12pt, exactly 24pt line spacing
-  const BB = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
-  const bbp = (children, opts = {}) => bp(children, { ...BB, ...opts });
-
+  // Post-caption body area: exactly 24pt line spacing.
+  // Blank shell: one blank line (matches source document structure).
+  // With body_text (packet/VF exports): centered title + blank + body lines.
+  const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const docTitle = fields.document_title || '[DOCUMENT TITLE]';
   const bodyText = fields.body_text || '';
-  const bodyArea = [
-    bbp([tr('')]),
-    bbp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER }),
-    bbp([tr('')]),
-    ...(bodyText
-      ? bodyText.split('\n').map(line => bbp([tr(line)]))
-      : [bbp([tr('')]), bbp([tr('')]), bbp([tr('')])]),
-  ];
+  const bodyArea = bodyText
+    ? [
+        bp([tr('')], EXACT_SP),
+        bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
+        bp([tr('')], EXACT_SP),
+        ...bodyText.split('\n').map(line => bp([tr(line)], EXACT_SP)),
+      ]
+    : [bp([tr('')], EXACT_SP)];
 
   return [...attyBlock, ...courtBlock, captionTable, ...bodyArea];
 }
@@ -495,7 +498,7 @@ async function generatePleadingShell(options = {}) {
           size:   { width: 12240, height: 15840 },    // 8.5" × 11"
           margin: plainPaper
             ? { top: 1440, bottom: 1440, left: 1800, right: 1440 }
-            : { top: 1080, bottom: 630, left: 1440, right: 720, header: 720, footer: 432 },
+            : { top: 1080, bottom: 1170, left: 1440, right: 720, header: 720, footer: 432 },
         },
         titlePage: true,  // enables separate first-page footer
       },
