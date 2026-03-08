@@ -21,7 +21,8 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
 | vf-app.js | 980 | ~10,500 | Active | When touching VF tab |
 | docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
-| pleading-shell.js | 600 | ~5,500 | Stable | When touching pleading shell |
+| pleading-shell.js | ~605 | ~5,500 | Active | When touching pleading shell |
+| pleading-ui.js | ~110 | ~1,000 | Active | When touching Pleading tab UI |
 | vf-data.js | 42 | ~400 | Stable | NEVER — data file |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
 | parse-caci.js | 208 | ~1,900 | Utility | Only if re-parsing CACI PDF |
@@ -49,10 +50,9 @@ caci-compare.html              — single-page app shell, all tabs live here
   ├── vfs_fonts.min.js         — 10th: registers bundled fonts for pdfmake (CDN)
   ├── docx-export.js           — 11th: exposes exportDOCX()
   ├── vf-data.js               — 12th: exposes window.vfDB
-  └── vf-app.js                — 13th: all VF builder logic
-
-Standalone utilities (Node.js CLI + browser module, no HTML):
-  └── pleading-shell.js        — generates blank CA pleading paper DOCX shells
+  ├── vf-app.js                — 13th: all VF builder logic
+  ├── pleading-shell.js        — 14th: exposes window.generatePleadingShell(options)
+  └── pleading-ui.js           — 15th: Pleading Shell tab UI controller
 ```
 
 **No build step. No bundler. No framework. All vanilla JS.**
@@ -69,8 +69,10 @@ No inline JavaScript (all logic is in .js files).
 - `data-tab="compare"` — diff viewer (`#tab-compare`)
 - `data-tab="draft"` — instruction drafter (`#tab-draft`)
 - `data-tab="vf"` — verdict form builder (`#tab-vf`)
+- `data-tab="pleading"` — pleading shell generator (`#tab-pleading`)
 
-**Case bar** (`#caseBar`): shown on draft tab and VF tab. Hidden on compare tab.
+**Case bar** (`#caseBar`): shown on draft tab and VF tab only. Hidden on compare and pleading tabs.
+Note: case persistence (caseSave/caseLoad) does not include pleading Section B fields.
 
 **Print settings panel** (`#print-settings-wrap`): shared across tabs.
 Controls font, size, spacing, alignment, margins for print/PDF output.
@@ -110,6 +112,8 @@ Shared:
 <script src="docx-export.js"></script>
 <script src="vf-data.js"></script>
 <script src="vf-app.js"></script>
+<script src="pleading-shell.js"></script>
+<script src="pleading-ui.js"></script>
 ```
 
 ---
@@ -173,6 +177,12 @@ let draftState = null;   // current parsed instruction (or null)
 | 304–352 | CUSTOM DROPDOWN | `activateDraftCustom()`, `restoreDraftDropdown()` |
 | 353–418 | PREVIEW | `updateDraftPreview()` |
 | 419–end | EVENT LISTENERS + HELPERS | loadDraftBtn, draftCaciNum, addToPacketBtn, lockEditBtn, copyDraftBtn, print/export draft, `getDraftText()`, `getDraftHeading()`, `getDraftBodyText()` |
+
+**Export picker locked-state bug fix (2026-03-07):** When the workspace is locked
+(`draft-locked` class), `getDraftHeading()` and `getDraftBodyText()` read from
+`#draftPreview` which is hidden. The export picker now checks `draft-locked` first:
+if locked, it calls `getDraftText()` (which reads `#draftEditArea`) and splits the
+result on `\n` / `\n\n` to derive heading and body. Unlocked path unchanged.
 
 ### Data Flow (Draft tab):
 ```
@@ -436,27 +446,30 @@ AND as browser module (`window.generatePleadingShell(options)`).
 **options shape:**
 ```javascript
 {
-  // Attorney block
-  attorney_name, state_bar_number, firm_name,
-  firm_address_1, firm_address_2,
-  firm_phone, firm_fax, firm_email,
-  attorney_role,    // "Plaintiff" | "Defendant"
-  client_name,      // displayed under "Attorneys for X"
+  fields: {
+    // Attorney block
+    attorney_name, state_bar_number, firm_name,
+    firm_address_1, firm_address_2,
+    firm_phone, firm_fax, firm_email,
+    attorney_role,    // "Plaintiff" | "Defendant"
+    client_name,      // displayed under "Attorneys for X"
 
-  // Court (defaults provided)
-  court_name,       // default: "IN THE SUPERIOR COURT..."
-  court_county,     // default: "COUNTY OF LOS ANGELES"
+    // Court (defaults provided)
+    court_name,       // default: "IN THE SUPERIOR COURT..."
+    court_county,     // default: "COUNTY OF LOS ANGELES"
 
-  // Caption — left cell
-  plaintiff_name, plaintiff_desc,
-  defendant_name, defendant_desc,
-  additional_parties,   // optional, omit line if empty
+    // Caption — left cell
+    plaintiff_name, plaintiff_desc,
+    defendant_name, defendant_desc,
+    additional_parties,   // optional, omit line if empty
 
-  // Caption — right cell
-  case_number, judge_name, dept_number,
-  document_title,       // bold in output
-  hearing_date, hearing_time, hearing_dept,   // omit if empty
-  complaint_filed, trial_date                 // omit if empty
+    // Caption — right cell
+    case_number, judge_name, dept_number,
+    document_title,       // bold in output
+    hearing_date, hearing_time, hearing_dept,   // omit if empty
+    complaint_filed, trial_date                 // omit if empty
+  },
+  plainPaper: true,   // optional — plain paper mode (browser-safe)
 }
 ```
 
@@ -466,9 +479,58 @@ AND as browser module (`window.generatePleadingShell(options)`).
 - Line numbers 1–28 with double vertical bar (injected from template XML via ZIP patch)
 - Footer: horizontal rule + page number + document title
 
-**NOT yet integrated into caci-compare.html** — standalone Node utility only.
-Integration point (future): button in case bar calling `generatePleadingShell()`
-with fields from the current case object.
+**Browser integration:** Loaded as `<script src="pleading-shell.js">` (14th script).
+Exposes `window.generatePleadingShell(options)`. Called by `pleading-ui.js`.
+
+**`plainPaper` option:**
+- `options.plainPaper === true` → plain paper margins (top 1", right 1", bottom 1", left 1.25"),
+  header injection skipped (no line numbers, no bar). **Browser-safe.**
+  Browser path uses `Packer.toBlob(doc)` and returns early — no Buffer, no ZIP patching.
+- `options.plainPaper` false/absent → pleading paper format. **Node CLI only.**
+  `injectPleadingHeader` calls `require('zlib')` via `readZipEntries` — fails in browser.
+
+**`#pleadingPaperCheck` in browser UI:** Ships **unchecked** by default so the first
+Generate click always takes the plain paper (browser-safe) path. Checking the box
+and clicking Generate in a browser will produce a JS error (caught and shown in UI).
+
+---
+
+## pleading-ui.js  (~110 lines)
+
+**Purpose:** Pleading Shell tab UI controller. Self-contained — no shared mutable state
+with other app files. Does not read `draftState`, `packetInstructions`, or `vfForms`.
+
+| Function | Description |
+|----------|-------------|
+| `loadProfile()` | Reads `PLEADING_PROFILE_KEY` from localStorage, populates Section A inputs |
+| `saveProfile()` | Reads Section A inputs, writes to localStorage, shows status |
+| `generateShell()` | Reads all live inputs, builds options, calls `generatePleadingShell()`, downloads DOCX |
+| DOMContentLoaded listener | Calls `loadProfile()`, wires Save Profile and Generate buttons |
+
+**Constants:**
+- `PLEADING_PROFILE_KEY = 'pleading_attorney_profile'` — localStorage key for Section A
+- `PROFILE_FIELD_IDS` — Section A input IDs (persisted)
+- `DOC_FIELD_IDS` — Section B required input IDs (not persisted)
+- `OPTIONAL_FIELD_IDS` — Section B optional input IDs; omitted from options when blank
+- `FIELD_MAP` — maps HTML input IDs to `generatePleadingShell options.fields` keys
+
+### localStorage Schema (pleading tab):
+```javascript
+// Key: 'pleading_attorney_profile'
+// Value: JSON object
+{
+  "pl_attorney_name":    "...",
+  "pl_state_bar_number": "...",
+  "pl_firm_name":        "...",
+  "pl_firm_address_1":   "...",
+  "pl_firm_address_2":   "...",
+  "pl_firm_phone":       "...",
+  "pl_firm_fax":         "...",
+  "pl_firm_email":       "...",
+  "pl_attorney_role":    "...",
+  "pl_client_name":      "..."
+}
+```
 
 ---
 
@@ -481,11 +543,14 @@ with fields from the current case object.
 
 ## KNOWN BUGS (PENDING FIX)
 
-*No known open bugs as of 2026-03-05.*
+*No known open bugs as of 2026-03-07.*
 
 **Previously fixed:**
 - ~~caseExport drops verdict form state~~ — FIXED. Both `caseExport()` and `caseImport()`
   now correctly include `verdictForms` via `getVFSerializedState()` / `setVFState()`.
+- ~~Draft export picker uses pre-edit text when locked~~ — FIXED. PDF and DOCX branches
+  now check `draft-locked` and derive heading/body from `getDraftText()` (reads textarea)
+  instead of `getDraftHeading()`/`getDraftBodyText()` (read hidden `#draftPreview`).
 
 ---
 
