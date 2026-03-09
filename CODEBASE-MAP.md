@@ -42,9 +42,11 @@ Logic files only. Data files never.
 ## REVIEW DOCUMENT
 
 **CODEBASE-REVIEW.md** exists as a companion to this file, optimized for Claude.ai chat sessions.
-It contains function signatures, global variables, event listeners, cross-file dependencies, and
-key code snippets for all active logic files — enough for Claude.ai to give code-grounded answers
-without opening files.
+It contains function signatures, global variables, event listeners, cross-file dependencies,
+key code snippets for all active logic files, ARCHITECTURE CONSTRAINTS (design-pattern rules),
+KNOWN LIMITATIONS and KNOWN BUGS (mirrored from this file), FILE TOKEN REFERENCE (mirrored from
+this file), Claude.ai session anchor template, and Claude Code handoff template — enough for
+Claude.ai to give code-grounded answers without opening files.
 
 Keep CODEBASE-REVIEW.md current whenever making significant changes:
 - New functions or changed signatures → update the relevant section
@@ -55,6 +57,7 @@ Keep CODEBASE-REVIEW.md current whenever making significant changes:
 
 **Claude Code has discretion to update CODEBASE-REVIEW.md in the ordinary course of work without
 being explicitly asked, as long as the update accurately reflects the current state of the code.**
+When updating KNOWN LIMITATIONS or KNOWN BUGS in this file, also update the mirror sections in CODEBASE-REVIEW.md.
 
 ---
 
@@ -81,6 +84,7 @@ caci-compare.html              — single-page app shell, all tabs live here
 ```
 
 **No build step. No bundler. No framework. All vanilla JS.**
+Python may be used for local utility scripts (data parsing, verification, file processing) that run outside the browser. Do not introduce Python to the browser app.
 Served locally via VS Code Live Server. Opened in browser as file or localhost.
 
 ---
@@ -664,12 +668,16 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN LIMITATIONS (BY DESIGN)
 
+*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
+
 - Alternative elements may drop their element number in output — attorney fixes in Lock & Edit
 - Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
 - caci-data.js requires manual refresh when Judicial Council updates CACI (re-run parse-caci.js)
 - vf-data.js contains only VF-400 (Negligence); additional verdict form groups added manually
 
 ## KNOWN BUGS (PENDING FIX)
+
+*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
 
 *No known open bugs as of 2026-03-08.*
 
