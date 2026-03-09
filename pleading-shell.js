@@ -227,44 +227,8 @@ function tr(text, opts = {}) {
   return new TextRun({ text, font: 'Times New Roman', size: 24, ...opts });
 }
 
-// Placeholder run (gray bracketed text)
-function ph(placeholder, opts = {}) {
-  return tr(placeholder, { color: '808080', ...opts });
-}
-
 // ─ FOOTER BUILDERS ───────────────────────────────────────────────────────────
 function makeDefaultFooter(fields) {
-  const { Footer, Paragraph, TextRun, PageNumber, AlignmentType, BorderStyle, TabStopType } = getDocx();
-  const title = fields.footer_title || fields.document_title || '[DOCUMENT TITLE]';
-  return new Footer({
-    children: [
-      // Line 1: horizontal rule + centered page number
-      new Paragraph({
-        border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'auto', space: 1 } },
-        spacing: { line: 240 },
-        tabStops: [
-          { type: TabStopType.CENTER, position: 4680 },
-          { type: TabStopType.RIGHT,  position: 9360 },
-        ],
-        children: [
-          new TextRun({ text: '\t', size: 24 }),
-          new TextRun({ children: [PageNumber.CURRENT], size: 24 }),
-        ],
-      }),
-      // Line 2: centered document title, bold 12pt
-      new Paragraph({
-        alignment: AlignmentType.CENTER,
-        spacing: { line: 240 },
-        children: [
-          new TextRun({ text: title, font: 'Times New Roman', size: 20, bold: true }),
-        ],
-      }),
-    ],
-  });
-}
-
-// First-page footer: identical to default footer (page 1 gets its own number via titlePg)
-function makeFirstPageFooter(fields) {
   const { Footer, Paragraph, TextRun, PageNumber, AlignmentType, BorderStyle, TabStopType } = getDocx();
   const title = fields.footer_title || fields.document_title || '[DOCUMENT TITLE]';
   return new Footer({
@@ -354,7 +318,7 @@ function makeCaption(fields) {
     cPara([cRun(plaintiffDesc)], LI),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
-    cPara([cRun('Plaintiff,')], RI),
+    cPara([cRun((f.plaintiff_label || 'Plaintiff') + ',')], RI),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
     cPara([cRun('vs.', { italics: true })], LI),
@@ -365,7 +329,8 @@ function makeCaption(fields) {
     ...(addlParties ? [cPara([cRun(addlParties)], LI)] : []),
     cPara([cRun('')], LI),
     cPara([cRun('')], LI),
-    cPara([cRun('Defendant.')], RI),
+    cPara([cRun((f.defendant_label || 'Defendant') + '.')], RI),
+    cPara([cRun('')], RI),
   ];
 
   const caseNum   = f.case_number    || '[CASE NUMBER]';
@@ -382,6 +347,7 @@ function makeCaption(fields) {
   const RC = { indent: { left: 258 } };
 
   const rightChildren = [
+    cPara([cRun('')], RC),
     cPara([cRun('CASE NO.:  ' + caseNum)], RC),
     cPara([cRun('')], RC),
     cPara([cRun(judgeName + ',')], RC),
@@ -399,6 +365,7 @@ function makeCaption(fields) {
 
   return new Table({
     width: { size: 8910, type: WidthType.DXA },
+    margins: { left: 10, right: 10, top: 0, bottom: 0 },
     rows: [
       new TableRow({
         children: [
@@ -412,7 +379,7 @@ function makeCaption(fields) {
 
 // ─ BODY BUILDER ──────────────────────────────────────────────────────────────
 function buildBody(fields) {
-  const { AlignmentType } = getDocx();
+  const { AlignmentType, PageBreak } = getDocx();
   const f = fields;
 
   // Attorney block (single-spaced)
@@ -453,30 +420,33 @@ function buildBody(fields) {
   const courtName   = f.court_name   || 'IN THE SUPERIOR COURT OF THE STATE OF CALIFORNIA';
   const courtCounty = f.court_county || 'COUNTY OF LOS ANGELES';
 
+  const EXACT = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const courtBlock = [
     bp([tr('')]),
-    bp([tr(courtName,   { bold: true })], { alignment: AlignmentType.CENTER }),
-    bp([tr('')]),
-    bp([tr(courtCounty, { bold: true })], { alignment: AlignmentType.CENTER }),
+    bp([tr(courtName,   { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT }),
+    bp([tr('')],                           { ...EXACT }),
+    bp([tr(courtCounty, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT }),
+    bp([tr('')],                           { spacing: { line: 480, lineRule: 'exact', before: 0, after: 480 } }),
   ];
 
   // Caption table
   const captionTable = makeCaption(fields);
 
-  // Post-caption body area: 12pt, exactly 24pt line spacing
-  const BB = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
-  const bbp = (children, opts = {}) => bp(children, { ...BB, ...opts });
-
+  // Post-caption body area: exactly 24pt line spacing.
+  // Blank shell: one blank line (matches source document structure).
+  // With body_text (packet/VF exports): page break after caption (cover page),
+  // then centered title + blank + body lines on page 2+.
+  const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const docTitle = fields.document_title || '[DOCUMENT TITLE]';
   const bodyText = fields.body_text || '';
-  const bodyArea = [
-    bbp([tr('')]),
-    bbp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER }),
-    bbp([tr('')]),
-    ...(bodyText
-      ? bodyText.split('\n').map(line => bbp([tr(line)]))
-      : [bbp([tr('')]), bbp([tr('')]), bbp([tr('')])]),
-  ];
+  const bodyArea = bodyText
+    ? [
+        bp([new PageBreak()], EXACT_SP),
+        bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
+        bp([tr('')], EXACT_SP),
+        ...bodyText.split('\n').map(line => bp([tr(line)], EXACT_SP)),
+      ]
+    : [bp([tr('')], EXACT_SP)];
 
   return [...attyBlock, ...courtBlock, captionTable, ...bodyArea];
 }
@@ -531,7 +501,7 @@ async function generatePleadingShell(options = {}) {
           size:   { width: 12240, height: 15840 },    // 8.5" × 11"
           margin: plainPaper
             ? { top: 1440, bottom: 1440, left: 1800, right: 1440 }
-            : { top: 1080, bottom: 630, left: 1440, right: 720, header: 720, footer: 432 },
+            : { top: 1080, bottom: 1170, left: 1440, right: 720, header: 720, footer: 432 },
         },
         titlePage: true,  // enables separate first-page footer
       },
@@ -541,7 +511,7 @@ async function generatePleadingShell(options = {}) {
       },
       footers: {
         default: makeDefaultFooter(fields),
-        first:   makeFirstPageFooter(fields),
+        first:   makeDefaultFooter(fields),
       },
       children: buildBody(fields),
     }],
@@ -602,30 +572,30 @@ async function runCLI() {
   fields.client_name      = await ask('    Client name (all caps, Enter to skip)', 'JAMES HYPE');
 
   // Court
-  fields.court_name   = await ask('9.  Court name',
+  fields.court_name   = await ask('8.  Court name',
     'IN THE SUPERIOR COURT OF THE STATE OF CALIFORNIA');
-  fields.court_county = await ask('10. County',
+  fields.court_county = await ask('9.  County',
     'COUNTY OF LOS ANGELES');
 
   // Parties
-  fields.plaintiff_name     = await ask('11. Plaintiff name',           'JAMES HYPE');
-  fields.plaintiff_desc     = await ask('12. Plaintiff description',    'an individual,');
-  fields.defendant_name     = await ask('13. Defendant name',           'DOM DOLLA');
-  fields.defendant_desc     = await ask('14. Defendant description',    'an individual,');
-  fields.additional_parties = await ask('15. Additional parties (Enter to skip)', '');
+  fields.plaintiff_name     = await ask('10. Plaintiff name',           'JAMES HYPE');
+  fields.plaintiff_desc     = await ask('11. Plaintiff description',    'an individual,');
+  fields.defendant_name     = await ask('12. Defendant name',           'DOM DOLLA');
+  fields.defendant_desc     = await ask('13. Defendant description',    'an individual,');
+  fields.additional_parties = await ask('14. Additional parties (Enter to skip)', '');
 
   // Case info
-  fields.case_number    = await ask('16. Case number',                      '25STCV10354');
-  fields.judge_name     = await ask('17. Judge (e.g. Hon. John Smith)',     'Hon. John Summit');
+  fields.case_number    = await ask('15. Case number',                      '25STCV10354');
+  fields.judge_name     = await ask('16. Judge (e.g. Hon. John Smith)',     'Hon. John Summit');
   fields.dept_number    = await ask('    Department number',                 '67');
-  fields.document_title = await ask('18. Document title (all caps)',         'PLAINTIFF\'S MOTION FOR SUMMARY JUDGMENT');
+  fields.document_title = await ask('17. Document title (all caps)',         'PLAINTIFF\'S MOTION FOR SUMMARY JUDGMENT');
 
   // Hearing & dates
-  fields.hearing_date    = await ask('19. Hearing date (Enter to skip)',       'June 24, 2026');
-  fields.hearing_time    = await ask('20. Hearing time (Enter to skip)',       '8:30 a.m.');
-  fields.hearing_dept    = await ask('21. Hearing dept (Enter to skip)',       '67');
-  fields.complaint_filed = await ask('22. Complaint filed (Enter to skip)',    'May 5, 2025');
-  fields.trial_date      = await ask('23. Trial date (Enter to skip)',         'June 24, 2027');
+  fields.hearing_date    = await ask('18. Hearing date (Enter to skip)',       'June 24, 2026');
+  fields.hearing_time    = await ask('19. Hearing time (Enter to skip)',       '8:30 a.m.');
+  fields.hearing_dept    = await ask('20. Hearing dept (Enter to skip)',       '67');
+  fields.complaint_filed = await ask('21. Complaint filed (Enter to skip)',    'May 5, 2025');
+  fields.trial_date      = await ask('22. Trial date (Enter to skip)',         'June 24, 2027');
 
   fields.footer_title = fields.document_title;
 

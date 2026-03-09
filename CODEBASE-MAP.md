@@ -22,7 +22,7 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
 | vf-app.js | 1118 | ~11,000 | Active | When touching VF tab |
 | docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
-| pleading-shell.js | 664 | ~5,500 | Active | When touching pleading shell |
+| pleading-shell.js | 634 | ~5,200 | Active | When touching pleading shell |
 | pleading-ui.js | 291 | ~1,400 | Active | When touching Pleading tab UI |
 | vf-data.js | 42 | ~400 | Stable | NEVER — data file |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
@@ -42,9 +42,11 @@ Logic files only. Data files never.
 ## REVIEW DOCUMENT
 
 **CODEBASE-REVIEW.md** exists as a companion to this file, optimized for Claude.ai chat sessions.
-It contains function signatures, global variables, event listeners, cross-file dependencies, and
-key code snippets for all active logic files — enough for Claude.ai to give code-grounded answers
-without opening files.
+It contains function signatures, global variables, event listeners, cross-file dependencies,
+key code snippets for all active logic files, ARCHITECTURE CONSTRAINTS (design-pattern rules),
+KNOWN LIMITATIONS and KNOWN BUGS (mirrored from this file), FILE TOKEN REFERENCE (mirrored from
+this file), Claude.ai session anchor template, and Claude Code handoff template — enough for
+Claude.ai to give code-grounded answers without opening files.
 
 Keep CODEBASE-REVIEW.md current whenever making significant changes:
 - New functions or changed signatures → update the relevant section
@@ -55,6 +57,7 @@ Keep CODEBASE-REVIEW.md current whenever making significant changes:
 
 **Claude Code has discretion to update CODEBASE-REVIEW.md in the ordinary course of work without
 being explicitly asked, as long as the update accurately reflects the current state of the code.**
+When updating KNOWN LIMITATIONS or KNOWN BUGS in this file, also update the mirror sections in CODEBASE-REVIEW.md.
 
 ---
 
@@ -81,6 +84,7 @@ caci-compare.html              — single-page app shell, all tabs live here
 ```
 
 **No build step. No bundler. No framework. All vanilla JS.**
+Python may be used for local utility scripts (data parsing, verification, file processing) that run outside the browser. Do not introduce Python to the browser app.
 Served locally via VS Code Live Server. Opened in browser as file or localhost.
 
 ---
@@ -594,8 +598,8 @@ AND as browser module (`window.generatePleadingShell(options)`).
 ```
 
 **Page layout:** California pleading paper standard
-- 8.5" × 11", Times New Roman 12pt body, 10pt caption
-- Left margin: 1.0", right: 0.5", top: 0.75", bottom: 0.438"
+- 8.5" × 11", Times New Roman 12pt body, 12pt caption
+- Left margin: 1.0", right: 0.5", top: 0.75", bottom: 0.8125"
 - Line numbers 1–28 with double vertical bar (injected from template XML via ZIP patch)
 - Footer: horizontal rule + page number + document title
 
@@ -664,12 +668,16 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN LIMITATIONS (BY DESIGN)
 
+*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
+
 - Alternative elements may drop their element number in output — attorney fixes in Lock & Edit
 - Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
 - caci-data.js requires manual refresh when Judicial Council updates CACI (re-run parse-caci.js)
 - vf-data.js contains only VF-400 (Negligence); additional verdict form groups added manually
 
 ## KNOWN BUGS (PENDING FIX)
+
+*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
 
 *No known open bugs as of 2026-03-08.*
 
