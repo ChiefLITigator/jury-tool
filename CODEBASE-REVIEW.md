@@ -1,6 +1,6 @@
 # CODEBASE-REVIEW.md
 ## California Civil Litigation Tool Suite — Deep Reference for AI Chat Review
-### Last updated: 2026-03-08
+### Last updated: 2026-03-12
 
 **Purpose:** Self-contained reference for Claude.ai chat sessions where files cannot be opened.
 Supplements CODEBASE-MAP.md (architecture, file inventory, load order, localStorage schemas, parsedState/vfDB/exportDOCX/pleading-shell shapes, known bugs). This document adds function signatures, globals, event listeners, cross-file dependencies, and key code snippets.
@@ -79,89 +79,15 @@ pleading-ui.js    → EXPOSES: nothing (self-contained)
 
 ---
 
-## ARCHITECTURE CONSTRAINTS
+## CANONICAL REFERENCES (maintained in CODEBASE-MAP.md)
 
-These are load-order and design-pattern rules that govern all feature design.
-Any Claude.ai design session or Claude Code implementation must respect them.
+The following are maintained exclusively in CODEBASE-MAP.md to avoid duplication drift.
+When a design recommendation touches any of these, check CODEBASE-MAP.md (or paste it into the session):
 
-**1. No build step. No bundler. No framework.**
-All browser-side logic is vanilla JS loaded via `<script>` tags in defined order.
-No npm packages in the browser beyond those already present (docx v9 UMD, pdfmake CDN).
-
-**2. Script load order is fixed (16 scripts).**
-Dependencies flow one direction. A file may only depend on files that load before it.
-See CODEBASE-MAP.md architecture tree for the full load order.
-
-**3. localStorage is the persistence layer.**
-No IndexedDB, no server, no external storage.
-Schemas: `caci_cases` (case saves), `pleading_attorney_profiles` + `pleading_attorney_profile` (attorney profiles).
-
-**4. Three independent pleading checkboxes pattern.**
-Every export context that produces a pleading DOCX has its own independent checkbox:
-- `#pleadingPaperCheck` → Pleading tab (`pleading-ui.js`)
-- `#packetPleadingCheck` → Packet tray (`app-packet.js`)
-- `#vfPleadingCheck` → VF tab (`vf-app.js`)
-Any new export feature producing a pleading DOCX must add its own independent checkbox.
-Do NOT share or reuse an existing checkbox across export contexts.
-
-**5. caseSelect listener firing order is load-order guaranteed.**
-app-cases.js fires first → vf-app.js second → pleading-ui.js third.
-Do not alter script load order in ways that would break this sequence.
-
-**6. No display numbers stored in VF.**
-VF question display numbers (1., 2., 3.) are always computed at render time from array order.
-Internal IDs (q1, q2...) are the stable source identifiers. Never persist display numbers.
-
-**7. No live API fetching for legal data.**
-All reference data (caciDB, vfDB) is loaded from local JSON files at startup.
-Claude API (Anthropic) is the only permitted external API call, and is not currently active.
-
-**8. Python is for local utility scripts only.**
-Python does not run in the browser. It may be used for offline utilities (data parsing, verification).
-Verify Python presence with Claude Code before assuming; do not introduce it to the browser app.
-
----
-
-## KNOWN LIMITATIONS (BY DESIGN)
-
-*(Mirrored from CODEBASE-MAP.md — keep in sync)*
-
-- Alternative elements may drop their element number in output — attorney fixes in Lock & Edit
-- Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
-- `caci-data.js` requires manual refresh when Judicial Council updates CACI (re-run `parse-caci.js`)
-- `vf-data.js` contains only VF-400 (Negligence); additional verdict form groups added manually as needed
-
----
-
-## KNOWN BUGS (PENDING FIX)
-
-*(Mirrored from CODEBASE-MAP.md — keep in sync)*
-
-*No known open bugs as of 2026-03-08.*
-
----
-
-## FILE TOKEN REFERENCE
-
-*(Mirrored from CODEBASE-MAP.md — for Claude Code session load planning)*
-Total context ceiling: ~40,000 tokens. Logic files only. Data files never.
-
-| File | ~Tokens | Load when... |
-|------|---------|--------------|
-| caci-compare.html | ~8,500 | Touching HTML/CSS/tabs |
-| app-shared.js | ~1,700 | Always — shared utilities |
-| app-compare.js | ~5,300 | Touching diff engine / compare tab |
-| app-draft.js | ~6,300 | Touching instruction drafter |
-| app-packet.js | ~1,800 | Touching packet tray |
-| app-cases.js | ~2,300 | Touching case persistence |
-| app-browse.js | ~1,200 | Touching browse/search panel |
-| draft-parser.js | ~3,700 | Touching parse logic only |
-| vf-app.js | ~11,000 | Touching VF tab |
-| docx-export.js | ~2,800 | Touching DOCX export |
-| pleading-shell.js | ~5,200 | Touching pleading shell |
-| pleading-ui.js | ~1,400 | Touching Pleading tab UI |
-| caci-data.js | ~150k+ | **NEVER** |
-| vf-data.js | ~400 | **NEVER** (unless debugging data) |
+- **Architecture Constraints** (8 rules: no build step, fixed load order, localStorage persistence, independent pleading checkboxes, caseSelect firing order, no stored display numbers, no live API fetching, Python local-only)
+- **Known Limitations** (by design)
+- **Known Bugs** (pending fix)
+- **File Token Reference** (session load planning table)
 
 ---
 
@@ -177,7 +103,7 @@ Working on: ___
 Files involved: ___
 Last Claude Code session result: ___
 Open question for this session: ___
-Known constraints that apply: [list any from ARCHITECTURE CONSTRAINTS above]
+Known constraints that apply: [list any from CODEBASE-MAP.md Architecture Constraints]
 ```
 
 ---
@@ -193,7 +119,7 @@ Files affected: ___
 Approach agreed: ___
 Do NOT change: ___
 Stopping condition (when is the task done?): ___
-Estimated token load: ___ (sum from FILE TOKEN REFERENCE above)
+Estimated token load: ___ (sum from CODEBASE-MAP.md File Token Reference)
 Open questions for Claude Code to resolve: ___
 ```
 
