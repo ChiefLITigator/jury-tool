@@ -61,6 +61,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 .btn-primary:disabled { opacity: .5; cursor: default; }
 .btn-secondary { background: #f3f4f6; color: var(--navy); border: 1px solid var(--border); }
 .btn-secondary:hover { background: #e5e7eb; }
+.btn-secondary.active { background: var(--navy); color: #fff; border-color: var(--navy); }
 .btn-secondary:disabled { opacity: .5; cursor: default; }
 .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); font-size: .8em; padding: 5px 12px; }
 .btn-ghost:hover { background: #f3f4f6; }
@@ -443,8 +444,62 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
 <div id="tab-compare" class="tab-panel">
 
+<!-- Mode Toggle -->
+<div class="card" id="card-compare-mode" style="padding:10px 18px;display:flex;align-items:center;gap:12px">
+  <span style="font-weight:600;font-size:.9em;color:var(--text)">Mode:</span>
+  <button class="btn-secondary active" id="modeSingleBtn" data-compare-mode="single" style="padding:5px 16px;font-size:.85em">Single Instruction</button>
+  <button class="btn-secondary" id="modeBatchBtn" data-compare-mode="batch" style="padding:5px 16px;font-size:.85em">Batch Compare</button>
+</div>
 
-<!-- Text Inputs -->
+<!-- Batch Compare Panel (hidden by default) -->
+<div class="card hidden" id="card-batch">
+  <div class="card-label">Batch DOCX Compare</div>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
+    <div style="flex:1;min-width:200px">
+      <label for="batchFileA" style="font-size:.85em;font-weight:600">Party A Instructions</label>
+      <input type="file" id="batchFileA" accept=".docx" style="display:block;margin-top:4px">
+      <input type="text" id="batchLabelA" placeholder="Party A label (e.g. Plaintiff)" style="margin-top:6px;width:100%">
+    </div>
+    <div style="flex:1;min-width:200px">
+      <label for="batchFileB" style="font-size:.85em;font-weight:600">Party B Instructions</label>
+      <input type="file" id="batchFileB" accept=".docx" style="display:block;margin-top:4px">
+      <input type="text" id="batchLabelB" placeholder="Party B label (e.g. Defendants)" style="margin-top:6px;width:100%">
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:.85em;font-weight:600">Core (baseline) set:</span>
+    <label style="font-size:.85em;cursor:pointer"><input type="radio" name="batchCore" value="A" checked> Party A</label>
+    <label style="font-size:.85em;cursor:pointer"><input type="radio" name="batchCore" value="B"> Party B</label>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div class="sel-wrap" style="min-width:200px">
+      <label for="batchCompMode" style="font-size:.85em">Comparison Mode</label>
+      <select id="batchCompMode">
+        <option value="two-way" selected>Two-way (Core vs Other)</option>
+        <option value="three-way">Three-way (Both vs Official CACI)</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="batchParseBtn" style="padding:8px 24px;font-size:.9em">Parse &amp; Compare</button>
+    <span id="batchStatus" class="status"></span>
+  </div>
+</div>
+
+<!-- Batch Navigator (hidden until results parsed) -->
+<div class="card hidden" id="card-batch-nav">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="sel-wrap" style="flex:1;min-width:200px">
+      <label for="batchSelect" style="font-size:.85em">Instruction</label>
+      <select id="batchSelect"></select>
+    </div>
+    <span id="batchNavStatus" style="font-size:.8em;color:var(--muted)"></span>
+  </div>
+  <div id="batchUnmatched" style="margin-top:10px;font-size:.83em;color:var(--muted)"></div>
+</div>
+
+<!-- Text Inputs (single mode) -->
 <div class="card" id="card-inputs">
   <div class="card-label">Jury Instruction Texts</div>
 
@@ -925,6 +980,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <script src="caci-data.js"></script>
 <script src="draft-parser.js"></script>
 <script src="app-shared.js"></script>
+<script src="docx-reader.js"></script>
 <script src="app-compare.js"></script>
 <script src="app-draft.js"></script>
 <script src="app-packet.js"></script>
