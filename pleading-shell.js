@@ -39,75 +39,49 @@ function crc32(buf) {
 }
 
 // ─ ZIP UTILITIES ─────────────────────────────────────────────────────────────
-// ZIP reader. Returns Promise<Array<{ name: string, data: Buffer }>>.
-// Node path: require('zlib').inflateRawSync — unchanged.
-// Browser path: DecompressionStream('deflate-raw') — no native dependencies.
+// Browser: inflateRawBrowser, concatU8, readZipEntries loaded from app-shared.js
+// Node: local definitions below (app-shared.js not available)
 
-async function inflateRawBrowser(compData) {
-  const input  = compData instanceof Uint8Array ? compData
-               : new Uint8Array(compData.buffer, compData.byteOffset, compData.byteLength);
-  const ds     = new DecompressionStream('deflate-raw');
-  const writer = ds.writable.getWriter();
-  const reader = ds.readable.getReader();
-  writer.write(input);
-  writer.close();
-  const chunks = [];
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-  }
-  const total = chunks.reduce((n, c) => n + c.length, 0);
-  const out   = new Uint8Array(total);
-  let   off   = 0;
-  for (const c of chunks) { out.set(c, off); off += c.length; }
-  return out;
-}
-
-function concatU8(arrays) {
-  let total = 0;
-  for (const a of arrays) total += a.length;
-  const res = new Uint8Array(total);
-  let offset = 0;
-  for (const a of arrays) {
-    res.set(a, offset);
-    offset += a.length;
-  }
-  return res;
-}
-
-async function readZipEntries(zipBuf) {
-  const entries = [];
-  const u8 = zipBuf instanceof Uint8Array ? zipBuf : new Uint8Array(zipBuf);
-  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
-  let pos = 0;
-  while (pos < u8.length - 4) {
-    if (dv.getUint32(pos, true) === 0x04034b50) {
-      const compression = dv.getUint16(pos + 8, true);
-      const compSize    = dv.getUint32(pos + 18, true);
-      const fnLen       = dv.getUint16(pos + 26, true);
-      const extraLen    = dv.getUint16(pos + 28, true);
-      const nameBytes   = u8.subarray(pos + 30, pos + 30 + fnLen);
-      const name        = typeof TextDecoder !== 'undefined' ? new TextDecoder().decode(nameBytes) : Buffer.from(nameBytes).toString('utf8');
-      const dataStart   = pos + 30 + fnLen + extraLen;
-      const compData    = u8.subarray(dataStart, dataStart + compSize);
-      let data;
-      if (compression === 8) {
-        if (IS_NODE) {
-          data = require('zlib').inflateRawSync(compData);
+if (IS_NODE) {
+  // Node-only ZIP reader — uses zlib.inflateRawSync
+  var concatU8 = function(arrays) {
+    let total = 0;
+    for (const a of arrays) total += a.length;
+    const res = new Uint8Array(total);
+    let offset = 0;
+    for (const a of arrays) { res.set(a, offset); offset += a.length; }
+    return res;
+  };
+  var readZipEntries = async function(zipBuf) {
+    const zlib = require('zlib');
+    const entries = [];
+    const u8 = zipBuf instanceof Uint8Array ? zipBuf : new Uint8Array(zipBuf);
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let pos = 0;
+    while (pos < u8.length - 4) {
+      if (dv.getUint32(pos, true) === 0x04034b50) {
+        const compression = dv.getUint16(pos + 8, true);
+        const compSize    = dv.getUint32(pos + 18, true);
+        const fnLen       = dv.getUint16(pos + 26, true);
+        const extraLen    = dv.getUint16(pos + 28, true);
+        const nameBytes   = u8.subarray(pos + 30, pos + 30 + fnLen);
+        const name        = Buffer.from(nameBytes).toString('utf8');
+        const dataStart   = pos + 30 + fnLen + extraLen;
+        const compData    = u8.subarray(dataStart, dataStart + compSize);
+        let data;
+        if (compression === 8) {
+          data = zlib.inflateRawSync(compData);
         } else {
-          data = await inflateRawBrowser(compData);
+          data = compData;
         }
+        entries.push({ name, data: Buffer.isBuffer(data) ? data : Buffer.from(data) });
+        pos = dataStart + compSize;
       } else {
-        data = compData;
+        pos++;
       }
-      entries.push({ name, data: IS_NODE && !Buffer.isBuffer(data) ? Buffer.from(data) : data });
-      pos = dataStart + compSize;
-    } else {
-      pos++;
     }
-  }
-  return entries;
+    return entries;
+  };
 }
 
 // Write a ZIP buffer from { name, data } entries.

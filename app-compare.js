@@ -390,6 +390,247 @@ async function runCompare() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// BATCH COMPARE MODE
+// ═══════════════════════════════════════════════════════════════════════
+
+let batchResult = null;  // { matched, aOnly, bOnly, specials, labelA, labelB }
+
+// ── Mode toggle ──────────────────────────────────────────────
+document.querySelectorAll('#card-compare-mode button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.compareMode;
+    document.querySelectorAll('#card-compare-mode button').forEach(b =>
+      b.classList.toggle('active', b === btn)
+    );
+    document.getElementById('card-inputs').classList.toggle('hidden', mode === 'batch');
+    document.getElementById('card-options').classList.toggle('hidden', mode === 'batch');
+    document.getElementById('card-batch').classList.toggle('hidden', mode === 'single');
+    if (mode === 'single') {
+      document.getElementById('card-batch-nav').classList.add('hidden');
+    }
+    document.getElementById('compareStatus').textContent = '';
+    document.getElementById('compareStatus').className = 'status';
+  });
+});
+
+// ── Parse & Compare button ───────────────────────────────────
+document.getElementById('batchParseBtn').addEventListener('click', async () => {
+  const fileA = document.getElementById('batchFileA').files[0];
+  const fileB = document.getElementById('batchFileB').files[0];
+  const statusEl = document.getElementById('batchStatus');
+
+  if (!fileA || !fileB) {
+    statusEl.textContent = 'Please select both DOCX files.';
+    statusEl.className = 'status err';
+    return;
+  }
+
+  statusEl.textContent = 'Parsing documents...';
+  statusEl.className = 'status';
+  document.getElementById('batchParseBtn').disabled = true;
+
+  try {
+    const [bufA, bufB] = await Promise.all([
+      fileA.arrayBuffer(),
+      fileB.arrayBuffer(),
+    ]);
+
+    const [instA, instB] = await Promise.all([
+      parseDocxInstructions(bufA),
+      parseDocxInstructions(bufB),
+    ]);
+
+    const result = matchInstructions(instA, instB);
+    const labelA = document.getElementById('batchLabelA').value.trim() || 'Party A';
+    const labelB = document.getElementById('batchLabelB').value.trim() || 'Party B';
+
+    batchResult = { ...result, labelA, labelB };
+
+    // Populate navigator
+    const select = document.getElementById('batchSelect');
+    select.innerHTML = '';
+    result.matched.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = `CACI ${m.caciNum}: ${m.titleA}`;
+      select.appendChild(opt);
+    });
+
+    // Nav status
+    const navStatus = document.getElementById('batchNavStatus');
+    const parts = [`${result.matched.length} matched`];
+    if (result.aOnly.length) parts.push(`${result.aOnly.length} ${labelA}-only`);
+    if (result.bOnly.length) parts.push(`${result.bOnly.length} ${labelB}-only`);
+    if (result.specials.length) parts.push(`${result.specials.length} special`);
+    navStatus.textContent = parts.join(' \u00b7 ');
+
+    // Unmatched summary
+    const unmatchedEl = document.getElementById('batchUnmatched');
+    const unmLines = [];
+    if (result.aOnly.length) {
+      unmLines.push(`<strong>${esc(labelA)} only:</strong> ` +
+        result.aOnly.map(x => `CACI ${esc(x.caciNum)}`).join(', '));
+    }
+    if (result.bOnly.length) {
+      unmLines.push(`<strong>${esc(labelB)} only:</strong> ` +
+        result.bOnly.map(x => `CACI ${esc(x.caciNum)}`).join(', '));
+    }
+    if (result.specials.length) {
+      unmLines.push(`<strong>Special instructions:</strong> ` +
+        result.specials.map(s =>
+          `${esc(s.title)} (${s.party === 'A' ? esc(labelA) : esc(labelB)})`
+        ).join(', '));
+    }
+    if (result.duplicates.length) {
+      unmLines.push(`<strong>Duplicates skipped (first kept):</strong> ` +
+        result.duplicates.map(d =>
+          `CACI ${esc(d.caciNum)} (${d.party === 'A' ? esc(labelA) : esc(labelB)})`
+        ).join(', '));
+    }
+    unmatchedEl.innerHTML = unmLines.join('<br>') || '';
+
+    // Show navigator
+    document.getElementById('card-batch-nav').classList.remove('hidden');
+
+    if (result.matched.length > 0) {
+      select.value = '0';
+      runBatchCompare(0);
+      statusEl.textContent = `Parsed ${instA.length} + ${instB.length} instructions.`;
+      statusEl.className = 'status ok';
+    } else {
+      statusEl.textContent = 'No matching instructions found between documents.';
+      statusEl.className = 'status err';
+    }
+  } catch (err) {
+    statusEl.textContent = 'Error: ' + err.message;
+    statusEl.className = 'status err';
+    console.error('Batch parse error:', err);
+  } finally {
+    document.getElementById('batchParseBtn').disabled = false;
+  }
+});
+
+// ── Batch navigator change ───────────────────────────────────
+document.getElementById('batchSelect').addEventListener('change', (e) => {
+  runBatchCompare(parseInt(e.target.value, 10));
+});
+
+// ── Batch comparison mode change ─────────────────────────────
+document.getElementById('batchCompMode').addEventListener('change', () => {
+  const idx = parseInt(document.getElementById('batchSelect').value, 10);
+  if (!isNaN(idx) && batchResult) runBatchCompare(idx);
+});
+
+// ── Core set radio change ────────────────────────────────────
+document.querySelectorAll('input[name="batchCore"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const idx = parseInt(document.getElementById('batchSelect').value, 10);
+    if (!isNaN(idx) && batchResult) runBatchCompare(idx);
+  });
+});
+
+/**
+ * Run comparison for matched instruction at given index.
+ */
+async function runBatchCompare(idx) {
+  if (!batchResult || idx >= batchResult.matched.length) return;
+
+  const m = batchResult.matched[idx];
+  const coreIsA = document.querySelector('input[name="batchCore"]:checked').value === 'A';
+  const mode = document.getElementById('batchCompMode').value;
+
+  const coreText = coreIsA ? m.textA : m.textB;
+  const otherText = coreIsA ? m.textB : m.textA;
+  const coreLabel = coreIsA ? batchResult.labelA : batchResult.labelB;
+  const otherLabel = coreIsA ? batchResult.labelB : batchResult.labelA;
+
+  const diffColsEl = document.getElementById('diffCols');
+  const sumCard    = document.getElementById('card-summary');
+  const sumBody    = document.getElementById('sumBody');
+  const yelLegend  = document.getElementById('yel-legend');
+  const resultsEl  = document.getElementById('results');
+
+  resultsEl.classList.remove('hidden');
+  sumCard.classList.add('hidden');
+  yelLegend.classList.add('hidden');
+
+  // Yield to let browser repaint before CPU-heavy diff
+  await new Promise(r => setTimeout(r, 20));
+
+  if (mode === 'two-way') {
+    const tCore  = tokenize(coreText);
+    const tOther = tokenize(otherText);
+    const ops    = computeDiff(tCore, tOther);
+    const c      = counts(ops);
+
+    diffColsEl.innerHTML =
+      colHtml(`${esc(coreLabel)} — Base (CACI ${m.caciNum})`, renderLeft(ops)) +
+      colHtml(`${esc(otherLabel)} — Changes`, renderRight(ops));
+
+    document.getElementById('compareStatus').textContent =
+      `CACI ${m.caciNum}: ${c.ins} addition(s) \u00b7 ${c.del} deletion(s)`;
+    document.getElementById('compareStatus').className = 'status ok';
+
+  } else {
+    // Three-way: both vs official CACI
+    let officialText = '';
+    try {
+      officialText = stripInstructionHeading(lookupCACIText(m.caciNum));
+    } catch (_) {
+      // CACI not in database — fall back to two-way
+      const tCore  = tokenize(coreText);
+      const tOther = tokenize(otherText);
+      const ops    = computeDiff(tCore, tOther);
+      const c      = counts(ops);
+      diffColsEl.innerHTML =
+        colHtml(`${esc(coreLabel)} — Base (CACI ${m.caciNum})`, renderLeft(ops)) +
+        colHtml(`${esc(otherLabel)} — Changes`, renderRight(ops));
+      document.getElementById('compareStatus').textContent =
+        `CACI ${m.caciNum}: official text not in database, showing two-way. ${c.ins} addition(s) \u00b7 ${c.del} deletion(s)`;
+      document.getElementById('compareStatus').className = 'status ok';
+      attachScrollSync();
+      return;
+    }
+
+    const tA    = tokenize(coreIsA ? coreText : otherText);
+    const tCaci = tokenize(officialText);
+    const tB    = tokenize(coreIsA ? otherText : coreText);
+
+    const { opsA, opsB, countsCA, countsCB, countsAB, hasYellow } =
+      threeWayDiff(tA, tCaci, tB);
+
+    if (hasYellow) yelLegend.classList.remove('hidden');
+
+    const caciHtml = esc(officialText).replace(/\n{2,}/g, '</p><p class="diff-para">');
+    diffColsEl.innerHTML =
+      colHtml(esc(batchResult.labelA), renderFull(opsA)) +
+      colHtml('Official CACI — Base', caciHtml, true) +
+      colHtml(esc(batchResult.labelB), renderFull(opsB));
+
+    sumCard.classList.remove('hidden');
+    sumBody.innerHTML = `
+      <tr><td>${esc(batchResult.labelA)} vs Official CACI</td>
+          <td><span class="badge badge-g">+${countsCA.ins}</span></td>
+          <td><span class="badge badge-r">\u2212${countsCA.del}</span></td>
+          <td><span class="badge badge-b">${countsCA.total}</span></td></tr>
+      <tr><td>${esc(batchResult.labelB)} vs Official CACI</td>
+          <td><span class="badge badge-g">+${countsCB.ins}</span></td>
+          <td><span class="badge badge-r">\u2212${countsCB.del}</span></td>
+          <td><span class="badge badge-b">${countsCB.total}</span></td></tr>
+      <tr><td>${esc(batchResult.labelA)} vs ${esc(batchResult.labelB)}</td>
+          <td><span class="badge badge-g">+${countsAB.ins}</span></td>
+          <td><span class="badge badge-r">\u2212${countsAB.del}</span></td>
+          <td><span class="badge badge-b">${countsAB.total}</span></td></tr>`;
+
+    document.getElementById('compareStatus').textContent =
+      `CACI ${m.caciNum}: ${batchResult.labelA}\u2194CACI: ${countsCA.total} \u00b7 ${batchResult.labelB}\u2194CACI: ${countsCB.total}`;
+    document.getElementById('compareStatus').className = 'status ok';
+  }
+
+  attachScrollSync();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // LOAD CACI
 // ═══════════════════════════════════════════════════════════════════════
 

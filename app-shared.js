@@ -223,3 +223,70 @@ function exportPDF(sections, filename) {
 document.addEventListener('click', () => {
   document.querySelectorAll('.export-picker').forEach(p => p.classList.add('hidden'));
 });
+
+// ═══════════════════════════════════════════════════════════════════════
+// ZIP UTILITIES (shared — used by pleading-shell.js, docx-reader.js)
+// ═══════════════════════════════════════════════════════════════════════
+
+async function inflateRawBrowser(compData) {
+  const input  = compData instanceof Uint8Array ? compData
+               : new Uint8Array(compData.buffer, compData.byteOffset, compData.byteLength);
+  const ds     = new DecompressionStream('deflate-raw');
+  const writer = ds.writable.getWriter();
+  const reader = ds.readable.getReader();
+  writer.write(input);
+  writer.close();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const total = chunks.reduce((n, c) => n + c.length, 0);
+  const out   = new Uint8Array(total);
+  let   off   = 0;
+  for (const c of chunks) { out.set(c, off); off += c.length; }
+  return out;
+}
+
+function concatU8(arrays) {
+  let total = 0;
+  for (const a of arrays) total += a.length;
+  const res = new Uint8Array(total);
+  let offset = 0;
+  for (const a of arrays) {
+    res.set(a, offset);
+    offset += a.length;
+  }
+  return res;
+}
+
+async function readZipEntries(zipBuf) {
+  const entries = [];
+  const u8 = zipBuf instanceof Uint8Array ? zipBuf : new Uint8Array(zipBuf);
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let pos = 0;
+  while (pos < u8.length - 4) {
+    if (dv.getUint32(pos, true) === 0x04034b50) {
+      const compression = dv.getUint16(pos + 8, true);
+      const compSize    = dv.getUint32(pos + 18, true);
+      const fnLen       = dv.getUint16(pos + 26, true);
+      const extraLen    = dv.getUint16(pos + 28, true);
+      const nameBytes   = u8.subarray(pos + 30, pos + 30 + fnLen);
+      const name        = new TextDecoder().decode(nameBytes);
+      const dataStart   = pos + 30 + fnLen + extraLen;
+      const compData    = u8.subarray(dataStart, dataStart + compSize);
+      let data;
+      if (compression === 8) {
+        data = await inflateRawBrowser(compData);
+      } else {
+        data = compData;
+      }
+      entries.push({ name, data });
+      pos = dataStart + compSize;
+    } else {
+      pos++;
+    }
+  }
+  return entries;
+}
