@@ -73,7 +73,7 @@ caci-compare.html              — single-page app shell, all tabs live here
   ├── app-packet.js            — 6th: packet tray
   ├── app-cases.js             — 7th: localStorage case system
   ├── app-browse.js            — 8th: CACI browse/search panel
-  ├── node_modules/docx/...    — 9th: window.docx (UMD bundle, docx v9)
+  ├── lib/docx.iife.js         — 9th: window.docx (UMD bundle, docx v9)
   ├── pdfmake.min.js           — 10th: window.pdfMake (CDN, v0.2.7)
   ├── vfs_fonts.min.js         — 11th: registers bundled fonts for pdfmake (CDN)
   ├── docx-export.js           — 12th: exposes exportDOCX()
@@ -138,7 +138,7 @@ Shared:
 <script src="app-packet.js"></script>
 <script src="app-cases.js"></script>
 <script src="app-browse.js"></script>
-<script src="node_modules/docx/dist/index.iife.js"></script>
+<script src="lib/docx.iife.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
 <script src="docx-export.js"></script>
