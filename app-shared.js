@@ -125,6 +125,7 @@ function doPrint(cls) {
 
 const PS_FONTS = {
   serif: 'Georgia, "Times New Roman", serif',
+  times: '"Times New Roman", Times, serif',
   sans:  '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   mono:  '"Consolas", "Courier New", monospace',
 };
