@@ -14,6 +14,34 @@ const CACI_TITLE_RE = /^CACI\s*(?:No\.?\s*)?(\d+[A-Za-z]?)\s*[:\u2013\u2014\-.\s
 const SPECIAL_TITLE_RE = /^(?:(?:Plaintiff|Defendant)(?:'s|s')?\s+)?(S-\d+)\s*[:\u2013\u2014\-.\s]\s*(.*)/i;
 
 /**
+ * Build a set of short text strings that appear 3+ times in the document.
+ * These are almost certainly header/footer artifacts from PDF-to-Word conversion
+ * (firm addresses, phone numbers, document titles repeated on every page).
+ * Excludes sentence-like body text and parser keywords from the noise set.
+ */
+function buildNoiseSet(paragraphs) {
+  const counts = new Map();
+  for (const p of paragraphs) {
+    const t = p.text.trim();
+    if (!t || t.length > 80) continue; // only short text can be header/footer noise
+    counts.set(t, (counts.get(t) || 0) + 1);
+  }
+  const noiseSet = new Set();
+  for (const [text, count] of counts) {
+    if (count < 3) continue;
+    // Preserve parser keywords that have specific handling
+    if (/^(?:Authority|Reservation of Objection)\s*:/i.test(text)) continue;
+    // Preserve sentence-like body text (ends with punctuation + enough words)
+    const words = text.split(/\s+/).length;
+    if (words > 6 && /[.;!?]$/.test(text)) continue;
+    // Preserve text starting with common sentence starters
+    if (/^(?:That|The|A|An|If|When|Each|Whether|To|In|Any|You|Do|It|This)\b/.test(text) && words > 3) continue;
+    noiseSet.add(text);
+  }
+  return noiseSet;
+}
+
+/**
  * Parse a DOCX ArrayBuffer into an array of instructions.
  * Returns: [{ caciNum: string|null, title: string, text: string, special: boolean }]
  */
@@ -33,13 +61,16 @@ async function parseDocxInstructions(arrayBuffer) {
   // Extract all paragraphs with style and formatting info
   const paragraphs = extractParagraphs(doc);
 
+  // Build repeated-text noise set (header/footer artifacts)
+  const noiseSet = buildNoiseSet(paragraphs);
+
   // Detect which parsing strategy to use
   const hasHeadingStyles = paragraphs.some(p => /^Heading\s*1$/i.test(p.style));
 
   if (hasHeadingStyles) {
-    return parseByHeadingStyle(paragraphs);
+    return parseByHeadingStyle(paragraphs, noiseSet);
   } else {
-    return parseByFormatting(paragraphs);
+    return parseByFormatting(paragraphs, noiseSet);
   }
 }
 
@@ -130,24 +161,45 @@ function extractParagraphs(doc) {
 
 /**
  * Parse using Heading 1 style as delimiters (PDF-to-Word documents).
- * Filters out line-number sequences, firm name blocks, footer lines.
+ * Filters out line-number sequences, firm name blocks, footer lines,
+ * address/phone noise, and repeated header/footer text.
  */
-function parseByHeadingStyle(paragraphs) {
+function parseByHeadingStyle(paragraphs, noiseSet) {
   const instructions = [];
   let current = null;
 
   // Noise filters for PDF-to-Word artifacts
-  const isLineNumber = (p) => /^\d{1,2}$/.test(p.text.trim());
-  const isFooterLine = (p) => /^\d{5,}/.test(p.text.trim()); // case number pattern in footer
-  const isFirmBlock  = (p) => p.style === 'Normal' && p.text.trim().length < 80 &&
-    /(?:LLP|LLC|P\.?C\.?|Law\s+(?:Firm|Office|Group))/i.test(p.text.trim());
+  const isLineNumber = (t) => /^\d{1,2}$/.test(t);
+  const isFooterLine = (t) => /^\d{5,}/.test(t);
+  const isFirmName   = (t) => t.length < 80 &&
+    /(?:LLP|LLC|P\.?C\.?|Law\s+(?:Firm|Office|Group)|Esq\.|Attorney)/i.test(t);
+  const isAddress    = (t) => t.length < 100 &&
+    /(?:,\s*(?:CA|California|[A-Z]{2})\s+\d{5}|Suite\s+\d|^\d+\s+\w+.+(?:Blvd|Boulevard|Street|St|Avenue|Ave|Drive|Dr|Road|Rd|Way|Place|Pl)\b)/i.test(t);
+  const isPhoneFax   = (t) => t.length < 80 &&
+    /^(?:Tel|Fax|Phone|Telephone|Facsimile)\s*[:.]?\s*\(?[\d]/i.test(t);
+  const isDocTitle   = (t) =>
+    /^\[?(?:PROPOSED|DEFENDANTS?|PLAINTIFFS?).{0,20}(?:JURY\s+INSTRUCTIONS|VERDICT\s+FORM)/i.test(t);
+  const isEmail      = (t) => t.length < 80 && /^E-?[Mm]ail\s*:/i.test(t);
+
+  function isNoise(p) {
+    const t = p.text.trim();
+    if (!t) return true;
+    if (noiseSet.has(t)) return true;
+    if (isLineNumber(t)) return true;
+    if (isFooterLine(t)) return true;
+    if (isFirmName(t)) return true;
+    if (isAddress(t)) return true;
+    if (isPhoneFax(t)) return true;
+    if (isDocTitle(t)) return true;
+    if (isEmail(t)) return true;
+    return false;
+  }
 
   for (const p of paragraphs) {
-    // Skip noise paragraphs
-    if (isLineNumber(p) || isFooterLine(p)) continue;
+    const trimmed = p.text.trim();
+    if (isNoise(p)) continue;
 
     const isH1 = /^Heading\s*1$/i.test(p.style);
-    const trimmed = p.text.trim();
 
     if (isH1 && trimmed) {
       // Check if this heading is a CACI instruction title
@@ -173,11 +225,12 @@ function parseByHeadingStyle(paragraphs) {
         };
         continue;
       }
-      // Non-instruction heading (front matter, proof of service) — skip
+      // Non-instruction heading (firm name, court, proof of service) — skip
+      continue;
     }
 
     // Body content — accumulate if inside an instruction
-    if (current && trimmed && !isFirmBlock(p)) {
+    if (current && trimmed) {
       // Skip "Authority:" and "Reservation of Objection:" sub-sections
       if (/^(?:Authority|Reservation of Objection)\s*:/i.test(trimmed)) {
         // Push current and stop accumulating (authority sections are after body)
@@ -202,38 +255,41 @@ function parseByHeadingStyle(paragraphs) {
 /**
  * Parse using formatting detection (clean Word documents).
  * Title = centered + bold + matches CACI pattern.
+ * Also detects CACI titles without formatting as a fallback (the CACI_TITLE_RE
+ * pattern is specific enough that false positives in body text are rare).
  */
-function parseByFormatting(paragraphs) {
+function parseByFormatting(paragraphs, noiseSet) {
   const instructions = [];
   let current = null;
 
   for (const p of paragraphs) {
     const trimmed = p.text.trim();
+    if (!trimmed) continue;
+    if (noiseSet.has(trimmed)) continue;
 
-    // Detect instruction title: centered + bold + CACI pattern
-    if ((p.isCentered || p.isBold) && trimmed) {
-      const caciMatch = trimmed.match(CACI_TITLE_RE);
-      const specialMatch = trimmed.match(SPECIAL_TITLE_RE);
+    // Detect instruction title: prefer centered/bold, but also detect
+    // CACI titles without formatting (handles inconsistent Word docs)
+    const caciMatch = trimmed.match(CACI_TITLE_RE);
+    const specialMatch = !caciMatch ? trimmed.match(SPECIAL_TITLE_RE) : null;
 
-      if (caciMatch) {
-        if (current) instructions.push(current);
-        current = {
-          caciNum: caciMatch[1],
-          title: caciMatch[2].trim() || trimmed,
-          lines: [],
-          special: false,
-        };
-        continue;
-      } else if (specialMatch) {
-        if (current) instructions.push(current);
-        current = {
-          caciNum: null,
-          title: specialMatch[1] + ': ' + (specialMatch[2].trim() || trimmed),
-          lines: [],
-          special: true,
-        };
-        continue;
-      }
+    if (caciMatch) {
+      if (current) instructions.push(current);
+      current = {
+        caciNum: caciMatch[1],
+        title: caciMatch[2].trim() || trimmed,
+        lines: [],
+        special: false,
+      };
+      continue;
+    } else if (specialMatch && (p.isCentered || p.isBold)) {
+      if (current) instructions.push(current);
+      current = {
+        caciNum: null,
+        title: specialMatch[1] + ': ' + (specialMatch[2].trim() || trimmed),
+        lines: [],
+        special: true,
+      };
+      continue;
     }
 
     // Body content
