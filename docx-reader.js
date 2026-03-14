@@ -197,12 +197,14 @@ function parseByHeadingStyle(paragraphs, noiseSet) {
 
   for (const p of paragraphs) {
     const trimmed = p.text.trim();
-    if (isNoise(p)) continue;
+    if (!trimmed) continue;
 
     const isH1 = /^Heading\s*1$/i.test(p.style);
 
-    if (isH1 && trimmed) {
-      // Check if this heading is a CACI instruction title
+    // Heading1 paragraphs: check for CACI title FIRST, before noise filtering.
+    // This prevents pattern filters (e.g. isFirmName matching "Attorney") from
+    // accidentally killing legitimate CACI titles like "Attorney Fees".
+    if (isH1) {
       const caciMatch = trimmed.match(CACI_TITLE_RE);
       const specialMatch = trimmed.match(SPECIAL_TITLE_RE);
 
@@ -228,6 +230,9 @@ function parseByHeadingStyle(paragraphs, noiseSet) {
       // Non-instruction heading (firm name, court, proof of service) — skip
       continue;
     }
+
+    // Body text: apply noise filtering
+    if (isNoise(p)) continue;
 
     // Body content — accumulate if inside an instruction
     if (current && trimmed) {
