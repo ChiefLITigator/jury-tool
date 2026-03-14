@@ -6,7 +6,7 @@ Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
 Never paste caci-data.js or vf-data.js into a session unless debugging data.
 
-**NEVER push to GitHub unless the user explicitly instructs you to do so.**
+**NEVER push to GitHub unless the user explicitly instructs you to do so. Push authorization is per-commit — it does NOT carry forward to subsequent commits.**
 
 ---
 
