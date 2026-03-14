@@ -331,7 +331,7 @@ async function runCompare() {
       diffColsEl.innerHTML =
         colHtml('Version A — Base', renderLeft(ops)) +
         colHtml('Version B — Changes', renderRight(ops));
-      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s)`, 'ok');
+      setStatus(`${c.ins} word(s) added · ${c.del} word(s) removed`, 'ok');
 
     } else if (mode === 'ao') {
       const ops = computeDiff(tC, tA);
@@ -339,7 +339,7 @@ async function runCompare() {
       diffColsEl.innerHTML =
         colHtml('Official CACI — Base', renderLeft(ops), true) +
         colHtml('Version A — Changes from CACI', renderRight(ops));
-      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s) from CACI`, 'ok');
+      setStatus(`${c.ins} word(s) added · ${c.del} word(s) removed from CACI`, 'ok');
 
     } else if (mode === 'bo') {
       const ops = computeDiff(tC, tB);
@@ -347,7 +347,7 @@ async function runCompare() {
       diffColsEl.innerHTML =
         colHtml('Official CACI — Base', renderLeft(ops), true) +
         colHtml('Version B — Changes from CACI', renderRight(ops));
-      setStatus(`${c.ins} addition(s) · ${c.del} deletion(s) from CACI`, 'ok');
+      setStatus(`${c.ins} word(s) added · ${c.del} word(s) removed from CACI`, 'ok');
 
     } else {
       // ── THREE-WAY ────────────────────────────────────────────────
@@ -377,7 +377,7 @@ async function runCompare() {
             <td><span class="badge badge-r">−${countsAB.del}</span></td>
             <td><span class="badge badge-b">${countsAB.total}</span></td></tr>`;
 
-      setStatus(`A↔CACI: ${countsCA.total} change(s) · B↔CACI: ${countsCB.total} change(s) · A↔B: ${countsAB.total} change(s)`, 'ok');
+      setStatus(`A↔CACI: ${countsCA.total} word(s) changed · B↔CACI: ${countsCB.total} word(s) changed · A↔B: ${countsAB.total} word(s) changed`, 'ok');
     }
 
     attachScrollSync();
@@ -568,7 +568,7 @@ async function runBatchCompare(idx) {
       colHtml(`${esc(otherLabel)} — Changes`, renderRight(ops));
 
     document.getElementById('compareStatus').textContent =
-      `CACI ${m.caciNum}: ${c.ins} addition(s) \u00b7 ${c.del} deletion(s)`;
+      `CACI ${m.caciNum}: ${c.ins} word(s) added \u00b7 ${c.del} word(s) removed`;
     document.getElementById('compareStatus').className = 'status ok';
 
   } else {
@@ -586,7 +586,7 @@ async function runBatchCompare(idx) {
         colHtml(`${esc(coreLabel)} — Base (CACI ${m.caciNum})`, renderLeft(ops)) +
         colHtml(`${esc(otherLabel)} — Changes`, renderRight(ops));
       document.getElementById('compareStatus').textContent =
-        `CACI ${m.caciNum}: official text not in database, showing two-way. ${c.ins} addition(s) \u00b7 ${c.del} deletion(s)`;
+        `CACI ${m.caciNum}: official text not in database, showing two-way. ${c.ins} word(s) added \u00b7 ${c.del} word(s) removed`;
       document.getElementById('compareStatus').className = 'status ok';
       attachScrollSync();
       return;
