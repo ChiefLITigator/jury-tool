@@ -259,12 +259,12 @@ function exportDOCX(content, filename) {
               }));
             }
           } else {
-            // Flat item — unchanged behavior
+            // Flat item — bold label with $ line
             items.push(new Paragraph({
               tabStops: [{ type: TabStopType.RIGHT, position: RIGHT_TAB }],
               indent:   { left: IN_HALF },
               spacing:  { line: LINE15, before: 60, after: 60 },
-              children: [r(liItem.label || ''), r('\t$________________')]
+              children: [r(liItem.label || '', { bold: true }), r('\t$________________')]
             }));
           }
         }
