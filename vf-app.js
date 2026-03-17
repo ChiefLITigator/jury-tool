@@ -145,9 +145,12 @@ function addQuestionFromPalette(groupId, sourceQid) {
   block.uid          = newUid;
   block.source_group = groupId;
   block.source_id    = sourceQid;
-  if (block.if_yes  != null) block.if_yes  = translateRouting(block.if_yes,  uidMap, groupId);
-  if (block.if_no   != null) block.if_no   = translateRouting(block.if_no,   uidMap, groupId);
-  if (block.if_done != null) block.if_done = translateRouting(block.if_done, uidMap, groupId);
+  if (block.if_yes     != null) block.if_yes     = translateRouting(block.if_yes,     uidMap, groupId);
+  if (block.if_no      != null) block.if_no      = translateRouting(block.if_no,      uidMap, groupId);
+  if (block.if_done    != null) block.if_done    = translateRouting(block.if_done,    uidMap, groupId);
+  if (block.if_none    != null) block.if_none    = translateRouting(block.if_none,    uidMap, groupId);
+  if (block.if_any_yes != null) block.if_any_yes = translateRouting(block.if_any_yes, uidMap, groupId);
+  if (block.if_all_no  != null) block.if_all_no  = translateRouting(block.if_all_no,  uidMap, groupId);
 
   form.questions.push(block);
   normalizeRoutes(form);
@@ -181,7 +184,7 @@ function normalizeRoutes(form) {
     }
   }
   for (const q of qs) {
-    for (const field of ['if_yes', 'if_no', 'if_done']) {
+    for (const field of ['if_yes', 'if_no', 'if_done', 'if_none', 'if_any_yes', 'if_all_no']) {
       const val = q[field];
       if (typeof val === 'string' && val.startsWith('__src__:')) {
         const key = val.slice('__src__:'.length);
@@ -220,11 +223,12 @@ function addCustomQuestion() {
 
 function typeBadgeLabel(type) {
   switch (type) {
-    case 'yes_no':     return 'YES/NO';
-    case 'damages':    return 'DAMAGES';
-    case 'percentage': return '%';
-    case 'write_in':   return 'WRITE-IN';
-    default:           return type ? type.toUpperCase() : '?';
+    case 'yes_no':       return 'YES/NO';
+    case 'yes_no_multi': return 'YES/NO (MULTI)';
+    case 'damages':      return 'DAMAGES';
+    case 'percentage':   return '%';
+    case 'write_in':     return 'WRITE-IN';
+    default:             return type ? type.toUpperCase() : '?';
   }
 }
 
@@ -270,16 +274,21 @@ function renderBuilder() {
     let routing = '';
     if (q.type === 'yes_no') {
       routing = `Yes → ${routingLabel(q.if_yes, qs)}  |  No → ${routingLabel(q.if_no, qs)}`;
+    } else if (q.type === 'yes_no_multi') {
+      routing = `Any Yes → ${routingLabel(q.if_any_yes, qs)}  |  All No → ${routingLabel(q.if_all_no, qs)}`;
     } else if (q.if_done) {
       routing = `Done → ${routingLabel(q.if_done, qs)}`;
     }
 
-    html += `<div class="vf-q-block" data-uid="${escHtml(q.uid)}" data-idx="${idx}" draggable="true">
+    const optionalStyle = q.optional ? 'border:2px dashed var(--muted);opacity:.85' : '';
+    html += `<div class="vf-q-block" data-uid="${escHtml(q.uid)}" data-idx="${idx}" draggable="true"${optionalStyle ? ` style="${optionalStyle}"` : ''}>
       <span class="vf-q-drag" title="Drag to reorder">⠿</span>
       <div class="vf-q-body">
         <div>
           <span class="vf-q-type-badge">${badge}</span>
+          ${q.optional ? '<span style="font-family:var(--sans);font-size:.62em;color:var(--muted);margin-left:4px;border:1px solid var(--muted);border-radius:3px;padding:0 4px">[optional]</span>' : ''}
           <span style="font-family:var(--sans);font-size:.7em;color:var(--muted);margin-left:6px">#${num}</span>
+          ${q.source_group && q.source_group !== 'custom' ? `<span style="font-family:var(--sans);font-size:.65em;color:var(--muted);margin-left:6px;opacity:.7">${escHtml(q.source_group)}</span>` : ''}
         </div>
         <div class="vf-q-preview-text">${escHtml(preview)}</div>
         ${routing ? `<div class="vf-q-routing">${escHtml(routing)}</div>` : ''}
@@ -390,10 +399,11 @@ function buildInlineEditorHTML(q, form) {
   const qs    = form.questions;
   const uid   = q.uid;
   const types = [
-    { v: 'yes_no',     l: 'Yes/No'   },
-    { v: 'damages',    l: 'Damages'  },
-    { v: 'percentage', l: '%'        },
-    { v: 'write_in',   l: 'Write-in' },
+    { v: 'yes_no',       l: 'Yes/No'         },
+    { v: 'yes_no_multi', l: 'Yes/No (Multi)' },
+    { v: 'damages',      l: 'Damages'        },
+    { v: 'percentage',   l: '%'              },
+    { v: 'write_in',     l: 'Write-in'       },
   ];
 
   const typeRadios = types.map(t =>
@@ -407,7 +417,20 @@ function buildInlineEditorHTML(q, form) {
 
   if (q.type === 'yes_no') {
     const showStop = q.if_no === 'stop';
+    const hasAlt   = !!(q.alt_text);
     typeFields = `
+      <div style="margin-bottom:8px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.82em">
+          <input type="checkbox" data-ed-toggle="alt_text" ${hasAlt ? 'checked' : ''}
+            style="accent-color:var(--navy);cursor:pointer">
+          Alternative formulation
+        </label>
+      </div>
+      <div id="vfed-alt-${uid}" style="${hasAlt ? '' : 'display:none;'}margin-bottom:8px">
+        <label style="display:block">Alternative text</label>
+        <textarea data-ed-field="alt_text" rows="2"
+          style="width:100%;font-family:var(--serif);font-size:.83em">${escHtml(q.alt_text || '')}</textarea>
+      </div>
       <div class="vf-routing-row">
         <div>
           <label style="display:block">If Yes →</label>
@@ -466,10 +489,44 @@ function buildInlineEditorHTML(q, form) {
     typeFields = `
       <div id="vfed-plist-${uid}">${rows}</div>
       <button class="btn-ghost" id="vfed-padd-${uid}" style="font-size:.78em;margin-top:4px">+ Add party</button>`;
+
+  } else if (q.type === 'yes_no_multi') {
+    const subjects = q.subjects || [];
+    const subjRows = subjects.map((s, i) =>
+      `<div style="display:flex;gap:4px;margin-bottom:5px;align-items:center">
+        <input type="text" data-ed-subj="${i}" value="${escHtml(s.label)}"
+          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px">
+        <button class="btn-ghost" data-ed-subj-up="${i}" title="Move up" style="padding:2px 5px;font-size:.7em"${i === 0 ? ' disabled' : ''}>&#x25B2;</button>
+        <button class="btn-ghost" data-ed-subj-down="${i}" title="Move down" style="padding:2px 5px;font-size:.7em"${i === subjects.length - 1 ? ' disabled' : ''}>&#x25BC;</button>
+        <button class="btn-ghost" data-ed-subj-del="${i}" style="padding:2px 8px;font-size:.8em">×</button>
+      </div>`
+    ).join('');
+    const showMultiStop = q.if_all_no === 'stop';
+    typeFields = `
+      <div style="margin-bottom:6px;font-family:var(--sans);font-size:.75em;color:var(--muted)">
+        Use [subject] in the question text as a placeholder for each subject name.
+      </div>
+      <div id="vfed-subjlist-${uid}">${subjRows}</div>
+      <button class="btn-ghost" id="vfed-subjadd-${uid}" style="font-size:.78em;margin-top:4px">+ Add subject</button>
+      <div class="vf-routing-row" style="margin-top:8px">
+        <div>
+          <label style="display:block">If any Yes →</label>
+          <select data-ed-field="if_any_yes" style="width:100%">${buildRoutingOptions(uid, qs, q.if_any_yes)}</select>
+        </div>
+        <div>
+          <label style="display:block">If all No →</label>
+          <select data-ed-field="if_all_no" style="width:100%">${buildRoutingOptions(uid, qs, q.if_all_no)}</select>
+        </div>
+      </div>
+      <div id="vfed-multistop-${uid}" style="margin-top:8px${showMultiStop ? '' : ';display:none'}">
+        <label style="display:block">Stop text</label>
+        <textarea data-ed-field="stop_text" rows="2"
+          style="width:100%;font-family:var(--serif);font-size:.83em">${escHtml(q.stop_text || '')}</textarea>
+      </div>`;
   }
 
   // if_done routing for non-yes_no types ("stop" not supported for these — A4)
-  if (q.type !== 'yes_no') {
+  if (q.type !== 'yes_no' && q.type !== 'yes_no_multi') {
     const doneLabel = (q.type === 'damages' && q.if_none != null) ? 'If damages proved →' : 'When done →';
     typeFields += `
       <div style="margin-top:8px">
@@ -497,6 +554,13 @@ function buildInlineEditorHTML(q, form) {
 
   return `
     <div class="vf-inline-editor" id="vfed-${uid}">
+      <div style="margin-bottom:8px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.82em">
+          <input type="checkbox" data-ed-toggle="optional" ${q.optional ? 'checked' : ''}
+            style="accent-color:var(--navy);cursor:pointer">
+          Optional (include only if this issue is at play)
+        </label>
+      </div>
       <div style="margin-bottom:8px">
         <label style="display:block;margin-bottom:5px">Question type</label>
         <div>${typeRadios}</div>
@@ -526,19 +590,30 @@ function wireEditorEvents() {
   // Type radio
   el.querySelectorAll(`input[name="vfqtype_${uid}"]`).forEach(radio => {
     radio.addEventListener('change', () => {
+      const prev = q.type;
       q.type = radio.value;
       if (q.type === 'yes_no') {
         q.if_yes    = q.if_yes  || 'sign';
         q.if_no     = q.if_no   || 'stop';
         q.stop_text = q.stop_text || '';
         delete q.if_done;
+        delete q.if_any_yes; delete q.if_all_no; delete q.subjects;
+      } else if (q.type === 'yes_no_multi') {
+        if (!q.subjects) q.subjects = [];
+        q.if_any_yes = q.if_any_yes || 'sign';
+        q.if_all_no  = q.if_all_no  || 'stop';
+        q.stop_text  = q.stop_text  || '';
+        delete q.if_yes; delete q.if_no; delete q.if_done;
       } else {
         q.if_done = q.if_done || 'sign';
         delete q.if_yes; delete q.if_no;
+        delete q.if_any_yes; delete q.if_all_no; delete q.subjects;
         if (q.type !== 'damages') { delete q.if_none; delete q.stop_text; }
         if (q.type === 'damages'    && !q.line_items) q.line_items = [];
         if (q.type === 'percentage' && !q.parties)    q.parties    = [];
       }
+      // Clean up alt_text when switching away from yes_no
+      if (prev === 'yes_no' && q.type !== 'yes_no') delete q.alt_text;
       renderBuilder();
       renderPreview();
     });
@@ -548,6 +623,39 @@ function wireEditorEvents() {
   const textArea = el.querySelector('[data-ed-field="text"]');
   if (textArea) {
     textArea.addEventListener('input', () => { q.text = textArea.value; renderPreview(); });
+  }
+
+  // Optional checkbox
+  const optToggle = el.querySelector('[data-ed-toggle="optional"]');
+  if (optToggle) {
+    optToggle.addEventListener('change', () => {
+      q.optional = optToggle.checked;
+      renderBuilder();
+      renderPreview();
+    });
+  }
+
+  // Alt-text toggle (yes_no only)
+  const altToggle = el.querySelector('[data-ed-toggle="alt_text"]');
+  if (altToggle) {
+    altToggle.addEventListener('change', () => {
+      if (altToggle.checked) {
+        q.alt_text = q.alt_text || '';
+        const wrap = document.getElementById('vfed-alt-' + uid);
+        if (wrap) wrap.style.display = '';
+      } else {
+        delete q.alt_text;
+        const wrap = document.getElementById('vfed-alt-' + uid);
+        if (wrap) wrap.style.display = 'none';
+      }
+      renderPreview();
+    });
+  }
+
+  // Alt-text textarea (yes_no only)
+  const altArea = el.querySelector('[data-ed-field="alt_text"]');
+  if (altArea) {
+    altArea.addEventListener('input', () => { q.alt_text = altArea.value; renderPreview(); });
   }
 
   // Damages: conditional routing toggle (if_none)
@@ -564,13 +672,17 @@ function wireEditorEvents() {
     });
   }
 
-  // Routing selects (if_yes, if_no, if_done, if_none)
+  // Routing selects (if_yes, if_no, if_done, if_none, if_any_yes, if_all_no)
   el.querySelectorAll('select[data-ed-field]').forEach(sel => {
     sel.addEventListener('change', () => {
       const field = sel.dataset.edField;
       q[field] = sel.value;
       if (field === 'if_no') {
         const wrap = document.getElementById('vfed-stop-' + uid);
+        if (wrap) wrap.style.display = sel.value === 'stop' ? '' : 'none';
+      }
+      if (field === 'if_all_no') {
+        const wrap = document.getElementById('vfed-multistop-' + uid);
         if (wrap) wrap.style.display = sel.value === 'stop' ? '' : 'none';
       }
       renderPreview();
@@ -718,6 +830,49 @@ function wireEditorEvents() {
     });
   }
 
+  // Yes/No Multi: subject labels
+  el.querySelectorAll('[data-ed-subj]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.edSubj, 10);
+      if (q.subjects && q.subjects[i] != null) {
+        q.subjects[i].label = inp.value;
+        renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-subj-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edSubjDel, 10);
+      if (q.subjects) { q.subjects.splice(i, 1); renderBuilder(); renderPreview(); }
+    });
+  });
+  el.querySelectorAll('[data-ed-subj-up]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edSubjUp, 10);
+      if (i > 0 && q.subjects) {
+        [q.subjects[i - 1], q.subjects[i]] = [q.subjects[i], q.subjects[i - 1]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-subj-down]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edSubjDown, 10);
+      if (q.subjects && i < q.subjects.length - 1) {
+        [q.subjects[i], q.subjects[i + 1]] = [q.subjects[i + 1], q.subjects[i]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  const subjAdd = document.getElementById('vfed-subjadd-' + uid);
+  if (subjAdd) {
+    subjAdd.addEventListener('click', () => {
+      if (!q.subjects) q.subjects = [];
+      q.subjects.push({ id: 's' + (q.subjects.length + 1), label: '' });
+      renderBuilder(); renderPreview();
+    });
+  }
+
   // Done button
   const doneBtn = document.getElementById('vfed-done-' + uid);
   if (doneBtn) {
@@ -745,7 +900,10 @@ function routingText(q, qs, num) {
       const st = (q.stop_text || 'stop here and do not answer any further questions').replace(/\.$/, '');
       return st;
     }
-    if (typeof val === 'string' && (val.startsWith('__src__:') || !qs.some(x => x.uid === val))) {
+    if (typeof val === 'string' && val.startsWith('__src__:')) {
+      return 'answer question [PENDING — add remaining questions from palette]';
+    }
+    if (typeof val === 'string' && !qs.some(x => x.uid === val)) {
       return 'answer question [ROUTE BROKEN]';
     }
     const n = uidToDisplayNum(val, qs);
@@ -753,8 +911,12 @@ function routingText(q, qs, num) {
   }
   const parts = [];
   if (q.type === 'yes_no') {
-    if (q.if_yes != null) parts.push(`If your answer to question ${num} is Yes, ${targetLabel(q.if_yes, true)}.`);
+    const optFor = q.alt_text ? 'either option for ' : '';
+    if (q.if_yes != null) parts.push(`If your answer to ${optFor}question ${num} is Yes, ${targetLabel(q.if_yes, true)}.`);
     if (q.if_no  != null) parts.push(`If your answer is No, ${targetLabel(q.if_no, true)}.`);
+  } else if (q.type === 'yes_no_multi') {
+    if (q.if_any_yes != null) parts.push(`If you answered yes for any subject in question ${num}, ${targetLabel(q.if_any_yes, false)}.`);
+    if (q.if_all_no  != null) parts.push(`If you answered no for all subjects in question ${num}, ${targetLabel(q.if_all_no, true)}.`);
   } else if (q.type === 'damages' && q.if_none != null) {
     parts.push(`If damages have been proved, ${targetLabel(q.if_done || 'sign', false)}.`);
     parts.push(`If no damages have been proved, ${targetLabel(q.if_none, true)}.`);
@@ -794,13 +956,39 @@ function renderPreview() {
   qs.forEach((q, idx) => {
     const num  = idx + 1;
     const text = substituteParties(q.text || '', parties);
+    const ob = q.optional ? '[' : '';
+    const cb = q.optional ? ']' : '';
     html += '<div class="vf-preview-question">';
-    html += `<div><span class="vf-preview-q-num">${num}.</span>  ${escHtml(text)}</div>`;
+
+    if (q.type === 'yes_no_multi') {
+      // Render one sub-question per subject
+      const subjects = q.subjects || [];
+      subjects.forEach(subj => {
+        const subjText = substituteParties((q.text || '').replace(/\[subject\]/gi, subj.label || '[subject]'), parties);
+        html += `<div>${ob}<span class="vf-preview-q-num">${num}.</span>  ${escHtml(subjText)}${cb}</div>`;
+        html += `<div class="vf-preview-yn">${ob}Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______${cb}</div>`;
+      });
+      if (!subjects.length) {
+        html += `<div>${ob}<span class="vf-preview-q-num">${num}.</span>  ${escHtml(text)}${cb}</div>`;
+        html += `<div class="vf-preview-yn">${ob}Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______${cb}</div>`;
+      }
+      const rt = routingText(q, qs, num);
+      if (rt) html += `<div class="vf-preview-routing">${ob}${escHtml(rt)}${cb}</div>`;
+
+    } else {
+      html += `<div>${ob}<span class="vf-preview-q-num">${num}.</span>  ${escHtml(text)}${cb}</div>`;
+    }
 
     if (q.type === 'yes_no') {
-      html += '<div class="vf-preview-yn">Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______</div>';
+      html += `<div class="vf-preview-yn">${ob}Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______${cb}</div>`;
+      if (q.alt_text) {
+        const altText = substituteParties(q.alt_text, parties);
+        html += `<div style="margin:0.4em 0 0.2em 2em;font-style:italic">${ob}[or]${cb}</div>`;
+        html += `<div>${ob}<span class="vf-preview-q-num">${num}.</span>  ${escHtml(altText)}${cb}</div>`;
+        html += `<div class="vf-preview-yn">${ob}Yes &nbsp;______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No &nbsp;______${cb}</div>`;
+      }
       const rt = routingText(q, qs, num);
-      if (rt) html += `<div class="vf-preview-routing">${escHtml(rt)}</div>`;
+      if (rt) html += `<div class="vf-preview-routing">${ob}${escHtml(rt)}${cb}</div>`;
 
     } else if (q.type === 'damages') {
       for (const item of (q.line_items || [])) {
@@ -850,9 +1038,9 @@ function renderPreview() {
     }
 
     // Routing text for non-yes_no question types (A3)
-    if (q.type !== 'yes_no') {
+    if (q.type !== 'yes_no' && q.type !== 'yes_no_multi') {
       const rt = routingText(q, qs, num);
-      if (rt) html += `<div class="vf-preview-routing">${escHtml(rt)}</div>`;
+      if (rt) html += `<div class="vf-preview-routing">${ob}${escHtml(rt)}${cb}</div>`;
     }
 
     html += '</div>';
@@ -930,6 +1118,13 @@ function renderCaptionFields() {
 // FORM SELECTOR  (Multiple Forms Per Case)
 // ═══════════════════════════════════════════════════════════════════════
 
+const VF_SAVED_KEY = 'vf_saved_forms';
+
+function loadSavedVFs() {
+  try { return JSON.parse(localStorage.getItem(VF_SAVED_KEY) || '{}'); } catch { return {}; }
+}
+function saveSavedVFs(obj) { localStorage.setItem(VF_SAVED_KEY, JSON.stringify(obj)); }
+
 function renderFormSelector() {
   const container = document.getElementById('vfFormSelector');
   if (!container) return;
@@ -939,11 +1134,29 @@ function renderFormSelector() {
     `<option value="${escHtml(f.id)}"${f.id === activeVfFormId ? ' selected' : ''}>${escHtml(f.name)}</option>`
   ).join('');
 
+  // Saved forms for Load picker
+  const saved = loadSavedVFs();
+  const savedNames = Object.keys(saved).sort();
+  const savedOpts = savedNames.length
+    ? savedNames.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join('')
+    : '<option value="" disabled>No saved forms</option>';
+
   container.innerHTML = `
     <select id="vfFormSelect" style="width:100%">${opts}</select>
     <input type="text" id="vfFormRename" placeholder="Rename form…"
       value="${escHtml(form ? form.name : '')}">
-    <button class="btn-secondary" id="vfNewFormBtn" style="font-size:.8em">+ New Form</button>`;
+    <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+      <button class="btn-secondary" id="vfNewFormBtn" style="font-size:.78em;flex:1">+ New</button>
+      <button class="btn-secondary" id="vfDeleteFormBtn" style="font-size:.78em;flex:1"${vfForms.length <= 1 ? ' disabled' : ''}>Delete</button>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+      <button class="btn-secondary" id="vfSaveFormBtn" style="font-size:.78em;flex:1">Save Form</button>
+      <select id="vfLoadFormSelect" style="font-size:.78em;flex:1;min-width:0">
+        <option value="">Load saved…</option>
+        ${savedOpts}
+      </select>
+    </div>
+    <div id="vfFormStatus" style="font-family:var(--sans);font-size:.72em;color:var(--muted);margin-top:3px;min-height:1em"></div>`;
 
   document.getElementById('vfFormSelect').addEventListener('change', e => {
     vfOpenEditorUid = null;
@@ -964,6 +1177,60 @@ function renderFormSelector() {
     vfForms.push(f);
     activeVfFormId  = f.id;
     vfOpenEditorUid = null;
+    renderAll();
+  });
+
+  document.getElementById('vfDeleteFormBtn').addEventListener('click', () => {
+    if (vfForms.length <= 1) return;
+    const f = activeWorkingForm();
+    if (!f) return;
+    if (!confirm(`Delete "${f.name}"?`)) return;
+    vfForms = vfForms.filter(x => x.id !== f.id);
+    activeVfFormId  = vfForms[0].id;
+    vfOpenEditorUid = null;
+    renderAll();
+  });
+
+  document.getElementById('vfSaveFormBtn').addEventListener('click', () => {
+    const f = activeWorkingForm();
+    if (!f) return;
+    const name = (f.name || '').trim() || 'Untitled';
+    const lib = loadSavedVFs();
+    if (lib[name] && !confirm(`Overwrite saved form "${name}"?`)) return;
+    lib[name] = JSON.parse(JSON.stringify(f));
+    saveSavedVFs(lib);
+    const statusEl = document.getElementById('vfFormStatus');
+    if (statusEl) statusEl.textContent = `✓ Saved "${name}"`;
+    renderFormSelector();
+  });
+
+  document.getElementById('vfLoadFormSelect').addEventListener('change', e => {
+    const name = e.target.value;
+    if (!name) return;
+    const lib = loadSavedVFs();
+    const saved_form = lib[name];
+    if (!saved_form) return;
+    // Deep-copy, assign fresh ids so it doesn't collide with existing forms
+    const loaded = JSON.parse(JSON.stringify(saved_form));
+    loaded.id = nextFormId();
+    // Reassign UIDs to all questions to avoid collisions
+    const uidRemap = {};
+    for (const q of loaded.questions) {
+      const oldUid = q.uid;
+      q.uid = nextUid();
+      uidRemap[oldUid] = q.uid;
+    }
+    // Remap routing references
+    for (const q of loaded.questions) {
+      for (const field of ['if_yes', 'if_no', 'if_done', 'if_none', 'if_any_yes', 'if_all_no']) {
+        if (q[field] && uidRemap[q[field]]) q[field] = uidRemap[q[field]];
+      }
+    }
+    vfForms.push(loaded);
+    activeVfFormId  = loaded.id;
+    vfOpenEditorUid = null;
+    const statusEl = document.getElementById('vfFormStatus');
+    if (statusEl) statusEl.textContent = `✓ Loaded "${name}"`;
     renderAll();
   });
 }
@@ -990,12 +1257,36 @@ function renderVFPlainText() {
   qs.forEach((q, idx) => {
     const num  = idx + 1;
     const text = substituteParties(q.text || '', parties);
-    lines.push(`${num}.  ${text}`);
+    const ob = q.optional ? '[' : '';
+    const cb = q.optional ? ']' : '';
+
+    if (q.type === 'yes_no_multi') {
+      const subjects = q.subjects || [];
+      subjects.forEach(subj => {
+        const subjText = substituteParties((q.text || '').replace(/\[subject\]/gi, subj.label || '[subject]'), parties);
+        lines.push(`${ob}${num}.  ${subjText}${cb}`);
+        lines.push(`    ${ob}Yes  ______          No  ______${cb}`);
+      });
+      if (!subjects.length) {
+        lines.push(`${ob}${num}.  ${text}${cb}`);
+        lines.push(`    ${ob}Yes  ______          No  ______${cb}`);
+      }
+      const rt = routingText(q, qs, num);
+      if (rt) lines.push(`    ${ob}${rt}${cb}`);
+    } else {
+      lines.push(`${ob}${num}.  ${text}${cb}`);
+    }
 
     if (q.type === 'yes_no') {
-      lines.push('    Yes  ______          No  ______');
+      lines.push(`    ${ob}Yes  ______          No  ______${cb}`);
+      if (q.alt_text) {
+        const altText = substituteParties(q.alt_text, parties);
+        lines.push(`    ${ob}[or]${cb}`);
+        lines.push(`${ob}${num}.  ${altText}${cb}`);
+        lines.push(`    ${ob}Yes  ______          No  ______${cb}`);
+      }
       const rt = routingText(q, qs, num);
-      if (rt) lines.push('    ' + rt);
+      if (rt) lines.push(`    ${ob}${rt}${cb}`);
 
     } else if (q.type === 'damages') {
       for (const item of (q.line_items || [])) {
@@ -1018,9 +1309,9 @@ function renderVFPlainText() {
       lines.push('    _______________________________________________');
     }
     // Routing text for non-yes_no question types (A3)
-    if (q.type !== 'yes_no') {
+    if (q.type !== 'yes_no' && q.type !== 'yes_no_multi') {
       const rt = routingText(q, qs, num);
-      if (rt) lines.push('    ' + rt);
+      if (rt) lines.push(`    ${ob}${rt}${cb}`);
     }
     lines.push('');
   });
@@ -1049,8 +1340,15 @@ function buildVFDocxContent() {
       const obj  = { displayNumber: num, type: q.type, text };
 
       obj.routing_text = routingText(q, qs, num);
+      if (q.optional) obj.optional = true;
+      if (q.alt_text) obj.alt_text = substituteParties(q.alt_text, parties);
 
-      if (q.type === 'damages') {
+      if (q.type === 'yes_no_multi') {
+        obj.subjects = (q.subjects || []).map(s => ({
+          id: s.id,
+          label: substituteParties(s.label || '', parties)
+        }));
+      } else if (q.type === 'damages') {
         obj.line_items = (q.line_items || []).map(li => {
           const out = { label: li.label };
           if (li.children && li.children.length) {
