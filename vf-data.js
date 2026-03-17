@@ -94,7 +94,9 @@ const vfDB = {
             { "id": "past_nonecon",   "label": "Past noneconomic loss" },
             { "id": "future_nonecon", "label": "Future noneconomic loss" }
           ],
-          "if_done": "q4"
+          "if_done": "q4",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
