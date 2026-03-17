@@ -215,25 +215,81 @@ function exportDOCX(content, filename) {
       var num  = q.displayNumber || (qi + 1);
       var text = q.text || '';
 
-      // Question number + text
-      items.push(new Paragraph({
-        spacing:  { line: LINE15, after: 120 },
-        children: [r(num + '.  ', { bold: true }), r(text)]
-      }));
+      var ob = q.optional ? '[' : '';
+      var cb = q.optional ? ']' : '';
+
+      if (q.type === 'yes_no_multi') {
+        // Render one sub-question per subject
+        var subjects = q.subjects || [];
+        for (var si = 0; si < subjects.length; si++) {
+          var subjText = text.replace(/\[subject\]/gi, subjects[si].label || '[subject]');
+          items.push(new Paragraph({
+            spacing:  { line: LINE15, after: 120 },
+            children: [r(ob + num + '.  ', { bold: true }), r(subjText + cb)]
+          }));
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, after: 80 },
+            children: [r(ob + 'Yes  ______          No  ______' + cb)]
+          }));
+        }
+        if (!subjects.length) {
+          items.push(new Paragraph({
+            spacing:  { line: LINE15, after: 120 },
+            children: [r(ob + num + '.  ', { bold: true }), r(text + cb)]
+          }));
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, after: 80 },
+            children: [r(ob + 'Yes  ______          No  ______' + cb)]
+          }));
+        }
+        if (q.routing_text) {
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, after: 280 },
+            children: [r(ob + q.routing_text + cb, { italic: true })]
+          }));
+        }
+
+      } else {
+        // Question number + text
+        items.push(new Paragraph({
+          spacing:  { line: LINE15, after: 120 },
+          children: [r(ob + num + '.  ', { bold: true }), r(text + cb)]
+        }));
+      }
 
       if (q.type === 'yes_no') {
         // Yes / No answer line
         items.push(new Paragraph({
           indent:   { left: IN_HALF },
           spacing:  { line: LINE15, after: 80 },
-          children: [r('Yes  ______          No  ______')]
+          children: [r(ob + 'Yes  ______          No  ______' + cb)]
         }));
+        // Alternative formulation
+        if (q.alt_text) {
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, after: 80 },
+            children: [r(ob + '[or]' + cb, { italic: true })]
+          }));
+          items.push(new Paragraph({
+            spacing:  { line: LINE15, after: 120 },
+            children: [r(ob + num + '.  ', { bold: true }), r(q.alt_text + cb)]
+          }));
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, after: 80 },
+            children: [r(ob + 'Yes  ______          No  ______' + cb)]
+          }));
+        }
         // Routing instruction — italic, indented
         if (q.routing_text) {
           items.push(new Paragraph({
             indent:   { left: IN_HALF },
             spacing:  { line: LINE15, after: 280 },
-            children: [r(q.routing_text, { italic: true })]
+            children: [r(ob + q.routing_text + cb, { italic: true })]
           }));
         }
 
