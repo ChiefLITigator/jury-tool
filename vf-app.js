@@ -470,11 +470,29 @@ function buildInlineEditorHTML(q, form) {
 
   // if_done routing for non-yes_no types ("stop" not supported for these — A4)
   if (q.type !== 'yes_no') {
+    const doneLabel = (q.type === 'damages' && q.if_none != null) ? 'If damages proved →' : 'When done →';
     typeFields += `
       <div style="margin-top:8px">
-        <label style="display:block">When done →</label>
+        <label style="display:block">${doneLabel}</label>
         <select data-ed-field="if_done" style="width:200px">${buildRoutingOptions(uid, qs, q.if_done || 'sign', false)}</select>
       </div>`;
+    if (q.type === 'damages') {
+      typeFields += `
+        <div style="margin-top:6px">
+          <label style="display:flex;align-items:center;gap:8px">
+            <input type="checkbox" data-ed-toggle="if_none" ${q.if_none != null ? 'checked' : ''}
+              style="accent-color:var(--navy);cursor:pointer">
+            Conditional routing (if no damages proved)
+          </label>
+        </div>`;
+      if (q.if_none != null) {
+        typeFields += `
+          <div style="margin-top:4px">
+            <label style="display:block">If no damages →</label>
+            <select data-ed-field="if_none" style="width:200px">${buildRoutingOptions(uid, qs, q.if_none, true)}</select>
+          </div>`;
+      }
+    }
   }
 
   return `
@@ -516,7 +534,8 @@ function wireEditorEvents() {
         delete q.if_done;
       } else {
         q.if_done = q.if_done || 'sign';
-        delete q.if_yes; delete q.if_no; delete q.stop_text;
+        delete q.if_yes; delete q.if_no;
+        if (q.type !== 'damages') { delete q.if_none; delete q.stop_text; }
         if (q.type === 'damages'    && !q.line_items) q.line_items = [];
         if (q.type === 'percentage' && !q.parties)    q.parties    = [];
       }
@@ -531,7 +550,21 @@ function wireEditorEvents() {
     textArea.addEventListener('input', () => { q.text = textArea.value; renderPreview(); });
   }
 
-  // Routing selects (if_yes, if_no, if_done)
+  // Damages: conditional routing toggle (if_none)
+  const ifNoneToggle = el.querySelector('[data-ed-toggle="if_none"]');
+  if (ifNoneToggle) {
+    ifNoneToggle.addEventListener('change', () => {
+      if (ifNoneToggle.checked) {
+        q.if_none = 'stop';
+      } else {
+        delete q.if_none;
+      }
+      renderBuilder();
+      renderPreview();
+    });
+  }
+
+  // Routing selects (if_yes, if_no, if_done, if_none)
   el.querySelectorAll('select[data-ed-field]').forEach(sel => {
     sel.addEventListener('change', () => {
       const field = sel.dataset.edField;
@@ -722,6 +755,9 @@ function routingText(q, qs, num) {
   if (q.type === 'yes_no') {
     if (q.if_yes != null) parts.push(`If your answer to question ${num} is Yes, ${targetLabel(q.if_yes, true)}.`);
     if (q.if_no  != null) parts.push(`If your answer is No, ${targetLabel(q.if_no, true)}.`);
+  } else if (q.type === 'damages' && q.if_none != null) {
+    parts.push(`If damages have been proved, ${targetLabel(q.if_done || 'sign', false)}.`);
+    parts.push(`If no damages have been proved, ${targetLabel(q.if_none, true)}.`);
   } else if (q.if_done != null) {
     parts.push(`After completing this question, ${targetLabel(q.if_done, false)}.`);
   }
@@ -796,7 +832,7 @@ function renderPreview() {
     } else if (q.type === 'percentage') {
       for (const party of (q.parties || [])) {
         html += `<div class="vf-preview-damage-row">
-          <div class="vf-preview-damage-label">${escHtml(party.label)}</div>
+          <div class="vf-preview-damage-label">${escHtml(substituteParties(party.label, parties))}</div>
           <div class="vf-preview-damage-blank">_____%</div>
         </div>`;
       }
@@ -973,7 +1009,7 @@ function renderVFPlainText() {
       if ((q.line_items || []).length) lines.push('    TOTAL    $________________');
 
     } else if (q.type === 'percentage') {
-      for (const p of (q.parties || [])) lines.push(`    ${p.label}    _____%`);
+      for (const p of (q.parties || [])) lines.push(`    ${substituteParties(p.label, parties)}    _____%`);
       if ((q.parties || []).length) lines.push('    TOTAL    100%');
 
     } else if (q.type === 'write_in') {
@@ -1023,7 +1059,7 @@ function buildVFDocxContent() {
           return out;
         });
       } else if (q.type === 'percentage') {
-        obj.parties = (q.parties || []).map(p => ({ label: p.label }));
+        obj.parties = (q.parties || []).map(p => ({ label: substituteParties(p.label, parties) }));
       }
       return obj;
     }),
