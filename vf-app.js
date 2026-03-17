@@ -428,10 +428,9 @@ function buildInlineEditorHTML(q, form) {
     let rows = '';
     const items = q.line_items || [];
     items.forEach((item, i) => {
-      const hasCh = item.children && item.children.length;
       rows += `<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">
         <input type="text" data-ed-li="${i}" value="${escHtml(item.label)}"
-          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px${hasCh ? ';font-weight:700' : ''}">
+          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px;font-weight:700">
         <button class="btn-ghost" data-ed-li-up="${i}" title="Move up" style="padding:2px 5px;font-size:.7em"${i === 0 ? ' disabled' : ''}>&#x25B2;</button>
         <button class="btn-ghost" data-ed-li-down="${i}" title="Move down" style="padding:2px 5px;font-size:.7em"${i === items.length - 1 ? ' disabled' : ''}>&#x25BC;</button>
         <button class="btn-ghost" data-ed-li-addchild="${i}" title="Add sub-item" style="padding:2px 6px;font-size:.7em">+&#x25BF;</button>
@@ -782,7 +781,7 @@ function renderPreview() {
           }
         } else {
           html += `<div class="vf-preview-damage-row">
-            <div class="vf-preview-damage-label">${escHtml(item.label)}</div>
+            <div class="vf-preview-damage-label"><strong>${escHtml(item.label)}</strong></div>
             <div class="vf-preview-damage-blank">$________________</div>
           </div>`;
         }
