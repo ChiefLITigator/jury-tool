@@ -418,7 +418,11 @@ function buildBody(fields) {
         bp([new PageBreak()], EXACT_SP),
         bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
         bp([tr('')], EXACT_SP),
-        ...bodyText.split('\n').map(line => bp([tr(line)], EXACT_SP)),
+        ...bodyText.split('\n').flatMap(line =>
+          line === '\f'
+            ? [bp([new PageBreak()], EXACT_SP)]
+            : [bp([tr(line)], EXACT_SP)]
+        ),
       ]
     : [bp([tr('')], EXACT_SP)];
 

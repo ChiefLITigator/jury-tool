@@ -1013,22 +1013,11 @@ function renderAll() {
       const form     = activeWorkingForm();
       const slug     = form ? form.name.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/-+/g, '-') : 'verdict-form';
       const dateSlug = new Date().toISOString().slice(0, 10);
-      if (fmt === 'pdf') {
-        try {
-          const full    = renderVFPlainText();
-          const marker  = 'SPECIAL VERDICT FORM\n';
-          const mIdx    = full.indexOf(marker);
-          const heading = 'SPECIAL VERDICT FORM';
-          const body    = mIdx >= 0 ? full.slice(mIdx + marker.length).trimStart() : full;
-          exportPDF([{ heading, body }], `VF-${slug}-${dateSlug}.pdf`);
-        } catch (err) {
-          console.error('[vf-app] PDF export failed:', err);
-        }
-      } else if (fmt === 'docx') {
+      if (fmt === 'docx') {
         const content = buildVFDocxContent();
         if (!content) return;
         exportDOCX(content, `VF-${slug}-${dateSlug}.docx`);
-      } else if (fmt === 'pleading') {
+      } else if (fmt === 'filed' || fmt === 'reading') {
         if (!form) return;
         (async () => {
           try {
@@ -1055,12 +1044,14 @@ function renderAll() {
             const marker = 'SPECIAL VERDICT FORM\n';
             const mIdx   = full.indexOf(marker);
             fields.body_text = mIdx >= 0 ? full.slice(mIdx + marker.length).trimStart() : full;
-            const paperCheck = document.getElementById('vfPleadingCheck');
-            const blob = await generatePleadingShell({ fields, plainPaper: !(paperCheck && paperCheck.checked) });
+            const plainPaper = (fmt === 'reading');
+            const blob = await generatePleadingShell({ fields, plainPaper });
             const url  = URL.createObjectURL(blob);
             const a    = document.createElement('a');
             a.href     = url;
-            a.download = `VF-${slug}-pleading-${dateSlug}.docx`;
+            a.download = plainPaper
+              ? `VF-${slug}-jury-copy-${dateSlug}.docx`
+              : `VF-${slug}-filed-copy-${dateSlug}.docx`;
             a.click();
             URL.revokeObjectURL(url);
           } catch (err) {
