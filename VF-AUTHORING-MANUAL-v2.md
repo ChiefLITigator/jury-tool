@@ -153,8 +153,16 @@ Used for questions asking the jury to write in dollar amounts.
   "text":  "What are [name of plaintiff]'s damages?",
   "fields": ["name of plaintiff"],
   "line_items": [
-    { "id": "past_econ",      "label": "Past economic loss" },
-    { "id": "future_econ",    "label": "Future economic loss" },
+    { "id": "past_econ", "label": "Past economic loss", "children": [
+      { "id": "past_lost_earnings", "label": "Lost earnings" },
+      { "id": "past_medical",       "label": "Medical expenses" },
+      { "id": "past_other_econ",    "label": "Other past economic loss" }
+    ]},
+    { "id": "future_econ", "label": "Future economic loss", "children": [
+      { "id": "future_lost_earnings", "label": "Lost earnings" },
+      { "id": "future_medical",       "label": "Medical expenses" },
+      { "id": "future_other_econ",    "label": "Other future economic loss" }
+    ]},
     { "id": "past_nonecon",   "label": "Past noneconomic loss" },
     { "id": "future_nonecon", "label": "Future noneconomic loss" }
   ],
@@ -166,7 +174,13 @@ Used for questions asking the jury to write in dollar amounts.
 |-------|-------|
 | `line_items` | One entry per damages category. Copy labels exactly from the form. |
 | `id` in line_items | Short snake_case you make up. Never appears in the form. |
+| `children` | Optional. Array of sub-items under a category (e.g., specific types of economic loss). When present, the parent renders as a bold category header with no `$` line — only the children get `$` lines. Omit entirely for flat items that get their own `$` line. |
 | `if_done` | Almost always `"sign"`. |
+
+**Sub-categories:** Many damages questions break economic loss into sub-items
+(lost earnings, medical expenses, etc.). Use `children` on the parent item.
+Items without `children` render as flat dollar lines (e.g., noneconomic loss).
+The builder UI lets users add, remove, and reorder sub-items after import.
 
 **Standard line_item id conventions — use these consistently:**
 
@@ -176,8 +190,14 @@ Used for questions asking the jury to write in dollar amounts.
 | `future_econ` | Future economic loss |
 | `past_nonecon` | Past noneconomic loss |
 | `future_nonecon` | Future noneconomic loss |
-| `medical` | Medical expenses |
-| `lost_wages` | Lost earnings / lost wages |
+| `past_lost_earnings` | Lost earnings (past, child of past_econ) |
+| `past_medical` | Medical expenses (past, child of past_econ) |
+| `past_other_econ` | Other past economic loss (child of past_econ) |
+| `future_lost_earnings` | Lost earnings (future, child of future_econ) |
+| `future_medical` | Medical expenses (future, child of future_econ) |
+| `future_other_econ` | Other future economic loss (child of future_econ) |
+| `lost_wages` | Lost earnings / lost wages (standalone) |
+| `medical` | Medical expenses (standalone) |
 | `property` | Property damage |
 | `punitive` | Punitive damages |
 | `brandt` | Brandt fees / attorneys' fees |
@@ -456,7 +476,10 @@ DAMAGES QUESTION
   type            "damages"
   text            string    exact text with [brackets]
   fields          array     [...] or []
-  line_items      array     [{ "id": "past_econ", "label": "Past economic loss" }, ...]
+  line_items      array     [{ "id": "...", "label": "...", "children": [...] }, ...]
+    children      array?    optional sub-items: [{ "id": "...", "label": "..." }, ...]
+                            parent with children = bold header, no $ line
+                            parent without children = flat item with $ line
   if_done         string    "sign" or internal id
 
 PERCENTAGE QUESTION

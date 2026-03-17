@@ -425,13 +425,30 @@ function buildInlineEditorHTML(q, form) {
       </div>`;
 
   } else if (q.type === 'damages') {
-    const rows = (q.line_items || []).map((item, i) =>
-      `<div style="display:flex;gap:6px;margin-bottom:5px">
+    let rows = '';
+    const items = q.line_items || [];
+    items.forEach((item, i) => {
+      const hasCh = item.children && item.children.length;
+      rows += `<div style="display:flex;gap:4px;margin-bottom:4px;align-items:center">
         <input type="text" data-ed-li="${i}" value="${escHtml(item.label)}"
-          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px">
+          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px${hasCh ? ';font-weight:700' : ''}">
+        <button class="btn-ghost" data-ed-li-up="${i}" title="Move up" style="padding:2px 5px;font-size:.7em"${i === 0 ? ' disabled' : ''}>&#x25B2;</button>
+        <button class="btn-ghost" data-ed-li-down="${i}" title="Move down" style="padding:2px 5px;font-size:.7em"${i === items.length - 1 ? ' disabled' : ''}>&#x25BC;</button>
+        <button class="btn-ghost" data-ed-li-addchild="${i}" title="Add sub-item" style="padding:2px 6px;font-size:.7em">+&#x25BF;</button>
         <button class="btn-ghost" data-ed-li-del="${i}" style="padding:2px 8px;font-size:.8em">×</button>
-      </div>`
-    ).join('');
+      </div>`;
+      if (item.children) {
+        item.children.forEach((child, j) => {
+          rows += `<div style="display:flex;gap:4px;margin-bottom:3px;margin-left:24px;align-items:center">
+            <input type="text" data-ed-child="${i}-${j}" value="${escHtml(child.label)}"
+              style="flex:1;font-family:var(--serif);font-size:.8em;padding:3px 7px;border:1px solid var(--border);border-radius:3px">
+            <button class="btn-ghost" data-ed-child-up="${i}-${j}" title="Move up" style="padding:2px 5px;font-size:.65em"${j === 0 ? ' disabled' : ''}>&#x25B2;</button>
+            <button class="btn-ghost" data-ed-child-down="${i}-${j}" title="Move down" style="padding:2px 5px;font-size:.65em"${j === item.children.length - 1 ? ' disabled' : ''}>&#x25BC;</button>
+            <button class="btn-ghost" data-ed-child-del="${i}-${j}" style="padding:2px 8px;font-size:.75em">×</button>
+          </div>`;
+        });
+      }
+    });
     typeFields = `
       <div id="vfed-lilist-${uid}">${rows}</div>
       <button class="btn-ghost" id="vfed-liadd-${uid}" style="font-size:.78em;margin-top:4px">+ Add line item</button>`;
@@ -545,6 +562,73 @@ function wireEditorEvents() {
     btn.addEventListener('click', () => {
       const i = parseInt(btn.dataset.edLiDel, 10);
       if (q.line_items) { q.line_items.splice(i, 1); renderBuilder(); renderPreview(); }
+    });
+  });
+  el.querySelectorAll('[data-ed-li-up]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edLiUp, 10);
+      if (i > 0 && q.line_items) {
+        [q.line_items[i - 1], q.line_items[i]] = [q.line_items[i], q.line_items[i - 1]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-li-down]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edLiDown, 10);
+      if (q.line_items && i < q.line_items.length - 1) {
+        [q.line_items[i], q.line_items[i + 1]] = [q.line_items[i + 1], q.line_items[i]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-li-addchild]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edLiAddchild, 10);
+      if (q.line_items && q.line_items[i]) {
+        if (!q.line_items[i].children) q.line_items[i].children = [];
+        q.line_items[i].children.push({ id: 'ch_' + Date.now(), label: '' });
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  // Damages: sub-item (child) labels
+  el.querySelectorAll('[data-ed-child]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const [pi, ci] = inp.dataset.edChild.split('-').map(Number);
+      if (q.line_items && q.line_items[pi] && q.line_items[pi].children && q.line_items[pi].children[ci] != null) {
+        q.line_items[pi].children[ci].label = inp.value;
+        renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-child-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const [pi, ci] = btn.dataset.edChildDel.split('-').map(Number);
+      if (q.line_items && q.line_items[pi] && q.line_items[pi].children) {
+        q.line_items[pi].children.splice(ci, 1);
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-child-up]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const [pi, ci] = btn.dataset.edChildUp.split('-').map(Number);
+      const ch = q.line_items && q.line_items[pi] && q.line_items[pi].children;
+      if (ch && ci > 0) {
+        [ch[ci - 1], ch[ci]] = [ch[ci], ch[ci - 1]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-child-down]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const [pi, ci] = btn.dataset.edChildDown.split('-').map(Number);
+      const ch = q.line_items && q.line_items[pi] && q.line_items[pi].children;
+      if (ch && ci < ch.length - 1) {
+        [ch[ci], ch[ci + 1]] = [ch[ci + 1], ch[ci]];
+        renderBuilder(); renderPreview();
+      }
     });
   });
   const liAdd = document.getElementById('vfed-liadd-' + uid);
@@ -664,10 +748,23 @@ function renderPreview() {
 
     } else if (q.type === 'damages') {
       for (const item of (q.line_items || [])) {
-        html += `<div class="vf-preview-damage-row">
-          <div class="vf-preview-damage-label">${escHtml(item.label)}</div>
-          <div class="vf-preview-damage-blank">$________________</div>
-        </div>`;
+        if (item.children && item.children.length) {
+          html += `<div class="vf-preview-damage-row">
+            <div class="vf-preview-damage-label"><strong>${escHtml(item.label)}</strong></div>
+            <div class="vf-preview-damage-blank"></div>
+          </div>`;
+          for (const child of item.children) {
+            html += `<div class="vf-preview-damage-row" style="margin-left:2em">
+              <div class="vf-preview-damage-label">${escHtml(child.label)}</div>
+              <div class="vf-preview-damage-blank">$________________</div>
+            </div>`;
+          }
+        } else {
+          html += `<div class="vf-preview-damage-row">
+            <div class="vf-preview-damage-label">${escHtml(item.label)}</div>
+            <div class="vf-preview-damage-blank">$________________</div>
+          </div>`;
+        }
       }
       if ((q.line_items || []).length) {
         html += `<div class="vf-preview-damage-row">
@@ -845,7 +942,14 @@ function renderVFPlainText() {
       if (rt) lines.push('    ' + rt);
 
     } else if (q.type === 'damages') {
-      for (const item of (q.line_items || [])) lines.push(`    ${item.label}    $________________`);
+      for (const item of (q.line_items || [])) {
+        if (item.children && item.children.length) {
+          lines.push(`    ${item.label}`);
+          for (const child of item.children) lines.push(`        ${child.label}    $________________`);
+        } else {
+          lines.push(`    ${item.label}    $________________`);
+        }
+      }
       if ((q.line_items || []).length) lines.push('    TOTAL    $________________');
 
     } else if (q.type === 'percentage') {
@@ -891,7 +995,13 @@ function buildVFDocxContent() {
       obj.routing_text = routingText(q, qs, num);
 
       if (q.type === 'damages') {
-        obj.line_items = (q.line_items || []).map(li => ({ label: li.label }));
+        obj.line_items = (q.line_items || []).map(li => {
+          const out = { label: li.label };
+          if (li.children && li.children.length) {
+            out.children = li.children.map(ch => ({ label: ch.label }));
+          }
+          return out;
+        });
       } else if (q.type === 'percentage') {
         obj.parties = (q.parties || []).map(p => ({ label: p.label }));
       }
