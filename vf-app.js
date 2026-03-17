@@ -454,10 +454,13 @@ function buildInlineEditorHTML(q, form) {
       <button class="btn-ghost" id="vfed-liadd-${uid}" style="font-size:.78em;margin-top:4px">+ Add line item</button>`;
 
   } else if (q.type === 'percentage') {
-    const rows = (q.parties || []).map((p, i) =>
-      `<div style="display:flex;gap:6px;margin-bottom:5px">
+    const pItems = q.parties || [];
+    const rows = pItems.map((p, i) =>
+      `<div style="display:flex;gap:4px;margin-bottom:5px;align-items:center">
         <input type="text" data-ed-party="${i}" value="${escHtml(p.label)}"
           style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px">
+        <button class="btn-ghost" data-ed-party-up="${i}" title="Move up" style="padding:2px 5px;font-size:.7em"${i === 0 ? ' disabled' : ''}>&#x25B2;</button>
+        <button class="btn-ghost" data-ed-party-down="${i}" title="Move down" style="padding:2px 5px;font-size:.7em"${i === pItems.length - 1 ? ' disabled' : ''}>&#x25BC;</button>
         <button class="btn-ghost" data-ed-party-del="${i}" style="padding:2px 8px;font-size:.8em">×</button>
       </div>`
     ).join('');
@@ -654,6 +657,24 @@ function wireEditorEvents() {
     btn.addEventListener('click', () => {
       const i = parseInt(btn.dataset.edPartyDel, 10);
       if (q.parties) { q.parties.splice(i, 1); renderBuilder(); renderPreview(); }
+    });
+  });
+  el.querySelectorAll('[data-ed-party-up]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edPartyUp, 10);
+      if (i > 0 && q.parties) {
+        [q.parties[i - 1], q.parties[i]] = [q.parties[i], q.parties[i - 1]];
+        renderBuilder(); renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-party-down]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edPartyDown, 10);
+      if (q.parties && i < q.parties.length - 1) {
+        [q.parties[i], q.parties[i + 1]] = [q.parties[i + 1], q.parties[i]];
+        renderBuilder(); renderPreview();
+      }
     });
   });
   const pAdd = document.getElementById('vfed-padd-' + uid);
