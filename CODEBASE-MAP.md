@@ -16,6 +16,7 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 |------|-------|---------|--------|-------------------|
 | caci-compare.html | ~930 | ~8,500 | Active | Only if touching HTML/CSS/tabs |
 | app-shared.js | 225 | ~1,700 | Active | Yes — shared utilities, CACI lookup, print |
+| docx-reader.js | 385 | ~3,500 | Active | When touching batch compare / DOCX parsing |
 | app-compare.js | 476 | ~5,300 | Active | Yes — diff engine, compare tab |
 | app-draft.js | 595 | ~6,300 | Active | Yes — instruction drafter |
 | app-packet.js | 192 | ~1,800 | Active | Yes — packet tray |
@@ -69,20 +70,21 @@ When updating KNOWN LIMITATIONS or KNOWN BUGS in this file, also update the mirr
 caci-compare.html              — single-page app shell, all tabs live here
   ├── caci-data.js             — 1st: exposes window.caciDB (read-only)
   ├── draft-parser.js          — 2nd: exposes parseInstruction(), findTopLevelBrackets()
-  ├── app-shared.js            — 3rd: esc, lookupCACIText*, downloadTXT, doPrint, print settings
-  ├── app-compare.js           — 4th: diff engine, compare tab logic
-  ├── app-draft.js             — 5th: instruction drafter
-  ├── app-packet.js            — 6th: packet tray
-  ├── app-cases.js             — 7th: localStorage case system
-  ├── app-browse.js            — 8th: CACI browse/search panel
-  ├── lib/docx.iife.js         — 9th: window.docx (UMD bundle, docx v9)
-  ├── pdfmake.min.js           — 10th: window.pdfMake (CDN, v0.2.7)
-  ├── vfs_fonts.min.js         — 11th: registers bundled fonts for pdfmake (CDN)
-  ├── docx-export.js           — 12th: exposes exportDOCX()
-  ├── vf-data.js               — 13th: exposes window.vfDB
-  ├── vf-app.js                — 14th: all VF builder logic
-  ├── pleading-shell.js        — 15th: exposes window.generatePleadingShell(options)
-  └── pleading-ui.js           — 16th: Pleading Shell tab UI controller
+  ├── app-shared.js            — 3rd: esc, lookupCACIText*, downloadTXT, doPrint, print settings, ZIP utilities
+  ├── docx-reader.js           — 4th: parseDocxInstructions(), matchInstructions() for batch compare
+  ├── app-compare.js           — 5th: diff engine, compare tab logic (single + batch)
+  ├── app-draft.js             — 6th: instruction drafter
+  ├── app-packet.js            — 7th: packet tray
+  ├── app-cases.js             — 8th: localStorage case system
+  ├── app-browse.js            — 9th: CACI browse/search panel
+  ├── lib/docx.iife.js         — 10th: window.docx (UMD bundle, docx v9)
+  ├── pdfmake.min.js           — 11th: window.pdfMake (CDN, v0.2.7)
+  ├── vfs_fonts.min.js         — 12th: registers bundled fonts for pdfmake (CDN)
+  ├── docx-export.js           — 13th: exposes exportDOCX()
+  ├── vf-data.js               — 14th: exposes window.vfDB
+  ├── vf-app.js                — 15th: all VF builder logic
+  ├── pleading-shell.js        — 16th: exposes window.generatePleadingShell(options)
+  └── pleading-ui.js           — 17th: Pleading Shell tab UI controller
 ```
 
 **No build step. No bundler. No framework. All vanilla JS.**
@@ -135,6 +137,7 @@ Shared:
 <script src="caci-data.js"></script>
 <script src="draft-parser.js"></script>
 <script src="app-shared.js"></script>
+<script src="docx-reader.js"></script>
 <script src="app-compare.js"></script>
 <script src="app-draft.js"></script>
 <script src="app-packet.js"></script>
@@ -276,10 +279,12 @@ Respects `#packetPleadingCheck` (independent from Pleading tab checkbox). Async 
 ### Global State:
 ```javascript
 const CASE_KEY = 'caci_cases';   // localStorage key
-const CAPTION_FIELD_MAP = [      // 12 Pleading Section B fields → no-prefix key
+const CAPTION_FIELD_MAP = [      // 14 Pleading Section B fields → no-prefix key
   ['pl_court_name', 'court_name'], ['pl_court_county', 'court_county'],
   ['pl_plaintiff_name', 'plaintiff_name'], ['pl_plaintiff_desc', 'plaintiff_desc'],
+  ['pl_plaintiff_label', 'plaintiff_label'],
   ['pl_defendant_name', 'defendant_name'], ['pl_defendant_desc', 'defendant_desc'],
+  ['pl_defendant_label', 'defendant_label'],
   ['pl_additional_parties', 'additional_parties'],
   ['pl_case_number', 'case_number'], ['pl_judge_name', 'judge_name'],
   ['pl_dept_number', 'dept_number'],
