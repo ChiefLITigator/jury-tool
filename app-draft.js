@@ -581,11 +581,7 @@ document.getElementById('exportDraftPicker').addEventListener('click', e => {
     body    = getDraftBodyText();
   }
 
-  if (fmt === 'pdf') {
-    const h        = heading || (num ? `CACI ${num}` : 'CACI Instruction');
-    const filename = num ? `CACI-${num}-${dateSlug}.pdf` : `CACI-draft-${dateSlug}.pdf`;
-    exportPDF([{ heading: h, body }], filename);
-  } else if (fmt === 'docx') {
+  if (fmt === 'docx') {
     const filename = num ? `CACI-${num}-${dateSlug}.docx` : `CACI-draft-${dateSlug}.docx`;
     exportDOCX({ type: 'instruction', heading, body }, filename);
   } else if (fmt === 'txt') {

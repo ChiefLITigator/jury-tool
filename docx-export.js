@@ -18,7 +18,7 @@ function exportDOCX(content, filename) {
   }
 
   const {
-    Document, Packer, Paragraph, TextRun,
+    Document, Packer, Paragraph, TextRun, PageBreak,
     AlignmentType, UnderlineType, TabStopType, convertInchesToTwip
   } = docx;
 
@@ -50,6 +50,8 @@ function exportDOCX(content, filename) {
   try {
     if (content.type === 'instruction') {
       children = buildInstruction(content);
+    } else if (content.type === 'packet') {
+      children = buildPacket(content);
     } else if (content.type === 'verdict_form') {
       children = buildVerdictForm(content);
     } else {
@@ -124,6 +126,27 @@ function exportDOCX(content, filename) {
       }
     }
 
+    return items;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PACKET BUILDER
+  // Each section (instruction) starts on its own page.
+  // ═══════════════════════════════════════════════════════════════════
+
+  function buildPacket(c) {
+    const items = [];
+    var sections = c.sections || [];
+    for (var si = 0; si < sections.length; si++) {
+      // Page break before every section after the first
+      if (si > 0) {
+        items.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+      var sectionItems = buildInstruction(sections[si]);
+      for (var j = 0; j < sectionItems.length; j++) {
+        items.push(sectionItems[j]);
+      }
+    }
     return items;
   }
 

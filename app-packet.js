@@ -102,6 +102,19 @@ function getPacketUnfilledSummary() {
     .filter(x => x.count > 0);
 }
 
+/** Returns [{heading, body}] for each instruction in the packet. */
+function compilePacketSections() {
+  return packetInstructions.map(entry => {
+    const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
+    const title   = titleMatch ? titleMatch[1].trim() : '';
+    const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
+    const body    = compileInstruction(entry.parsedState);
+    return { heading, body };
+  });
+}
+
+/** Flat text version for compile overlay, TXT export, and pleading body_text.
+ *  Uses \f (form feed) between instructions so pleading-shell can insert page breaks. */
 function compilePacket() {
   const parts = [];
   const warnItems = getPacketUnfilledSummary();
@@ -113,18 +126,14 @@ function compilePacket() {
     }
     parts.push(warn.trimEnd());
   }
-  for (const entry of packetInstructions) {
-    const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
-    const title   = titleMatch ? titleMatch[1].trim() : '';
-    const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
-    const body    = compileInstruction(entry.parsedState);
+  for (const { heading, body } of compilePacketSections()) {
     parts.push(heading + '\n\n' + body);
   }
-  return parts.join('\n\n---\n\n');
+  return parts.join('\n\f\n');
 }
 
 document.getElementById('compilePacketBtn').addEventListener('click', () => {
-  document.getElementById('packetCompileText').textContent = compilePacket();
+  document.getElementById('packetCompileText').textContent = compilePacket().replace(/\f/g, '---');
   document.getElementById('packetCompileOverlay').classList.remove('hidden');
 });
 
@@ -142,20 +151,11 @@ document.getElementById('exportPacketPicker').addEventListener('click', e => {
   if (!fmt) return;
   document.getElementById('exportPacketPicker').classList.add('hidden');
   const dateSlug = new Date().toISOString().slice(0, 10);
-  if (fmt === 'pdf') {
-    const sections = packetInstructions.map(entry => {
-      const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
-      const title   = titleMatch ? titleMatch[1].trim() : '';
-      const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
-      const body    = compileInstruction(entry.parsedState);
-      return { heading, body };
-    });
-    exportPDF(sections, `CACI-packet-${dateSlug}.pdf`);
-  } else if (fmt === 'docx') {
-    exportDOCX({ type: 'instruction', heading: 'CACI Instruction Packet', body: compilePacket() }, `CACI-packet-${dateSlug}.docx`);
+  if (fmt === 'docx') {
+    exportDOCX({ type: 'packet', sections: compilePacketSections() }, `CACI-packet-${dateSlug}.docx`);
   } else if (fmt === 'txt') {
-    downloadTXT(compilePacket(), `CACI-packet-${dateSlug}.txt`);
-  } else if (fmt === 'pleading') {
+    downloadTXT(compilePacket().replace(/\f/g, '---'), `CACI-packet-${dateSlug}.txt`);
+  } else if (fmt === 'filed' || fmt === 'reading') {
     (async () => {
       try {
         // Load saved attorney profile; strip 'pl_' prefix to get field keys
@@ -176,12 +176,14 @@ document.getElementById('exportPacketPicker').addEventListener('click', e => {
         }
         fields.document_title = 'PROPOSED JURY INSTRUCTIONS';
         fields.body_text      = compilePacket();
-        const paperCheck = document.getElementById('packetPleadingCheck');
-        const blob = await generatePleadingShell({ fields, plainPaper: !(paperCheck && paperCheck.checked) });
+        const plainPaper = (fmt === 'reading');
+        const blob = await generatePleadingShell({ fields, plainPaper });
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
         a.href     = url;
-        a.download = `CACI-packet-pleading-${dateSlug}.docx`;
+        a.download = plainPaper
+          ? `CACI-packet-jury-copy-${dateSlug}.docx`
+          : `CACI-packet-filed-copy-${dateSlug}.docx`;
         a.click();
         URL.revokeObjectURL(url);
       } catch (err) {
