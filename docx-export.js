@@ -239,13 +239,34 @@ function exportDOCX(content, filename) {
 
       } else if (q.type === 'damages') {
         var lineItems = q.line_items || [];
+        var IN_FULL   = convertInchesToTwip(1.0);
         for (var li = 0; li < lineItems.length; li++) {
-          items.push(new Paragraph({
-            tabStops: [{ type: TabStopType.RIGHT, position: RIGHT_TAB }],
-            indent:   { left: IN_HALF },
-            spacing:  { line: LINE15, before: 60, after: 60 },
-            children: [r(lineItems[li].label || ''), r('\t$________________')]
-          }));
+          var liItem = lineItems[li];
+          if (liItem.children && liItem.children.length) {
+            // Category header — bold, no $ line
+            items.push(new Paragraph({
+              indent:  { left: IN_HALF },
+              spacing: { line: LINE15, before: 100, after: 40 },
+              children: [r(liItem.label || '', { bold: true })]
+            }));
+            // Sub-items — indented 1 inch, with $ lines
+            for (var ci = 0; ci < liItem.children.length; ci++) {
+              items.push(new Paragraph({
+                tabStops: [{ type: TabStopType.RIGHT, position: RIGHT_TAB }],
+                indent:   { left: IN_FULL },
+                spacing:  { line: LINE15, before: 60, after: 60 },
+                children: [r(liItem.children[ci].label || ''), r('\t$________________')]
+              }));
+            }
+          } else {
+            // Flat item — unchanged behavior
+            items.push(new Paragraph({
+              tabStops: [{ type: TabStopType.RIGHT, position: RIGHT_TAB }],
+              indent:   { left: IN_HALF },
+              spacing:  { line: LINE15, before: 60, after: 60 },
+              children: [r(liItem.label || ''), r('\t$________________')]
+            }));
+          }
         }
         if (lineItems.length) {
           items.push(new Paragraph({
