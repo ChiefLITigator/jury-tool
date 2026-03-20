@@ -43,28 +43,6 @@ Logic files only. Data files never.
 
 ---
 
-## REVIEW DOCUMENT
-
-**CODEBASE-REVIEW.md** exists as a companion to this file, optimized for Claude.ai chat sessions.
-It contains function signatures, global variables, event listeners, cross-file dependencies,
-key code snippets for all active logic files, ARCHITECTURE CONSTRAINTS (design-pattern rules),
-KNOWN LIMITATIONS and KNOWN BUGS (mirrored from this file), FILE TOKEN REFERENCE (mirrored from
-this file), Claude.ai session anchor template, and Claude Code handoff template — enough for
-Claude.ai to give code-grounded answers without opening files.
-
-Keep CODEBASE-REVIEW.md current whenever making significant changes:
-- New functions or changed signatures → update the relevant section
-- New global variables → update globals
-- New event listeners → update listeners
-- Cross-file dependency changes → update dependencies
-- Bug-prone logic changes → update snippets
-
-**Claude Code has discretion to update CODEBASE-REVIEW.md in the ordinary course of work without
-being explicitly asked, as long as the update accurately reflects the current state of the code.**
-When updating KNOWN LIMITATIONS or KNOWN BUGS in this file, also update the mirror sections in CODEBASE-REVIEW.md.
-
----
-
 ## ARCHITECTURE OVERVIEW
 
 ```
@@ -741,7 +719,6 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN LIMITATIONS (BY DESIGN)
 
-*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
 
 - Alternative elements may drop their element number in output — attorney fixes in Lock & Edit
 - Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
@@ -751,7 +728,6 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN BUGS (PENDING FIX)
 
-*(Mirrored in CODEBASE-REVIEW.md — update both when making changes)*
 
 *No known open bugs as of 2026-03-19.*
 
