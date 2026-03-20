@@ -194,31 +194,45 @@ const DISC_TITLE_LABELS = {
   rfp:  'REQUESTS FOR PRODUCTION OF DOCUMENTS',
 };
 
-/** Returns true if the user has selected discovery response mode. */
-function isDiscoveryMode() {
+/** Returns the current pleading mode: 'blank', 'request', or 'response'. */
+function getPleadingMode() {
   const radio = document.querySelector('input[name="pleadingMode"]:checked');
-  return radio && radio.value === 'discovery';
+  return radio ? radio.value : 'blank';
+}
+
+/** Returns true if the user has selected either discovery mode. */
+function isDiscoveryMode() {
+  const mode = getPleadingMode();
+  return mode === 'request' || mode === 'response';
 }
 
 /** Auto-generate document title from discovery fields. */
 function updateDiscoveryTitle() {
   if (!isDiscoveryMode()) return;
+  const mode     = getPleadingMode();
   const type     = document.getElementById('disc_type').value;
   const setNum   = document.getElementById('disc_set_number').value.trim() || 'ONE';
-  const respName = document.getElementById('disc_responding_name').value.trim() || '[RESPONDING PARTY]';
-  const respRole = document.getElementById('disc_responding_role').value;
   const propName = document.getElementById('disc_propounding_name').value.trim() || '[PROPOUNDING PARTY]';
   const propRole = document.getElementById('disc_propounding_role').value;
+  const respName = document.getElementById('disc_responding_name').value.trim() || '[RESPONDING PARTY]';
+  const respRole = document.getElementById('disc_responding_role').value;
 
-  const title = respRole + ' ' + respName + '\u2019S RESPONSES TO ' +
-    propRole + ' ' + propName + '\u2019S ' +
-    DISC_TITLE_LABELS[type] + ', SET ' + setNum.toUpperCase();
+  let title;
+  if (mode === 'request') {
+    title = propRole + ' ' + propName + '\u2019S ' +
+      DISC_TITLE_LABELS[type] + ', SET ' + setNum.toUpperCase();
+  } else {
+    title = respRole + ' ' + respName + '\u2019S RESPONSES TO ' +
+      propRole + ' ' + propName + '\u2019S ' +
+      DISC_TITLE_LABELS[type] + ', SET ' + setNum.toUpperCase();
+  }
   document.getElementById('pl_document_title').value = title;
 }
 
 /** Read discovery panel fields into an options object. */
 function readDiscoveryFields() {
   return {
+    direction:        getPleadingMode(),   // 'request' or 'response'
     type:             document.getElementById('disc_type').value,
     propoundingName:  document.getElementById('disc_propounding_name').value.trim(),
     propoundingRole:  document.getElementById('disc_propounding_role').value,
@@ -313,11 +327,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Discovery mode toggle — show/hide discovery panel
   const discoveryPanel = document.getElementById('discoveryPanel');
+  const discoveryLabel = document.getElementById('discoveryPanelLabel');
   document.querySelectorAll('input[name="pleadingMode"]').forEach(r => {
     r.addEventListener('change', () => {
       const disc = isDiscoveryMode();
       discoveryPanel.classList.toggle('hidden', !disc);
-      if (disc) updateDiscoveryTitle();
+      if (disc) {
+        discoveryLabel.textContent = getPleadingMode() === 'request'
+          ? 'Discovery Request Details' : 'Discovery Response Details';
+        updateDiscoveryTitle();
+      }
     });
   });
 

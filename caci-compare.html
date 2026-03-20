@@ -1001,21 +1001,25 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
   <!-- Document Mode selector -->
   <div class="card" style="padding:14px 20px">
     <div class="card-label">Document Mode</div>
-    <div style="display:flex;gap:16px;align-items:center">
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-family:var(--sans);font-size:.88em">
         <input type="radio" name="pleadingMode" value="blank" checked
                style="accent-color:var(--navy)"> Blank Shell
       </label>
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-family:var(--sans);font-size:.88em">
-        <input type="radio" name="pleadingMode" value="discovery"
+        <input type="radio" name="pleadingMode" value="request"
+               style="accent-color:var(--navy)"> Discovery Request
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-family:var(--sans);font-size:.88em">
+        <input type="radio" name="pleadingMode" value="response"
                style="accent-color:var(--navy)"> Discovery Response
       </label>
     </div>
   </div>
 
-  <!-- Discovery Response panel (shown when mode = discovery) -->
+  <!-- Discovery panel (shown when mode = request or response) -->
   <div id="discoveryPanel" class="card hidden">
-    <div class="card-label">Discovery Response Details</div>
+    <div class="card-label" id="discoveryPanelLabel">Discovery Details</div>
 
     <div class="draft-section">
       <div class="draft-section-label">Type &amp; Parties</div>
@@ -1030,13 +1034,13 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <div class="row gap-4" style="margin-bottom:12px">
         <div class="col">
           <label for="disc_propounding_name">Propounding Party Name</label>
-          <input type="text" id="disc_propounding_name" placeholder="DANIEL PERALES">
+          <input type="text" id="disc_propounding_name" placeholder="JOHN DOE">
         </div>
         <div class="col" style="flex:0 0 180px">
           <label for="disc_propounding_role">Role</label>
           <select id="disc_propounding_role" style="font-family:var(--sans);font-size:.88em;padding:6px 8px;border:1px solid var(--border);border-radius:4px;width:100%">
-            <option value="Plaintiff">Plaintiff</option>
-            <option value="Defendant" selected>Defendant</option>
+            <option value="Plaintiff" selected>Plaintiff</option>
+            <option value="Defendant">Defendant</option>
             <option value="Cross-Complainant">Cross-Complainant</option>
             <option value="Cross-Defendant">Cross-Defendant</option>
           </select>
@@ -1045,7 +1049,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
       <div class="row gap-4" style="margin-bottom:12px">
         <div class="col">
           <label for="disc_responding_name">Responding Party Name</label>
-          <input type="text" id="disc_responding_name" placeholder="ABIR COHEN TREYZON SALO, LLP">
+          <input type="text" id="disc_responding_name" placeholder="JANE DOE">
         </div>
         <div class="col" style="flex:0 0 180px">
           <label for="disc_responding_role">Role</label>
