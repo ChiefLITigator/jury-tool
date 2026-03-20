@@ -590,12 +590,6 @@ const vfDB = {
           "if_yes": "q3"
         },
         {
-          "id": "q8",
-          "type": "yes_no",
-          "text": "",
-          "fields": []
-        },
-        {
           "id": "q3",
           "type": "damages",
           "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
@@ -676,19 +670,19 @@ const vfDB = {
             },
             {
               "id": "p_name_of_second_defendant",
-              "label": "[[Name of second defendant]"
+              "label": "[Name of second defendant]"
             },
             {
               "id": "p_name_of_plaintiff",
-              "label": "[[Name of plaintiff]"
+              "label": "[Name of plaintiff]"
             },
             {
               "id": "p_namedescription_of_first_non_party",
-              "label": "[[Name/description of first non- party]"
+              "label": "[Name/description of first non- party]"
             },
             {
               "id": "p_namedescription_of_second_nonparty",
-              "label": "[[Name/description of second nonparty]"
+              "label": "[Name/description of second nonparty]"
             }
           ],
           "must_total": 100,
@@ -2503,14 +2497,9 @@ const vfDB = {
           "text": "Was [ name of plaintiff ]’s negligence a substantial factor in causing [his/her/ nonbinary pronoun ] harm?",
           "fields": [
             "name of plaintiff"
-          ]
-        },
-        {
-          "id": "q9",
-          "type": "yes_no",
-          "text": "",
-          "fields": [],
-          "if_yes": "q7"
+          ],
+          "if_yes": "q7",
+          "if_no": "q7"
         },
         {
           "id": "q7",
@@ -2531,7 +2520,7 @@ const vfDB = {
         {
           "id": "q9",
           "type": "percentage",
-          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:PRODUCTS LIABILITY VF-1200",
+          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:",
           "fields": [
             "name of plaintiff"
           ],
@@ -2602,11 +2591,13 @@ const vfDB = {
         {
           "id": "q5",
           "type": "yes_no",
-          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way? Regardless of your answer to question 5, answer question 6.",
+          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way?",
           "fields": [
             "product"
           ],
-          "optional": true
+          "optional": true,
+          "if_yes": "q6",
+          "if_no": "q6"
         },
         {
           "id": "q6",
