@@ -78,16 +78,25 @@ function renderPalette() {
     const catLabel = cat.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     const catId    = 'vfcat-' + cat;
     html += `<div class="vf-palette-group">
-      <div class="vf-palette-group-title" data-cat="${cat}">
-        <span>${catLabel}</span><span id="${catId}-arrow">▸</span>
+      <div class="vf-palette-group-title" data-toggle="${catId}-body">
+        <span>${catLabel}</span><span class="vf-toggle-arrow" data-for="${catId}-body">▸</span>
       </div>
       <div class="vf-palette-group-body" id="${catId}-body" style="display:none">`;
     for (const group of byCategory[cat]) {
+      const subId = 'vfsub-' + group.id;
+      const titlePreview = escHtml(group.title).substring(0, 60);
+      html += `<div class="vf-palette-subgroup">
+        <div class="vf-palette-subgroup-title" data-toggle="${subId}-body">
+          <span style="font-weight:600">${escHtml(group.id)}</span>
+          <span style="margin-left:6px;opacity:.7">${titlePreview}</span>
+          <span class="vf-toggle-arrow" data-for="${subId}-body" style="margin-left:auto">▸</span>
+        </div>
+        <div id="${subId}-body" style="display:none">`;
       for (const q of group.questions) {
         const preview = q.text.replace(/\[.*?\]/g, '[…]').substring(0, 55);
         html += `<div class="vf-palette-item">
           <div style="min-width:0;flex:1">
-            <div class="vf-palette-item-type">${typeBadgeLabel(q.type)} · ${escHtml(group.id)}</div>
+            <div class="vf-palette-item-type">${typeBadgeLabel(q.type)}</div>
             <div class="vf-palette-item-text" title="${escHtml(q.text)}">${escHtml(preview)}</div>
           </div>
           <button class="btn-secondary"
@@ -95,20 +104,22 @@ function renderPalette() {
             data-pal-group="${escHtml(group.id)}" data-pal-qid="${escHtml(q.id)}">+ Add</button>
         </div>`;
       }
+      html += `</div></div>`;
     }
     html += `</div></div>`;
   }
 
   listEl.innerHTML = html;
 
-  // Collapse toggles
-  listEl.querySelectorAll('.vf-palette-group-title').forEach(title => {
-    title.addEventListener('click', () => {
-      const body  = document.getElementById('vfcat-' + title.dataset.cat + '-body');
-      const arrow = document.getElementById('vfcat-' + title.dataset.cat + '-arrow');
+  // Collapse toggles (works for both category and subgroup levels)
+  listEl.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetId = el.dataset.toggle;
+      const body  = document.getElementById(targetId);
+      const arrow = listEl.querySelector(`.vf-toggle-arrow[data-for="${targetId}"]`);
       const hide  = body.style.display !== 'none';
-      body.style.display  = hide ? 'none' : '';
-      arrow.textContent   = hide ? '▸'   : '▾';
+      body.style.display = hide ? 'none' : '';
+      if (arrow) arrow.textContent = hide ? '▸' : '▾';
     });
   });
 
