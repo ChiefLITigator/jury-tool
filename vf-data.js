@@ -518,7 +518,9 @@ const vfDB = {
               "label": "TOTAL"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q4",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -552,7 +554,7 @@ const vfDB = {
             },
             {
               "id": "p_name_of_plaintiff",
-              "label": "[[Name of plaintiff]"
+              "label": "[Name of plaintiff]"
             }
           ],
           "must_total": 100,
@@ -620,7 +622,9 @@ const vfDB = {
               "label": "TOTAL"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q4",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -645,7 +649,8 @@ const vfDB = {
           "type": "yes_no_multi",
           "text": "Was [ name/description of first nonparty ] negligent? Was [ name/description of second nonparty ] negligent?",
           "fields": [],
-          "if_yes": "q8"
+          "if_yes": "q7",
+          "if_no": "q8"
         },
         {
           "id": "q7",
@@ -1551,7 +1556,8 @@ const vfDB = {
             "insert medical procedure",
             "name of plaintiff"
           ],
-          "if_no": "q7"
+          "if_no": "q7",
+          "if_yes": "q6"
         },
         {
           "id": "q6",
@@ -2124,7 +2130,9 @@ const vfDB = {
               "label": "TOTAL"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -2505,7 +2513,9 @@ const vfDB = {
               "label": "TOTAL"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -2842,7 +2852,9 @@ const vfDB = {
               "label": "TOTAL"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4542,7 +4554,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q2"
         },
         {
           "id": "q2",
@@ -4570,7 +4582,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q2"
         },
         {
           "id": "q2",
