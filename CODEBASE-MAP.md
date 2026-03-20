@@ -1,6 +1,6 @@
 # CODEBASE MAP
 ## California Civil Litigation Tool Suite
-## Last updated: 2026-03-08
+## Last updated: 2026-03-19
 
 Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
@@ -25,8 +25,8 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
 | vf-app.js | 1118 | ~11,000 | Active | When touching VF tab |
 | docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
-| pleading-shell.js | 634 | ~5,200 | Active | When touching pleading shell |
-| pleading-ui.js | 291 | ~1,400 | Active | When touching Pleading tab UI |
+| pleading-shell.js | 812 | ~7,000 | Active | When touching pleading shell |
+| pleading-ui.js | 385 | ~2,800 | Active | When touching Pleading tab UI |
 | vf-data.js | 42 | ~400 | Stable | NEVER — data file |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
 | parse-caci.js | 208 | ~1,900 | Utility | Only if re-parsing CACI PDF |
@@ -561,10 +561,10 @@ from array order. Never store display numbers — always compute them.
 
 ---
 
-## pleading-shell.js  (664 lines)
+## pleading-shell.js  (812 lines)
 
-**Purpose:** Generates blank California pleading paper DOCX shells
-with bracketed placeholders for all caption fields.
+**Purpose:** Generates California pleading paper DOCX shells — blank shells,
+discovery requests, and discovery responses with auto-numbered request/response pairs.
 
 **Dual-context:** Works as Node.js CLI (`node pleading-shell.js`)
 AND as browser module (`window.generatePleadingShell(options)`).
@@ -601,8 +601,29 @@ AND as browser module (`window.generatePleadingShell(options)`).
     body_text,            // optional — replaces blank body paragraphs; split on \n per line
   },
   plainPaper: true,   // optional — plain paper mode (browser-safe)
+  discovery: {        // optional — discovery shell mode
+    direction,        // 'request' or 'response'
+    type,             // 'rfa' | 'srog' | 'rfp'
+    propoundingName, propoundingRole,
+    respondingName, respondingRole,
+    setNumber,        // e.g. 'ONE'
+    count,            // number of request/response pairs
+    includeRequests,  // response mode only: include REQUEST lines (default true)
+  },
 }
 ```
+
+**Discovery mode (`options.discovery`):**
+- **Request mode** (`direction: 'request'`): Party ID block + centered/bold/underlined
+  section heading + auto-numbered request lines only. No boilerplate.
+- **Response mode** (`direction: 'response'`): Party ID + "TO ALL PARTIES" +
+  "COMES NOW" + preliminary statement boilerplate + centered/bold/underlined
+  section heading + auto-numbered request/response pairs.
+  `includeRequests: true` (default) interleaves REQUEST lines for pasting
+  propounding party text; `false` generates RESPONSE lines only.
+- Word auto-numbering via `disc-request` and `disc-response` numbering sequences;
+  deleting a request/response pair causes remaining items to renumber.
+- `DISC_TYPES` constant maps type to numbering label text and section headings.
 
 **Page layout:** California pleading paper standard
 - 8.5" × 11", Times New Roman 12pt body, 12pt caption
@@ -631,7 +652,7 @@ Unchecked = plain paper (browser-safe, early-return path).
 
 ---
 
-## pleading-ui.js  (291 lines)
+## pleading-ui.js  (385 lines)
 
 **Purpose:** Pleading Shell tab UI controller. Self-contained — no shared mutable state
 with other app files. Does not read `draftState`, `packetInstructions`, or `vfForms`.
@@ -645,8 +666,12 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 | `readProfileFields()` | Reads Section A inputs into a profile object |
 | `saveProfile()` | Saves current fields under profile name (`#profileNameInput` if filled, else dropdown selection); always writes legacy key too |
 | `deleteProfile()` | Removes selected profile; refuses if only 1 profile; loads next available |
-| `generateShell()` | Reads all live inputs, builds options, calls `generatePleadingShell()`, downloads DOCX |
-| DOMContentLoaded listener | Loads profiles index, populates dropdown, wires all buttons, adds `caseSelect` listener |
+| `getPleadingMode()` | Returns current mode: `'blank'`, `'request'`, or `'response'` |
+| `isDiscoveryMode()` | Returns true if mode is `'request'` or `'response'` |
+| `updateDiscoveryTitle()` | Auto-generates document title from discovery fields; uppercases party roles |
+| `readDiscoveryFields()` | Reads discovery panel inputs into `options.discovery` object |
+| `generateShell()` | Reads all live inputs, builds options (incl. discovery if applicable), calls `generatePleadingShell()`, downloads DOCX |
+| DOMContentLoaded listener | Loads profiles index, populates dropdown, wires all buttons, discovery mode toggle, discovery field change listeners, `caseSelect` listener |
 | `caseSelect` change listener | Pre-fills Section B inputs that are currently empty from case caption. Fires after app-cases.js. No write-back. |
 
 **Constants:**
@@ -681,6 +706,7 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 - Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
 - caci-data.js requires manual refresh when Judicial Council updates CACI (re-run parse-caci.js)
 - vf-data.js contains only VF-400 (Negligence); additional verdict form groups added manually
+- Discovery response auto-numbering uses two independent Word numbering sequences (request + response); deleting a request without its paired response will desync the numbering
 
 ## KNOWN BUGS (PENDING FIX)
 
