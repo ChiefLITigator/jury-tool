@@ -2,7 +2,7 @@ VF PARSE VALIDATION REPORT
 ============================================================
 Corpus: vf-corpus-target.txt
 Forms parsed: 62
-Total warnings: 75
+Total warnings: 49
 
 VF-300: Breach of Contract
   8 questions (yes_no, yes_no_multi, damages) — 4 warning(s)
@@ -111,8 +111,7 @@ VF-1001: Premises Liability—Affirmative Defense—Recreation Immunity—Except
   6 questions (yes_no, damages) — OK
 
 VF-1002: Premises Liability—Comparative Fault of Plaintiff at Issue
-  7 questions (yes_no, damages, percentage) — 1 warning(s)
-  ⚠ q7: Percentage question with no parties parsed
+  7 questions (yes_no, damages, percentage) — OK
 
 VF-1003: Landlord’s Liability for Dangerous Dog Kept on Property
   7 questions (yes_no, damages) — OK
@@ -129,12 +128,11 @@ VF-1101: Dangerous Condition of Public Property—Affirmative Defense—Reasonab
   ⚠ q6: Complex routing — review manually: If your answer to [either option for] question 6 is no, then answer question 7. If you answered yes [to both options], 
 
 VF-1200: Strict Products Liability—Manufacturing Defect—Comparative Fault at Issue
-  10 questions (yes_no, damages, percentage) — 5 warning(s)
+  10 questions (yes_no, damages, percentage) — 4 warning(s)
   ⚠ q6: Complex routing — review manually: If your answer to question 6 is yes, then answer questions 7 and
   ⚠ q9: Complex routing — review manually: If you answered no, insert the number zero next to [ name of plaintiff ]’s name in question 9 and answer question 7.
   ⚠ q6: yes_no question with no routing
   ⚠ q9: Question text is empty or very short: ""
-  ⚠ q9: Percentage question with no parties parsed
 
 VF-1201: Strict Products Liability—Design Defect—Affirmative Defense—Misuse or Modification
   8 questions (yes_no, damages) — 3 warning(s)
@@ -146,8 +144,7 @@ VF-1203: Strict Products Liability—Failure to Warn
   7 questions (yes_no, damages) — OK
 
 VF-1204: Products Liability—Negligence—Comparative Fault of Plaintiff at Issue
-  7 questions (yes_no, damages, percentage) — 1 warning(s)
-  ⚠ q7: Percentage question with no parties parsed
+  7 questions (yes_no, damages, percentage) — OK
 
 VF-1205: Products Liability—Negligent Failure to Warn
   7 questions (yes_no, damages) — OK
@@ -162,9 +159,7 @@ VF-1208: Products Liability—Implied Warranty of Fitness for a Particular Purpo
   7 questions (yes_no, damages) — OK
 
 VF-2300: Breach of Contractual Duty to Pay a Covered Claim
-  3 questions (yes_no, damages) — 2 warning(s)
-  ⚠ q3: Damages question with no parsed line items
-  ⚠ q3: Question text is empty or very short: ""
+  3 questions (yes_no, damages) — OK
 
 VF-2301: Breach of the Implied Obligation of Good Faith and Fair Dealing—Failure or Delay in Payment
   6 questions (yes_no, damages) — OK
@@ -210,24 +205,16 @@ VF-2408: Constructive Discharge in Violation of Public Policy—Plaintiff Requir
   7 questions (yes_no, damages) — OK
 
 VF-3900: Punitive Damages
-  2 questions (yes_no, damages) — 2 warning(s)
-  ⚠ q2: Damages question with no parsed line items
-  ⚠ q2: Question text is empty or very short: ""
+  2 questions (yes_no, damages) — OK
 
 VF-3901: Punitive Damages Against Employer or Principal for Conduct of a Specific Agent or Employee
-  3 questions (yes_no, damages) — 2 warning(s)
-  ⚠ q3: Damages question with no parsed line items
-  ⚠ q3: Question text is empty or very short: ""
+  3 questions (yes_no, damages) — OK
 
 VF-3902: Punitive Damages—Entity Defendant
-  2 questions (yes_no, damages) — 2 warning(s)
-  ⚠ q2: Damages question with no parsed line items
-  ⚠ q2: Question text is empty or very short: ""
+  2 questions (yes_no, damages) — OK
 
 VF-3903: Punitive Damages—Entity Defendant—Ratification
-  3 questions (yes_no, damages) — 2 warning(s)
-  ⚠ q3: Damages question with no parsed line items
-  ⚠ q3: Question text is empty or very short: ""
+  3 questions (yes_no, damages) — OK
 
 VF-3904: 
   0 questions () — 1 warning(s)
@@ -242,28 +229,15 @@ VF-3906: Damages for Wrongful Death (Parents’ Recovery for Death of a Minor Ch
   ⚠ q2: Damages question with no parsed line items
 
 VF-3907: Damages for Loss of Consortium (Noneconomic Damage)
-  1 questions (damages) — 2 warning(s)
-  ⚠ q1: Damages question with no parsed line items
-  ⚠ q1: Question text is empty or very short: ""
+  1 questions (damages) — OK
 
 VF-3919: Damages for Loss of Consortium (Noneconomic Damage)
-  1 questions (damages) — 2 warning(s)
-  ⚠ q1: Damages question with no parsed line items
-  ⚠ q1: Question text is empty or very short: ""
+  1 questions (damages) — OK
 
 VF-3920: Damages on Multiple Legal Theories What are [ name of plaintiff ]’s damages? [ List each item of damages listed in CACI No. 3934. ]
-  6 questions (damages) — 11 warning(s)
-  ⚠ q1: Damages question with no parsed line items
-  ⚠ q2: Damages question with no parsed line items
-  ⚠ q3: Damages question with no parsed line items
+  6 questions (damages) — 2 warning(s)
   ⚠ q4: Damages question with no parsed line items
-  ⚠ q5: Damages question with no parsed line items
   ⚠ q6: Damages question with no parsed line items
-  ⚠ q1: Question text is empty or very short: ""
-  ⚠ q2: Question text is empty or very short: ""
-  ⚠ q3: Question text is empty or very short: ""
-  ⚠ q5: Question text is empty or very short: ""
-  ⚠ q6: Question text is empty or very short: ""
 
 
 ROUND-TRIP RENDERINGS
@@ -912,6 +886,8 @@ We answer the questions submitted to us as follows:
 6. Yes No
   → yes: q7
 7. What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to the following?
+  [Name of defendant]: %
+  [Name of plaintiff]: %
   TOTAL 100 %
   → done: sign
 
@@ -1031,6 +1007,9 @@ We answer the questions submitted to us as follows:
 8. Yes No
   → yes: q9
 9. What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:PRODUCTS LIABILITY VF-1200
+  [Name of defendant]: %
+  [Name of plaintiff]: %
+  [Name/description of other person]: %
   TOTAL 100 %
   → done: sign
 
@@ -1115,6 +1094,8 @@ We answer the questions submitted to us as follows:
 6. Yes No
   → yes: q7
 7. What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:
+  [Name of defendant]: %
+  [Name of plaintiff]: %
   TOTAL 100 %
   → done: sign
 
@@ -1226,7 +1207,7 @@ We answer the questions submitted to us as follows:
 2. Was [ name of defendant ] notified of the loss [as required by the policy]?
 2. Yes No
   → yes: q3
-3. 
+3. What is the amount of the covered loss that [ name of defendant ] failed to pay [ name of plaintiff ]?
   → done: sign
 
 ===== VF-2301 =====
@@ -1562,7 +1543,7 @@ We answer the questions submitted to us as follows:
 1. Did [ name of defendant ] engage in the conduct with malice, oppression, or fraud?
 1. Yes No
   → yes: q2
-2. 
+2. What amount of punitive damages, if any, do you award [ name of plaintiff ]?
   → done: sign
 
 ===== VF-3901 =====
@@ -1574,7 +1555,7 @@ We answer the questions submitted to us as follows:
 2. Was [ name of employee/agent ] an officer, director, or managing agent of [ name of defendant ] acting on behalf of [ name of defendant ]?
 2. Yes No
   → yes: q3
-3. 
+3. What amount of punitive damages, if any, do you award [ name of plaintiff ]?
   → done: sign
 
 ===== VF-3902 =====
@@ -1583,7 +1564,7 @@ We answer the questions submitted to us as follows:
 1. Was the conduct constituting malice, oppression, or fraud committed by one or more officers, directors, or managing agents of [name of defendant ] acting on behalf of [ name of defendant ]?
 1. Yes No
   → yes: q2
-2. 
+2. What amount of punitive damages, if any, do you award [ name of plaintiff ]?
   → done: sign
 
 ===== VF-3903 =====
@@ -1595,7 +1576,7 @@ We answer the questions submitted to us as follows:
 2. Did one or more officers, directors, or managing agents of [ name of defendant ] know of this conduct and adopt or approve it after it occurred?
 2. Yes No
   → yes: q3
-3. 
+3. What amount of punitive damages, if any, do you award [ name of plaintiff ]?
   → done: sign
 
 ===== VF-3904 =====
@@ -1625,27 +1606,27 @@ We answer the questions submitted to us as follows:
 ===== VF-3907 =====
 VF-3907. Damages for Loss of Consortium (Noneconomic Damage)
 We answer the questions submitted to us as follows:
-1. 
+1. What are [ name of plaintiff ]’s damages for loss of [his/her/ nonbinary pronoun ] [husband/wife]’s love, companionship, comfort, care, assistance, protection, affection, society, moral support, and enjoyment of sexual relations [or the ability to have children]?
   → done: sign
 
 ===== VF-3919 =====
 VF-3919. Damages for Loss of Consortium (Noneconomic Damage)
 We answer the questions submitted to us as follows:
-1. 
+1. What are [ name of plaintiff ]’s damages for loss of [his/her/ nonbinary pronoun ] [husband/wife]’s love, companionship, comfort, care, assistance, protection, affection, society, moral support, and enjoyment of sexual relations [or the ability to have children]?
   → done: sign
 
 ===== VF-3920 =====
 VF-3920. Damages on Multiple Legal Theories What are [ name of plaintiff ]’s damages? [ List each item of damages listed in CACI No. 3934. ]
 We answer the questions submitted to us as follows:
-1. 
+1. e.g., economic damages: lost past earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify all of the legal theories supporting this element of damages; use “or” if more than one ].]
   → done: sign
-2. 
+2. e.g., economic damages: past medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]
   → done: sign
-3. 
+3. e.g., economic damages: lost future earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]
   → done: sign
 4. e.g., economic damages: future medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to
   → done: sign
-5. 
+5. e.g., past noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]
   → done: sign
-6. 
+6. e.g., future noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]
   → done: sign

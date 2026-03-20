@@ -319,14 +319,19 @@ function cleanLabel(label) {
 // ─ PARSE PERCENTAGE PARTIES ─────────────────────────────────────────────────
 function parsePercentageParties(lines) {
   const parties = [];
-  // Join all sub-item lines and split on % to handle multi-line party names
   const joined = lines.join(' ');
-  // Match patterns like "[Name of defendant ]: %" or "Name of plaintiff ]: %"
-  const re = /\[?\s*([^\]%]+?)\s*\]?\s*:\s*%/g;
+
+  // Match "[Name of defendant ]: %" or "[Name of defendant ]:" (% may be on next line or absent)
+  const re = /\[?\s*([^\]%:]+?)\s*\]?\s*:\s*%?/g;
   let m;
   while ((m = re.exec(joined)) !== null) {
     const name = m[1].replace(/\s+/g, ' ').trim();
-    if (/^TOTAL/i.test(name) || !name) continue;
+    if (!name) continue;
+    if (/^TOTAL/i.test(name)) continue;
+    if (/^\d+$/.test(name)) continue;                   // skip standalone numbers
+    if (/^(past|future|lost|medical|other|economic)/i.test(name)) continue;  // skip damage labels
+    // Must look like a party name (starts with uppercase or "Name/name")
+    if (!/^[A-Z\[]/.test(name) && !/name/i.test(name)) continue;
     parties.push({
       id: 'p_' + makeItemId(name),
       label: '[' + name + ']',
@@ -382,9 +387,12 @@ function parseQuestionBlock(block, formId, totalQs) {
     }
 
     // Sub-items (damage line items, percentage parties)
-    if (/^\[?[a-d]\./.test(line) || /^\[lost|^\[medical|^\[other/i.test(line) ||
+    // But NOT lines starting with a question number prefix (those are question text with inline $)
+    if (!qStartRe.test(line) && (
+        /^\[?[a-d]\./.test(line) || /^\[lost|^\[medical|^\[other/i.test(line) ||
         /^\[Name|^\[name/i.test(line) || /^TOTAL/i.test(line) ||
-        /:\s*%/.test(line) || /\$\s*\]?\s*$/.test(line)) {
+        /:\s*%/.test(line) || /\]\s*:\s*$/.test(line) ||
+        /\$\s*\]?\s*$/.test(line) || /^\s*%\s*$/.test(line) || /^\d+\s*%\s*$/.test(line))) {
       subItemLines.push(line);
       continue;
     }

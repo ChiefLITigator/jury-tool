@@ -2146,7 +2146,16 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "parties": [],
+          "parties": [
+            {
+              "id": "p_name_of_defendant",
+              "label": "[Name of defendant]"
+            },
+            {
+              "id": "p_name_of_plaintiff",
+              "label": "[Name of plaintiff]"
+            }
+          ],
           "must_total": 100,
           "if_done": "sign"
         }
@@ -2526,7 +2535,20 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "parties": [],
+          "parties": [
+            {
+              "id": "p_name_of_defendant",
+              "label": "[Name of defendant]"
+            },
+            {
+              "id": "p_name_of_plaintiff",
+              "label": "[Name of plaintiff]"
+            },
+            {
+              "id": "p_namedescription_of_other_person",
+              "label": "[Name/description of other person]"
+            }
+          ],
           "must_total": 100,
           "if_done": "sign"
         }
@@ -2800,7 +2822,16 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "parties": [],
+          "parties": [
+            {
+              "id": "p_name_of_defendant",
+              "label": "[Name of defendant]"
+            },
+            {
+              "id": "p_name_of_plaintiff",
+              "label": "[Name of plaintiff]"
+            }
+          ],
           "must_total": 100,
           "if_done": "sign"
         }
@@ -3166,8 +3197,11 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What is the amount of the covered loss that [ name of defendant ] failed to pay [ name of plaintiff ]?",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4284,8 +4318,10 @@ const vfDB = {
         {
           "id": "q2",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What amount of punitive damages, if any, do you award [ name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4319,8 +4355,10 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What amount of punitive damages, if any, do you award [ name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4344,8 +4382,10 @@ const vfDB = {
         {
           "id": "q2",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What amount of punitive damages, if any, do you award [ name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4378,8 +4418,10 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What amount of punitive damages, if any, do you award [ name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4479,8 +4521,10 @@ const vfDB = {
         {
           "id": "q1",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What are [ name of plaintiff ]’s damages for loss of [his/her/ nonbinary pronoun ] [husband/wife]’s love, companionship, comfort, care, assistance, protection, affection, society, moral support, and enjoyment of sexual relations [or the ability to have children]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4495,8 +4539,10 @@ const vfDB = {
         {
           "id": "q1",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "What are [ name of plaintiff ]’s damages for loss of [his/her/ nonbinary pronoun ] [husband/wife]’s love, companionship, comfort, care, assistance, protection, affection, society, moral support, and enjoyment of sexual relations [or the ability to have children]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
@@ -4511,24 +4557,36 @@ const vfDB = {
         {
           "id": "q1",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "e.g., economic damages: lost past earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify all of the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff",
+            "specify all of the legal theories supporting this element of damages; use “or” if more than one"
+          ],
           "line_items": [],
           "if_done": "sign"
         },
         {
           "id": "q2",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "e.g., economic damages: past medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff",
+            "specify the legal theories supporting this element of damages; use “or” if more than one"
+          ],
           "line_items": [],
           "if_done": "sign"
         },
         {
           "id": "q3",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "e.g., economic damages: lost future earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff",
+            "specify the legal theories supporting this element of damages; use “or” if more than one"
+          ],
           "line_items": [],
           "if_done": "sign"
         },
@@ -4545,16 +4603,24 @@ const vfDB = {
         {
           "id": "q5",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "e.g., past noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff",
+            "specify the legal theories supporting this element of damages; use “or” if more than one"
+          ],
           "line_items": [],
           "if_done": "sign"
         },
         {
           "id": "q6",
           "type": "damages",
-          "text": "",
-          "fields": [],
+          "text": "e.g., future noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]",
+          "fields": [
+            "name of defendant",
+            "name of plaintiff",
+            "specify the legal theories supporting this element of damages; use “or” if more than one"
+          ],
           "line_items": [],
           "if_done": "sign"
         }
