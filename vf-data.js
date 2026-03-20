@@ -934,9 +934,10 @@ const vfDB = {
         {
           "id": "q4",
           "type": "yes_no",
-          "text": "When [ name of defendant ] provided the alcoholic beverages, did",
+          "text": "When [ name of defendant ] provided the alcoholic beverages, did [name of alleged minor ] display symptoms that would lead a reasonable person to conclude that [ name of alleged minor ] was obviously intoxicated?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of alleged minor"
           ],
           "if_yes": "q5"
         },
@@ -953,9 +954,11 @@ const vfDB = {
         {
           "id": "q6",
           "type": "yes_no",
-          "text": "Was [ name of defendant ]’s [selling/giving] alcoholic beverages to",
+          "text": "Was [ name of defendant ]’s [selling/giving] alcoholic beverages to [name of alleged minor ] a substantial factor in causing [ name of plaintiff ]’s harm?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of alleged minor",
+            "name of plaintiff"
           ],
           "if_yes": "q7"
         },
@@ -1346,9 +1349,10 @@ const vfDB = {
         {
           "id": "q1",
           "type": "yes_no",
-          "text": "Was [ name of defendant ] negligent in the diagnosis or treatment of",
+          "text": "Was [ name of defendant ] negligent in the diagnosis or treatment of [name of plaintiff ]?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of plaintiff"
           ],
           "if_yes": "q2"
         },
@@ -1406,10 +1410,11 @@ const vfDB = {
         {
           "id": "q1",
           "type": "yes_no",
-          "text": "Did [ name of defendant ] perform a [ insert medical procedure ] on",
+          "text": "Did [ name of defendant ] perform a [ insert medical procedure ] on [name of plaintiff ]?",
           "fields": [
             "name of defendant",
-            "insert medical procedure"
+            "insert medical procedure",
+            "name of plaintiff"
           ],
           "if_yes": "q2"
         },
@@ -1498,10 +1503,11 @@ const vfDB = {
         {
           "id": "q1",
           "type": "yes_no",
-          "text": "Did [ name of defendant ] perform a [ insert medical procedure ] on",
+          "text": "Did [ name of defendant ] perform a [ insert medical procedure ] on [name of plaintiff ]?",
           "fields": [
             "name of defendant",
-            "insert medical procedure"
+            "insert medical procedure",
+            "name of plaintiff"
           ],
           "if_yes": "q2"
         },
@@ -1610,9 +1616,10 @@ const vfDB = {
         {
           "id": "q2",
           "type": "yes_no",
-          "text": "Did [ name of defendant ], by words or conduct, give permission to",
+          "text": "Did [ name of defendant ], by words or conduct, give permission to [name of driver ] to use the vehicle?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of driver"
           ],
           "if_yes": "sign",
           "if_no": "stop",
@@ -1639,9 +1646,10 @@ const vfDB = {
         {
           "id": "q2",
           "type": "yes_no",
-          "text": "Did [ name of defendant ], by words or conduct, give permission to",
+          "text": "Did [ name of defendant ], by words or conduct, give permission to [name of driver ] to use the vehicle?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of driver"
           ],
           "if_yes": "q3"
         },
@@ -2450,9 +2458,10 @@ const vfDB = {
         {
           "id": "q2",
           "type": "yes_no",
-          "text": "Did the [ product ] contain a manufacturing defect when it left",
+          "text": "Did the [ product ] contain a manufacturing defect when it left [name of defendant ]’s possession?",
           "fields": [
-            "product"
+            "product",
+            "name of defendant"
           ],
           "if_yes": "q3"
         },
@@ -2474,8 +2483,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -2620,9 +2639,10 @@ const vfDB = {
         {
           "id": "q7",
           "type": "yes_no",
-          "text": "Was the [ product ]’s design a substantial factor in causing harm to",
+          "text": "Was the [ product ]’s design a substantial factor in causing harm to [name of plaintiff ]?",
           "fields": [
-            "product"
+            "product",
+            "name of plaintiff"
           ],
           "if_yes": "q8"
         },
@@ -2635,8 +2655,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -2719,8 +2749,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -2780,8 +2820,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -2907,8 +2957,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -2964,9 +3024,10 @@ const vfDB = {
         {
           "id": "q4",
           "type": "yes_no",
-          "text": "Was the failure of the [ product ] to [perform] [or] [meet the quality] as represented a substantial factor in causing harm to",
+          "text": "Was the failure of the [ product ] to [perform] [or] [meet the quality] as represented a substantial factor in causing harm to [name of plaintiff ]?",
           "fields": [
-            "product"
+            "product",
+            "name of plaintiff"
           ],
           "if_yes": "q5"
         },
@@ -2979,8 +3040,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -3058,8 +3129,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -3150,8 +3231,18 @@ const vfDB = {
           ],
           "line_items": [
             {
+              "id": "past_economic_loss",
+              "label": "Past economic loss",
+              "children": []
+            },
+            {
               "id": "total_past_economic_damages_",
               "label": "Total Past Economic Damages: $"
+            },
+            {
+              "id": "future_economic_loss",
+              "label": "Future economic loss",
+              "children": []
             },
             {
               "id": "total_future_economic_damages_",
@@ -3685,7 +3776,7 @@ const vfDB = {
         {
           "id": "q1",
           "type": "yes_no",
-          "text": "Did [ name of plaintiff ] and [ name of defendant ] enter into an employment contract that specified a length of time for which",
+          "text": "Did [ name of plaintiff ] and [ name of defendant ] enter into an employment contract that specified a length of time for which [name of plaintiff ] would remain employed?",
           "fields": [
             "name of plaintiff",
             "name of defendant"
@@ -3763,7 +3854,7 @@ const vfDB = {
         {
           "id": "q1",
           "type": "yes_no",
-          "text": "Did [ name of plaintiff ] and [ name of defendant ] enter into an employment contract that specified a length of time for which",
+          "text": "Did [ name of plaintiff ] and [ name of defendant ] enter into an employment contract that specified a length of time for which [name of plaintiff ] would remain employed?",
           "fields": [
             "name of plaintiff",
             "name of defendant"
@@ -3801,9 +3892,10 @@ const vfDB = {
         {
           "id": "q5",
           "type": "yes_no",
-          "text": "Did [ name of defendant ] have good cause to [discharge/demote",
+          "text": "Did [ name of defendant ] have good cause to [discharge/demote] [name of plaintiff ]?",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of plaintiff"
           ],
           "if_no": "q6"
         },
@@ -4064,7 +4156,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "yes_no",
-          "text": "Was [ name of plaintiff ]’s [insert alleged activity protected by public policy, e.g., “refusal to engage in price fixing” ] a substantial motivating reason for [ name of defendant ]’s decision to discharge",
+          "text": "Was [ name of plaintiff ]’s [insert alleged activity protected by public policy, e.g., “refusal to engage in price fixing” ] a substantial motivating reason for [ name of defendant ]’s decision to discharge [name of plaintiff ]?",
           "fields": [
             "name of plaintiff",
             "insert alleged activity protected by public policy, e.g., “refusal to engage in price fixing”",
@@ -4146,8 +4238,10 @@ const vfDB = {
         {
           "id": "q3",
           "type": "yes_no",
-          "text": "Was this requirement so intolerable that a reasonable person in",
-          "fields": [],
+          "text": "Was this requirement so intolerable that a reasonable person in [name of plaintiff ]’s position would have had no reasonable alternative except to resign?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "if_yes": "q4"
         },
         {
@@ -4162,8 +4256,10 @@ const vfDB = {
         {
           "id": "q5",
           "type": "yes_no",
-          "text": "Was the requirement a substantial factor in causing harm to",
-          "fields": [],
+          "text": "Was the requirement a substantial factor in causing harm to [name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
           "if_yes": "q6"
         },
         {
@@ -4445,18 +4541,7 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [
-            {
-              "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that",
-              "children": []
-            },
-            {
-              "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that",
-              "children": []
-            }
-          ],
+          "line_items": [],
           "if_done": "sign"
         },
         {
@@ -4484,18 +4569,7 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [
-            {
-              "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that",
-              "children": []
-            },
-            {
-              "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that",
-              "children": []
-            }
-          ],
+          "line_items": [],
           "if_done": "sign"
         },
         {
@@ -4591,9 +4665,11 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "e.g., economic damages: future medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to",
+          "text": "e.g., economic damages: future medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to [name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
           "fields": [
-            "name of defendant"
+            "name of defendant",
+            "name of plaintiff",
+            "specify the legal theories supporting this element of damages; use “or” if more than one"
           ],
           "line_items": [],
           "if_done": "sign"

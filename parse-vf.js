@@ -132,7 +132,14 @@ function joinBlockLines(lines) {
   const qStartRe = /^(\[*)(\d+)\./;
   const joined = [];
   for (const line of lines) {
-    if (qStartRe.test(line) || /^\[?[a-d]\./.test(line) || /^\[lost|^\[medical|^\[other|^\[Name|^\[name|^TOTAL/i.test(line)) {
+    const isNewEntry =
+      qStartRe.test(line) ||
+      /^\[?[a-d]\./.test(line) ||
+      /^\[lost |^\[medical |^\[other /i.test(line) ||
+      /^\[?Name.*\]\s*:\s*%?\s*$/i.test(line) ||   // percentage party line: [Name of X]: %
+      /^TOTAL/i.test(line) ||
+      /^\(\d\)\s*\[/.test(line);                     // (3) [lost earnings $ ]
+    if (isNewEntry) {
       joined.push(line);
     } else if (joined.length > 0) {
       joined[joined.length - 1] += ' ' + line.trim();
@@ -389,8 +396,9 @@ function parseQuestionBlock(block, formId, totalQs) {
     // Sub-items (damage line items, percentage parties)
     // But NOT lines starting with a question number prefix (those are question text with inline $)
     if (!qStartRe.test(line) && (
-        /^\[?[a-d]\./.test(line) || /^\[lost|^\[medical|^\[other/i.test(line) ||
-        /^\[Name|^\[name/i.test(line) || /^TOTAL/i.test(line) ||
+        /^\[?[a-d]\./.test(line) || /^\[lost |^\[medical |^\[other /i.test(line) ||
+        /^\[?Name.*\]\s*:\s*%?\s*$/i.test(line) || /^TOTAL/i.test(line) ||
+        /^\(\d\)\s*\[/.test(line) ||
         /:\s*%/.test(line) || /\]\s*:\s*$/.test(line) ||
         /\$\s*\]?\s*$/.test(line) || /^\s*%\s*$/.test(line) || /^\d+\s*%\s*$/.test(line))) {
       subItemLines.push(line);
