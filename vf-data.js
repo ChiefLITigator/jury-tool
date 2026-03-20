@@ -490,7 +490,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -592,7 +592,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others.",
           "fields": [
             "name of plaintiff"
           ],
@@ -917,7 +917,10 @@ const vfDB = {
           "fields": [
             "name of defendant",
             "name of alleged minor"
-          ]
+          ],
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2388,7 +2391,10 @@ const vfDB = {
           "text": "Answer if you answered yes to the first option for question 4: When you consider the likelihood and seriousness of potential injury, compared with the practicality and cost of either (a) taking alternative action that would not have created the risk of injury, or (b) protecting against the risk of injury, was [ name of defendant ]’s [act/ specify failure to act ] that created the dangerous condition reasonable under the circumstances?] [Answer if you answered yes to the second option for question 4: When you consider the likelihood and seriousness of potential injury, compared with (a) how much time and opportunity [ name of defendant ] had to take action, and (b) the practicality and cost of protecting against the risk of injury, was [ name of defendant ]’s failure to take sufficient steps to protect against the risk of injury created by the dangerous condition reasonable under the circumstances?",
           "fields": [
             "name of defendant"
-          ]
+          ],
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -2462,7 +2468,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -2768,7 +2774,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -3414,7 +3420,8 @@ const vfDB = {
             "name of plaintiff"
           ],
           "line_items": [],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_done": "q4"
         },
         {
           "id": "q4",
@@ -4420,7 +4427,7 @@ const vfDB = {
     },
     {
       "id": "VF-3904",
-      "title": "",
+      "title": "Punitive Damages—Entity Defendant—Authorization or Ratification",
       "category": "punitive_damages",
       "signature_block": false,
       "questions": []
