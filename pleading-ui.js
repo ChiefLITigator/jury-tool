@@ -231,8 +231,9 @@ function updateDiscoveryTitle() {
 
 /** Read discovery panel fields into an options object. */
 function readDiscoveryFields() {
+  const direction = getPleadingMode();
   return {
-    direction:        getPleadingMode(),   // 'request' or 'response'
+    direction,                             // 'request' or 'response'
     type:             document.getElementById('disc_type').value,
     propoundingName:  document.getElementById('disc_propounding_name').value.trim(),
     propoundingRole:  document.getElementById('disc_propounding_role').value,
@@ -240,6 +241,7 @@ function readDiscoveryFields() {
     respondingRole:   document.getElementById('disc_responding_role').value,
     setNumber:        document.getElementById('disc_set_number').value.trim() || 'ONE',
     count:            parseInt(document.getElementById('disc_count').value, 10) || 10,
+    includeRequests:  direction === 'response' && document.getElementById('disc_include_requests').checked,
   };
 }
 
@@ -325,15 +327,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
   document.getElementById('generatePleadingBtn').addEventListener('click', generateShell);
 
-  // Discovery mode toggle — show/hide discovery panel
+  // Discovery mode toggle — show/hide discovery panel + request checkbox
   const discoveryPanel = document.getElementById('discoveryPanel');
   const discoveryLabel = document.getElementById('discoveryPanelLabel');
+  const includeReqLabel = document.getElementById('disc_include_requests_label');
   document.querySelectorAll('input[name="pleadingMode"]').forEach(r => {
     r.addEventListener('change', () => {
       const disc = isDiscoveryMode();
+      const mode = getPleadingMode();
       discoveryPanel.classList.toggle('hidden', !disc);
+      // Show "include requests" checkbox only in response mode
+      includeReqLabel.style.display = mode === 'response' ? 'flex' : 'none';
       if (disc) {
-        discoveryLabel.textContent = getPleadingMode() === 'request'
+        discoveryLabel.textContent = mode === 'request'
           ? 'Discovery Request Details' : 'Discovery Response Details';
         updateDiscoveryTitle();
       }

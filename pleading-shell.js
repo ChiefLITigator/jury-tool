@@ -478,19 +478,22 @@ function buildDiscoveryBodyArea(fields, discovery) {
 
     // Numbered request/response pairs
     const count = discovery.count || 1;
+    const withReq = discovery.includeRequests !== false;
     for (let i = 0; i < count; i++) {
-      paras.push(bp([tr('')], {
-        numbering: { reference: 'disc-request', level: 0 },
-        ...EXACT_SP,
-      }));
-      // Blank line for user to type request text
-      paras.push(bp([tr('')], EXACT_SP));
+      if (withReq) {
+        // REQUEST NO. X: (auto-numbered) + blank line for pasting request text
+        paras.push(bp([tr('')], {
+          numbering: { reference: 'disc-request', level: 0 },
+          ...EXACT_SP,
+        }));
+        paras.push(bp([tr('')], EXACT_SP));
+      }
 
+      // RESPONSE TO REQUEST NO. X: (auto-numbered) + blank line for response
       paras.push(bp([tr('')], {
         numbering: { reference: 'disc-response', level: 0 },
         ...EXACT_SP,
       }));
-      // Blank line for user to type response text
       paras.push(bp([tr('')], EXACT_SP));
     }
   }
@@ -623,8 +626,11 @@ async function generatePleadingShell(options = {}) {
   if (discovery) {
     const typeInfo = DISC_TYPES[discovery.type];
     const numStyle = { run: { font: 'Times New Roman', size: 24, bold: true } };
-    const config = [
-      {
+    const isResponse = discovery.direction !== 'request';
+    const withReq    = discovery.direction === 'request' || discovery.includeRequests;
+    const config = [];
+    if (withReq) {
+      config.push({
         reference: 'disc-request',
         levels: [{
           level: 0,
@@ -634,9 +640,9 @@ async function generatePleadingShell(options = {}) {
           suffix: LevelSuffix.NOTHING,
           style: numStyle,
         }],
-      },
-    ];
-    if (discovery.direction !== 'request') {
+      });
+    }
+    if (isResponse) {
       config.push({
         reference: 'disc-response',
         levels: [{
