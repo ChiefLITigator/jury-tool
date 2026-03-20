@@ -213,9 +213,9 @@ function updateDiscoveryTitle() {
   const type     = document.getElementById('disc_type').value;
   const setNum   = document.getElementById('disc_set_number').value.trim() || 'ONE';
   const propName = document.getElementById('disc_propounding_name').value.trim() || '[PROPOUNDING PARTY]';
-  const propRole = document.getElementById('disc_propounding_role').value;
+  const propRole = document.getElementById('disc_propounding_role').value.toUpperCase();
   const respName = document.getElementById('disc_responding_name').value.trim() || '[RESPONDING PARTY]';
-  const respRole = document.getElementById('disc_responding_role').value;
+  const respRole = document.getElementById('disc_responding_role').value.toUpperCase();
 
   let title;
   if (mode === 'request') {
