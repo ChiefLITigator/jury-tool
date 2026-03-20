@@ -998,6 +998,82 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
   </div>
 
+  <!-- Document Mode selector -->
+  <div class="card" style="padding:14px 20px">
+    <div class="card-label">Document Mode</div>
+    <div style="display:flex;gap:16px;align-items:center">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-family:var(--sans);font-size:.88em">
+        <input type="radio" name="pleadingMode" value="blank" checked
+               style="accent-color:var(--navy)"> Blank Shell
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400;font-family:var(--sans);font-size:.88em">
+        <input type="radio" name="pleadingMode" value="discovery"
+               style="accent-color:var(--navy)"> Discovery Response
+      </label>
+    </div>
+  </div>
+
+  <!-- Discovery Response panel (shown when mode = discovery) -->
+  <div id="discoveryPanel" class="card hidden">
+    <div class="card-label">Discovery Response Details</div>
+
+    <div class="draft-section">
+      <div class="draft-section-label">Type &amp; Parties</div>
+      <div class="draft-field">
+        <label for="disc_type">Discovery Type</label>
+        <select id="disc_type" style="font-family:var(--sans);font-size:.88em;padding:6px 8px;border:1px solid var(--border);border-radius:4px">
+          <option value="rfa">Requests for Admission (RFA)</option>
+          <option value="srog">Special Interrogatories (SROG)</option>
+          <option value="rfp">Requests for Production (RFP)</option>
+        </select>
+      </div>
+      <div class="row gap-4" style="margin-bottom:12px">
+        <div class="col">
+          <label for="disc_propounding_name">Propounding Party Name</label>
+          <input type="text" id="disc_propounding_name" placeholder="DANIEL PERALES">
+        </div>
+        <div class="col" style="flex:0 0 180px">
+          <label for="disc_propounding_role">Role</label>
+          <select id="disc_propounding_role" style="font-family:var(--sans);font-size:.88em;padding:6px 8px;border:1px solid var(--border);border-radius:4px;width:100%">
+            <option value="Plaintiff">Plaintiff</option>
+            <option value="Defendant" selected>Defendant</option>
+            <option value="Cross-Complainant">Cross-Complainant</option>
+            <option value="Cross-Defendant">Cross-Defendant</option>
+          </select>
+        </div>
+      </div>
+      <div class="row gap-4" style="margin-bottom:12px">
+        <div class="col">
+          <label for="disc_responding_name">Responding Party Name</label>
+          <input type="text" id="disc_responding_name" placeholder="ABIR COHEN TREYZON SALO, LLP">
+        </div>
+        <div class="col" style="flex:0 0 180px">
+          <label for="disc_responding_role">Role</label>
+          <select id="disc_responding_role" style="font-family:var(--sans);font-size:.88em;padding:6px 8px;border:1px solid var(--border);border-radius:4px;width:100%">
+            <option value="Plaintiff">Plaintiff</option>
+            <option value="Defendant" selected>Defendant</option>
+            <option value="Cross-Complainant">Cross-Complainant</option>
+            <option value="Cross-Defendant">Cross-Defendant</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="draft-section" style="margin-bottom:0">
+      <div class="draft-section-label">Set Details</div>
+      <div class="row gap-4" style="margin-bottom:0">
+        <div class="col" style="flex:0 0 120px">
+          <label for="disc_set_number">Set No.</label>
+          <input type="text" id="disc_set_number" value="ONE" placeholder="ONE">
+        </div>
+        <div class="col" style="flex:0 0 160px">
+          <label for="disc_count">Number of Requests</label>
+          <input type="number" id="disc_count" value="10" min="1" max="200" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Paper format checkbox -->
   <div class="card" style="padding:14px 20px">
     <label style="display:flex;align-items:center;gap:10px;cursor:pointer">

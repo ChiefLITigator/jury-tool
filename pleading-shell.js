@@ -351,8 +351,136 @@ function makeCaption(fields) {
   });
 }
 
+// ─ DISCOVERY TYPE DEFINITIONS ────────────────────────────────────────────────
+const DISC_TYPES = {
+  rfa: {
+    requestText:      'REQUEST FOR ADMISSION NO. %1:',
+    responseText:     'RESPONSE TO REQUEST FOR ADMISSION NO. %1:',
+    responsesHeading: 'RESPONSES TO REQUESTS FOR ADMISSION',
+    comesNowText:     'Request for Admission',
+  },
+  srog: {
+    requestText:      'SPECIAL INTERROGATORY NO. %1:',
+    responseText:     'RESPONSE TO SPECIAL INTERROGATORY NO. %1:',
+    responsesHeading: 'RESPONSES TO SPECIAL INTERROGATORIES',
+    comesNowText:     'Special Interrogatories',
+  },
+  rfp: {
+    requestText:      'REQUEST FOR PRODUCTION NO. %1:',
+    responseText:     'RESPONSE TO REQUEST FOR PRODUCTION NO. %1:',
+    responsesHeading: 'RESPONSES TO REQUESTS FOR PRODUCTION OF DOCUMENTS',
+    comesNowText:     'Request for Production of Documents',
+  },
+};
+
+// ─ DISCOVERY BODY BUILDER ───────────────────────────────────────────────────
+function buildDiscoveryBodyArea(fields, discovery) {
+  const { AlignmentType, PageBreak } = getDocx();
+  const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
+  const typeInfo = DISC_TYPES[discovery.type];
+  const docTitle = fields.document_title || '[DOCUMENT TITLE]';
+  const respName = discovery.respondingName  || '[RESPONDING PARTY]';
+  const propName = discovery.propoundingName || '[PROPOUNDING PARTY]';
+  const respRole = discovery.respondingRole  || 'Defendant';
+  const propRole = discovery.propoundingRole || 'Defendant';
+  const setNum   = discovery.setNumber       || 'ONE';
+
+  const paras = [];
+
+  // Page break after caption cover page
+  paras.push(bp([new PageBreak()], EXACT_SP));
+
+  // Centered bold title
+  paras.push(bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }));
+  paras.push(bp([tr('')], EXACT_SP));
+
+  // Party identification block
+  paras.push(bp([
+    tr('PROPOUNDING PARTY: ', { bold: true }),
+    tr(propRole.toUpperCase() + ', ' + propName.toUpperCase()),
+  ], EXACT_SP));
+  paras.push(bp([
+    tr('RESPONDING PARTY: ', { bold: true }),
+    tr(respRole.toUpperCase() + ', ' + respName.toUpperCase()),
+  ], EXACT_SP));
+  paras.push(bp([
+    tr('SET NO.: ', { bold: true }),
+    tr(setNum.toUpperCase()),
+  ], EXACT_SP));
+  paras.push(bp([tr('')], EXACT_SP));
+
+  // TO ALL PARTIES
+  paras.push(bp([tr('TO ALL PARTIES AND THEIR ATTORNEYS OF RECORD:')], EXACT_SP));
+
+  // COMES NOW paragraph
+  paras.push(bp([tr(
+    'COMES NOW ' + respRole + ' ' + respName +
+    ' (\u201cResponding Party\u201d), who hereby responds to ' +
+    propRole + ' ' + propName + '\u2019s (\u201cPropounding Party\u201d) ' +
+    typeInfo.comesNowText + ', Set ' + setNum + '.'
+  )], EXACT_SP));
+  paras.push(bp([tr('')], EXACT_SP));
+
+  // PRELIMINARY STATEMENT
+  paras.push(bp([tr('PRELIMINARY STATEMENT', { bold: true })], EXACT_SP));
+
+  paras.push(bp([tr(
+    'These responses are based upon diligent exploration by Responding Party and ' +
+    'counsel but reflect only the current state of Responding Party\u2019s understandings ' +
+    'and beliefs regarding the matters about which inquiry is made. Without in any way ' +
+    'obligating Responding Party to do so, Responding Party reserves the right to ' +
+    'modify or supplement these responses with additional information. Furthermore, ' +
+    'the responses are given without prejudice to using or relying at trial on ' +
+    'subsequently discovered and/or collateral information, or on information omitted ' +
+    'from these responses as a result of mistake, error or oversight.'
+  )], EXACT_SP));
+
+  paras.push(bp([tr(
+    'Responding Party does not intend to nor does Responding Party waive the ' +
+    'attorney-client privilege, the attorney work-product protection, or any other ' +
+    'privilege from disclosure, which may attach to information called for in ' +
+    'response to the requests. Additionally, Responding Party\u2019s responses are made ' +
+    'without waiver of, and with the explicit preservation of: (a)\u00a0all questions as ' +
+    'to competency, relevancy, materiality, privilege, and admissibility as evidence ' +
+    'for any purpose in the trial of this action, or any other action or proceeding; ' +
+    '(b)\u00a0the right to further object, on any ground, to these or other requests, ' +
+    'or any discovery procedures related to the subject matter of this case; and ' +
+    '(c)\u00a0the right at any time to revise, correct, add to, or clarify any of ' +
+    'Responding Party\u2019s responses.'
+  )], EXACT_SP));
+  paras.push(bp([tr('')], EXACT_SP));
+
+  // Responses section heading
+  paras.push(bp([tr(
+    typeInfo.responsesHeading + ' \u2014 SET ' + setNum.toUpperCase(), { bold: true }
+  )], EXACT_SP));
+  paras.push(bp([tr('')], EXACT_SP));
+
+  // Numbered request/response pairs
+  const count = discovery.count || 1;
+  for (let i = 0; i < count; i++) {
+    // REQUEST NO. X: (auto-numbered via Word list)
+    paras.push(bp([tr('')], {
+      numbering: { reference: 'disc-request', level: 0 },
+      ...EXACT_SP,
+    }));
+    // Blank line for user to type request text
+    paras.push(bp([tr('')], EXACT_SP));
+
+    // RESPONSE TO REQUEST NO. X: (auto-numbered via Word list)
+    paras.push(bp([tr('')], {
+      numbering: { reference: 'disc-response', level: 0 },
+      ...EXACT_SP,
+    }));
+    // Blank line for user to type response text
+    paras.push(bp([tr('')], EXACT_SP));
+  }
+
+  return paras;
+}
+
 // ─ BODY BUILDER ──────────────────────────────────────────────────────────────
-function buildBody(fields) {
+function buildBody(fields, discovery) {
   const { AlignmentType, PageBreak } = getDocx();
   const f = fields;
 
@@ -407,24 +535,30 @@ function buildBody(fields) {
   const captionTable = makeCaption(fields);
 
   // Post-caption body area: exactly 24pt line spacing.
-  // Blank shell: one blank line (matches source document structure).
+  // Discovery mode: structured boilerplate + auto-numbered request/response pairs.
   // With body_text (packet/VF exports): page break after caption (cover page),
   // then centered title + blank + body lines on page 2+.
-  const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
-  const docTitle = fields.document_title || '[DOCUMENT TITLE]';
-  const bodyText = fields.body_text || '';
-  const bodyArea = bodyText
-    ? [
-        bp([new PageBreak()], EXACT_SP),
-        bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
-        bp([tr('')], EXACT_SP),
-        ...bodyText.split('\n').flatMap(line =>
-          line === '\f'
-            ? [bp([new PageBreak()], EXACT_SP)]
-            : [bp([tr(line)], EXACT_SP)]
-        ),
-      ]
-    : [bp([tr('')], EXACT_SP)];
+  // Blank shell: one blank line (matches source document structure).
+  let bodyArea;
+  if (discovery) {
+    bodyArea = buildDiscoveryBodyArea(fields, discovery);
+  } else {
+    const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
+    const docTitle = fields.document_title || '[DOCUMENT TITLE]';
+    const bodyText = fields.body_text || '';
+    bodyArea = bodyText
+      ? [
+          bp([new PageBreak()], EXACT_SP),
+          bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }),
+          bp([tr('')], EXACT_SP),
+          ...bodyText.split('\n').flatMap(line =>
+            line === '\f'
+              ? [bp([new PageBreak()], EXACT_SP)]
+              : [bp([tr(line)], EXACT_SP)]
+          ),
+        ]
+      : [bp([tr('')], EXACT_SP)];
+  }
 
   return [...attyBlock, ...courtBlock, captionTable, ...bodyArea];
 }
@@ -450,11 +584,12 @@ async function injectPleadingHeader(zipBuf) {
 // options.fields: object with field values (all optional; defaults to placeholders)
 // Returns Promise<Buffer> in Node, Promise<Blob> in browser.
 async function generatePleadingShell(options = {}) {
-  const { fields = {} } = options;
+  const { fields = {}, discovery } = options;
   const plainPaper = options.plainPaper === true;
 
   const {
     Document, Header, Paragraph, TextRun, Packer,
+    LevelFormat, AlignmentType, LevelSuffix,
   } = getDocx();
 
   // Placeholder header — will be replaced via ZIP patching
@@ -462,7 +597,42 @@ async function generatePleadingShell(options = {}) {
     children: [new Paragraph({ children: [new TextRun('')] })],
   });
 
+  // Discovery mode: define two auto-numbering sequences (request + response)
+  let numberingProp = {};
+  if (discovery) {
+    const typeInfo = DISC_TYPES[discovery.type];
+    numberingProp = {
+      numbering: {
+        config: [
+          {
+            reference: 'disc-request',
+            levels: [{
+              level: 0,
+              format: LevelFormat.DECIMAL,
+              text: typeInfo.requestText,
+              alignment: AlignmentType.LEFT,
+              suffix: LevelSuffix.NOTHING,
+              style: { run: { font: 'Times New Roman', size: 24, bold: true } },
+            }],
+          },
+          {
+            reference: 'disc-response',
+            levels: [{
+              level: 0,
+              format: LevelFormat.DECIMAL,
+              text: typeInfo.responseText,
+              alignment: AlignmentType.LEFT,
+              suffix: LevelSuffix.NOTHING,
+              style: { run: { font: 'Times New Roman', size: 24, bold: true } },
+            }],
+          },
+        ],
+      },
+    };
+  }
+
   const doc = new Document({
+    ...numberingProp,
     styles: {
       default: {
         document: {
@@ -491,7 +661,7 @@ async function generatePleadingShell(options = {}) {
         default: makeDefaultFooter(fields),
         first:   makeDefaultFooter(fields),
       },
-      children: buildBody(fields),
+      children: buildBody(fields, discovery),
     }],
   });
 
