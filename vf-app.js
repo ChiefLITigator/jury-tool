@@ -75,7 +75,7 @@ function renderPalette() {
 
   let html = '';
   for (const cat of catOrder) {
-    const catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+    const catLabel = cat.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     const catId    = 'vfcat-' + cat;
     html += `<div class="vf-palette-group">
       <div class="vf-palette-group-title" data-cat="${cat}">
