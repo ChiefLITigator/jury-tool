@@ -378,10 +378,9 @@ const DISC_TYPES = {
 
 // ─ DISCOVERY BODY BUILDER ───────────────────────────────────────────────────
 function buildDiscoveryBodyArea(fields, discovery) {
-  const { AlignmentType, PageBreak } = getDocx();
+  const { AlignmentType, PageBreak, UnderlineType } = getDocx();
   const EXACT_SP = { spacing: { line: 480, lineRule: 'exact', before: 0, after: 0 } };
   const typeInfo  = DISC_TYPES[discovery.type];
-  const docTitle  = fields.document_title || '[DOCUMENT TITLE]';
   const respName  = discovery.respondingName  || '[RESPONDING PARTY]';
   const propName  = discovery.propoundingName || '[PROPOUNDING PARTY]';
   const respRole  = discovery.respondingRole  || 'Plaintiff';
@@ -389,7 +388,6 @@ function buildDiscoveryBodyArea(fields, discovery) {
   const setNum    = discovery.setNumber       || 'ONE';
   const isRequest = discovery.direction === 'request';
 
-  const { UnderlineType } = getDocx();
   const paras = [];
 
   // Page break after caption cover page (no title repeat — title is on caption only)
