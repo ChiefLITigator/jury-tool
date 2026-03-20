@@ -88,8 +88,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "past_economic_loss_insert",
+              "label": "Past economic loss insert"
+            },
+            {
+              "id": "future_economic_loss_insert",
+              "label": "Future economic loss insert"
             }
           ],
           "if_done": "sign"
@@ -281,16 +285,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "",
-              "label": "$"
+              "id": "past_economic_loss_insert_descriptions_o",
+              "label": "Past economic loss insert descriptions of claimed"
             },
             {
-              "id": "",
-              "label": "$"
-            },
-            {
-              "id": "total_contracts_vf303",
-              "label": "TOTAL $CONTRACTS VF-303"
+              "id": "future_economic_loss_insert_descriptions",
+              "label": "Future economic loss insert descriptions of"
             }
           ],
           "if_done": "sign"
@@ -394,8 +394,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "past_economic_loss_insert",
+              "label": "Past economic loss insert"
+            },
+            {
+              "id": "future_economic_loss_insert",
+              "label": "Future economic loss insert"
             }
           ],
           "if_done": "sign"
@@ -438,24 +442,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -498,24 +532,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "q4",
@@ -602,24 +666,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "q4",
@@ -733,24 +827,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -806,24 +930,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -876,24 +1030,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -978,24 +1162,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1059,24 +1273,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1139,24 +1383,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1208,24 +1482,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1321,24 +1625,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1382,24 +1716,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1475,24 +1839,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1579,24 +1973,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1727,24 +2151,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1806,24 +2260,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1896,24 +2380,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -1965,24 +2479,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2053,12 +2597,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic\r loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_eco_nomic_loss",
+                  "label": "Other future eco-\r nomic loss"
+                }
+              ]
+            },
+            {
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental"
+            },
+            {
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental"
             }
           ],
           "if_done": "sign"
@@ -2110,24 +2696,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "q5",
@@ -2246,24 +2862,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2328,24 +2974,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2423,24 +3099,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2493,24 +3199,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "q5",
@@ -2667,24 +3403,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2761,24 +3527,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -2832,24 +3628,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "q5",
@@ -2971,24 +3797,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3054,24 +3910,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3143,24 +4029,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3245,24 +4161,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3371,24 +4317,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3463,24 +4439,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3564,30 +4570,55 @@ const vfDB = {
           "line_items": [
             {
               "id": "amount_of_judgment_entered_against_name_",
-              "label": "Amount of judgment entered against  name of plaintiff",
-              "children": []
-            },
-            {
-              "id": "",
-              "label": "$"
+              "label": "Amount of judgment entered against  name of plaintiff"
             },
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -3666,16 +4697,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -3763,16 +4790,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -3841,16 +4864,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -3929,16 +4948,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4017,16 +5032,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4124,16 +5135,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
-            },
-            {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4196,24 +5203,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -4285,24 +5322,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -4382,24 +5449,54 @@ const vfDB = {
             {
               "id": "past_economic_loss",
               "label": "Past economic loss",
-              "children": []
-            },
-            {
-              "id": "total_past_economic_damages_",
-              "label": "Total Past Economic Damages: $"
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_past_economic_loss",
+                  "label": "Other past economic loss"
+                }
+              ]
             },
             {
               "id": "future_economic_loss",
               "label": "Future economic loss",
-              "children": []
+              "children": [
+                {
+                  "id": "lost_earnings",
+                  "label": "Lost earnings"
+                },
+                {
+                  "id": "lost_profits",
+                  "label": "Lost profits"
+                },
+                {
+                  "id": "medical_expenses",
+                  "label": "Medical expenses"
+                },
+                {
+                  "id": "other_future_economic_loss",
+                  "label": "Other future economic loss"
+                }
+              ]
             },
             {
-              "id": "total_future_economic_damages_",
-              "label": "Total Future Economic Damages: $"
+              "id": "past_noneconomic_loss_physical",
+              "label": "Past noneconomic loss, physical"
             },
             {
-              "id": "total",
-              "label": "TOTAL"
+              "id": "future_noneconomic_loss_physical",
+              "label": "Future noneconomic loss, physical"
             }
           ],
           "if_done": "sign"
@@ -4553,7 +5650,24 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [],
+          "line_items": [
+            {
+              "id": "past_financial_support_that_name_of",
+              "label": "Past financial support that  name of"
+            },
+            {
+              "id": "future_financial_support_that_name_of",
+              "label": "Future financial support that  name of"
+            },
+            {
+              "id": "past_losses_of_gifts_or_benefits_that",
+              "label": "Past losses of gifts or benefits that"
+            },
+            {
+              "id": "future_losses_of_gifts_or_benefits_that",
+              "label": "Future losses of gifts or benefits that"
+            }
+          ],
           "if_done": "q2"
         },
         {
@@ -4563,7 +5677,16 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [],
+          "line_items": [
+            {
+              "id": "the_loss_of_name_of_decedent_s_love",
+              "label": "The loss of  name of decedent ’s love"
+            },
+            {
+              "id": "the_loss_of_name_of_decedent_s_love",
+              "label": "The loss of  name of decedent ’s love"
+            }
+          ],
           "if_done": "sign"
         }
       ]
@@ -4581,7 +5704,24 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [],
+          "line_items": [
+            {
+              "id": "past_financial_support_that_name_of",
+              "label": "Past financial support that  name of"
+            },
+            {
+              "id": "future_financial_support_that_name_of",
+              "label": "Future financial support that  name of"
+            },
+            {
+              "id": "past_losses_of_gifts_or_benefits_that",
+              "label": "Past losses of gifts or benefits that"
+            },
+            {
+              "id": "future_losses_of_gifts_or_benefits_that",
+              "label": "Future losses of gifts or benefits that"
+            }
+          ],
           "if_done": "q2"
         },
         {
@@ -4591,7 +5731,16 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "line_items": [],
+          "line_items": [
+            {
+              "id": "the_loss_of_name_of_decedent_s_love",
+              "label": "The loss of  name of decedent ’s love"
+            },
+            {
+              "id": "the_loss_of_name_of_decedent_s_love",
+              "label": "The loss of  name of decedent ’s love"
+            }
+          ],
           "if_done": "sign"
         }
       ]

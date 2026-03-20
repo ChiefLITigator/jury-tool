@@ -254,56 +254,76 @@ function parseDamageItems(lines) {
   let currentParent = null;
 
   for (const line of lines) {
+    // Strip leading/trailing brackets for analysis, but keep original for $ detection
     const trimmed = line.replace(/^\[+/, '').replace(/\]+$/, '').trim();
 
-    // Skip TOTAL lines and empty
-    if (/^TOTAL\b/i.test(trimmed) || /^Total\s+(Past|Future)/i.test(trimmed)) continue;
-    if (!trimmed || /^\$/.test(trimmed)) continue;
+    // Skip lines that are pure totals, subtotals, or empty
+    if (/^TOTAL/i.test(trimmed)) continue;
+    if (/^Total\s+(Past|Future)/i.test(trimmed)) continue;
+    if (!trimmed || /^\$\s*$/.test(trimmed)) continue;
+    // Skip standalone % lines (percentage artifacts)
+    if (/^%\s*$/.test(trimmed) || /^\d+\s*%\s*$/.test(trimmed)) continue;
+    // Skip (N) prefixed subtotal lines: "(3) Total..."
+    if (/^\(\d\)\s*Total/i.test(trimmed)) continue;
 
-    // Top-level category: "a. Past economic loss" or "c. Past noneconomic loss..."
-    const catMatch = trimmed.match(/^([a-d])\.\s+(.*?)(?::\s*\$\s*)?$/);
+    // Top-level category line: "a. Past economic loss" or "a. Past economic loss: $ "
+    const catMatch = trimmed.match(/^([a-d])\.\s+(.*)/);
     if (catMatch) {
-      const letter = catMatch[1];
-      let label = catMatch[2].replace(/\s*\$\s*$/, '').trim();
-      // Clean up label — remove trailing brackets, commas
+      let label = catMatch[2];
+      const hasInlineDollar = /\$/.test(label);
+
+      // Strip ": $" or "$ " from end of label
+      label = label.replace(/\s*:?\s*\$\s*$/, '').trim();
+      // Strip brackets and trailing punctuation
       label = label.replace(/[\[\]]/g, '').replace(/,\s*$/, '').trim();
+      // Clean "including physical pain/mental suffering:"
+      if (/including\s+/i.test(label)) {
+        label = label.replace(/including\s+/i, '').replace(/:/g, '').trim();
+      }
 
-      const hasAmount = /\$/.test(line);
-      const item = {
-        id: makeItemId(label),
-        label: cleanLabel(label),
-      };
+      // Skip subtotal and TOTAL lines
+      if (/^Total/i.test(label)) continue;
 
-      if (hasAmount && !currentParent) {
-        // Standalone item with $ (e.g., "[a. Past economic loss: $ ]")
-        items.push(item);
+      if (!label || label === '$') continue;
+
+      const item = { id: makeItemId(label), label: cleanLabel(label) };
+
+      if (hasInlineDollar) {
+        // Standalone item with amount (e.g., "a. Past economic loss: $")
+        // Close any open parent
         currentParent = null;
-      } else if (!hasAmount) {
-        // Category header (children follow)
+        items.push(item);
+      } else {
+        // Category header — children follow on subsequent lines
         item.children = [];
         items.push(item);
         currentParent = item;
-      } else {
-        items.push(item);
-        currentParent = null;
       }
       continue;
     }
 
-    // Sub-item: "lost earnings $ ]" or "medical expenses $ ]"
-    const subMatch = trimmed.match(/^(.*?)\s*\$\s*$/);
-    if (subMatch) {
-      let label = subMatch[1].replace(/[\[\]]/g, '').replace(/,\s*$/, '').trim();
-      if (!label) continue;
-      // Clean up "including [physical pain/mental suffering:]"
-      label = label.replace(/including\s+/i, '').replace(/[\[\]:]/g, '').trim();
+    // Sub-item lines (under a parent): "lost earnings $" or "(3) [lost earnings $ ]"
+    // Strip leading (N) prefix
+    let subText = trimmed.replace(/^\(\d\)\s*/, '');
+    // Strip brackets
+    subText = subText.replace(/[\[\]]/g, '').trim();
+    // Must contain $
+    if (!/\$/.test(subText)) continue;
+    // Extract label before $
+    let label = subText.replace(/\s*\$\s*$/, '').replace(/,\s*$/, '').trim();
+    // Clean "including physical pain/mental suffering:"
+    if (/including\s+/i.test(label)) {
+      label = label.replace(/including\s+/i, '').replace(/:/g, '').trim();
+    }
+    // Skip subtotals
+    if (/^Total\s/i.test(label)) continue;
+    if (!label || label === ':') continue;
 
-      const subItem = { id: makeItemId(label), label: cleanLabel(label) };
-      if (currentParent && currentParent.children) {
-        currentParent.children.push(subItem);
-      } else {
-        items.push(subItem);
-      }
+    const subItem = { id: makeItemId(label), label: cleanLabel(label) };
+    if (currentParent && currentParent.children) {
+      currentParent.children.push(subItem);
+    } else {
+      items.push(subItem);
     }
   }
 
