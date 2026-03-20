@@ -260,16 +260,16 @@ function makeCaption(fields) {
     return new TextRun({ text, font: FONT, size: SZ, ...opts });
   }
 
-  // Left cell border spec (all four sides)
+  // Left cell border spec: no top border, left+bottom+right
   const leftBorders = {
-    top:    { style: BorderStyle.SINGLE, size: 6, color: '000000' },
+    top:    { style: BorderStyle.NONE },
     bottom: { style: BorderStyle.SINGLE, size: 6, color: '000000' },
     left:   { style: BorderStyle.SINGLE, size: 6, color: '000000' },
     right:  { style: BorderStyle.SINGLE, size: 6, color: '000000' },
   };
-  // Right cell: top+left only (no bottom, no right)
+  // Right cell: left border only (no top, bottom, right)
   const rightBorders = {
-    top:    { style: BorderStyle.SINGLE, size: 6, color: '000000' },
+    top:    { style: BorderStyle.NONE },
     bottom: { style: BorderStyle.NONE },
     left:   { style: BorderStyle.SINGLE, size: 6, color: '000000' },
     right:  { style: BorderStyle.NONE },
@@ -389,35 +389,31 @@ function buildDiscoveryBodyArea(fields, discovery) {
   const setNum    = discovery.setNumber       || 'ONE';
   const isRequest = discovery.direction === 'request';
 
+  const { UnderlineType } = getDocx();
   const paras = [];
 
-  // Page break after caption cover page
+  // Page break after caption cover page (no title repeat — title is on caption only)
   paras.push(bp([new PageBreak()], EXACT_SP));
 
-  // Centered bold title
-  paras.push(bp([tr(docTitle, { bold: true })], { alignment: AlignmentType.CENTER, ...EXACT_SP }));
+  // Party identification block (all bold)
+  paras.push(bp([tr(
+    'PROPOUNDING PARTY: ' + propRole.toUpperCase() + ', ' + propName.toUpperCase(), { bold: true }
+  )], EXACT_SP));
+  paras.push(bp([tr(
+    'RESPONDING PARTY: ' + respRole.toUpperCase() + ', ' + respName.toUpperCase(), { bold: true }
+  )], EXACT_SP));
+  paras.push(bp([tr(
+    'SET NO.: ' + setNum.toUpperCase(), { bold: true }
+  )], EXACT_SP));
   paras.push(bp([tr('')], EXACT_SP));
-
-  // Party identification block
-  paras.push(bp([
-    tr('PROPOUNDING PARTY: ', { bold: true }),
-    tr(propRole.toUpperCase() + ', ' + propName.toUpperCase()),
-  ], EXACT_SP));
-  paras.push(bp([
-    tr('RESPONDING PARTY: ', { bold: true }),
-    tr(respRole.toUpperCase() + ', ' + respName.toUpperCase()),
-  ], EXACT_SP));
-  paras.push(bp([
-    tr('SET NO.: ', { bold: true }),
-    tr(setNum.toUpperCase()),
-  ], EXACT_SP));
   paras.push(bp([tr('')], EXACT_SP));
 
   if (isRequest) {
     // ── REQUEST mode: section heading + numbered requests only ──
     paras.push(bp([tr(
-      typeInfo.requestsHeading + ' \u2014 SET ' + setNum.toUpperCase(), { bold: true }
-    )], EXACT_SP));
+      typeInfo.requestsHeading + ' \u2014 SET ' + setNum.toUpperCase(),
+      { bold: true, underline: { type: UnderlineType.SINGLE } }
+    )], { alignment: AlignmentType.CENTER, ...EXACT_SP }));
     paras.push(bp([tr('')], EXACT_SP));
 
     const count = discovery.count || 1;
@@ -473,10 +469,11 @@ function buildDiscoveryBodyArea(fields, discovery) {
     )], EXACT_SP));
     paras.push(bp([tr('')], EXACT_SP));
 
-    // Responses section heading
+    // Responses section heading (centered, bold, underlined)
     paras.push(bp([tr(
-      typeInfo.responsesHeading + ' \u2014 SET ' + setNum.toUpperCase(), { bold: true }
-    )], EXACT_SP));
+      typeInfo.responsesHeading + ' \u2014 SET ' + setNum.toUpperCase(),
+      { bold: true, underline: { type: UnderlineType.SINGLE } }
+    )], { alignment: AlignmentType.CENTER, ...EXACT_SP }));
     paras.push(bp([tr('')], EXACT_SP));
 
     // Numbered request/response pairs
