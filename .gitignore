@@ -1,1 +1,6 @@
 node_modules/
+*.docx
+*.pdf
+vf-data-generated.js
+vf-data-manual-backup.js
+vf-parse-report.txt
