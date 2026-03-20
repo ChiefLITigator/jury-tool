@@ -140,7 +140,7 @@ const vfDB = {
           "id": "q1",
           "type": "yes_no",
           "text": "Was [name of first defendant] negligent?",
-          "fields": ["name of first defendant"],["name of second defendant"]
+          "fields": ["name of first defendant"],
           "if_yes": "q2",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
