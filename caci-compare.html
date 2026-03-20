@@ -1065,7 +1065,7 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 
     <div class="draft-section" style="margin-bottom:0">
       <div class="draft-section-label">Set Details</div>
-      <div class="row gap-4" style="margin-bottom:0">
+      <div class="row gap-4" style="margin-bottom:12px">
         <div class="col" style="flex:0 0 120px">
           <label for="disc_set_number">Set No.</label>
           <input type="text" id="disc_set_number" value="ONE" placeholder="ONE">
@@ -1075,6 +1075,11 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
           <input type="number" id="disc_count" value="10" min="1" max="200" style="width:100%">
         </div>
       </div>
+      <label id="disc_include_requests_label" class="hidden" style="display:none;align-items:center;gap:8px;cursor:pointer;font-family:var(--sans);font-size:.85em">
+        <input type="checkbox" id="disc_include_requests" checked
+               style="width:14px;height:14px;cursor:pointer;accent-color:var(--navy);flex-shrink:0">
+        Include request lines <span style="color:var(--muted)">(space for copy-pasting propounding party's requests)</span>
+      </label>
     </div>
   </div>
 
