@@ -186,6 +186,49 @@ function deleteProfile() {
   setTimeout(() => { if (statusEl.textContent === `Profile "${name}" deleted.`) statusEl.textContent = ''; }, 3000);
 }
 
+// ─ DISCOVERY MODE ─────────────────────────────────────────────────────────────
+
+const DISC_TITLE_LABELS = {
+  rfa:  'REQUESTS FOR ADMISSION',
+  srog: 'SPECIAL INTERROGATORIES',
+  rfp:  'REQUESTS FOR PRODUCTION OF DOCUMENTS',
+};
+
+/** Returns true if the user has selected discovery response mode. */
+function isDiscoveryMode() {
+  const radio = document.querySelector('input[name="pleadingMode"]:checked');
+  return radio && radio.value === 'discovery';
+}
+
+/** Auto-generate document title from discovery fields. */
+function updateDiscoveryTitle() {
+  if (!isDiscoveryMode()) return;
+  const type     = document.getElementById('disc_type').value;
+  const setNum   = document.getElementById('disc_set_number').value.trim() || 'ONE';
+  const respName = document.getElementById('disc_responding_name').value.trim() || '[RESPONDING PARTY]';
+  const respRole = document.getElementById('disc_responding_role').value;
+  const propName = document.getElementById('disc_propounding_name').value.trim() || '[PROPOUNDING PARTY]';
+  const propRole = document.getElementById('disc_propounding_role').value;
+
+  const title = respRole + ' ' + respName + '\u2019S RESPONSES TO ' +
+    propRole + ' ' + propName + '\u2019S ' +
+    DISC_TITLE_LABELS[type] + ', SET ' + setNum.toUpperCase();
+  document.getElementById('pl_document_title').value = title;
+}
+
+/** Read discovery panel fields into an options object. */
+function readDiscoveryFields() {
+  return {
+    type:             document.getElementById('disc_type').value,
+    propoundingName:  document.getElementById('disc_propounding_name').value.trim(),
+    propoundingRole:  document.getElementById('disc_propounding_role').value,
+    respondingName:   document.getElementById('disc_responding_name').value.trim(),
+    respondingRole:   document.getElementById('disc_responding_role').value,
+    setNumber:        document.getElementById('disc_set_number').value.trim() || 'ONE',
+    count:            parseInt(document.getElementById('disc_count').value, 10) || 10,
+  };
+}
+
 // ─ GENERATION ────────────────────────────────────────────────────────────────
 
 async function generateShell() {
@@ -212,6 +255,11 @@ async function generateShell() {
   const opts = { fields };
   if (!document.getElementById('pleadingPaperCheck').checked) {
     opts.plainPaper = true;
+  }
+
+  // Discovery mode: attach discovery config
+  if (isDiscoveryMode()) {
+    opts.discovery = readDiscoveryFields();
   }
 
   console.log('[pleading-ui] generatePleadingShell options:', JSON.stringify(opts, null, 2));
@@ -262,6 +310,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
   document.getElementById('deleteProfileBtn').addEventListener('click', deleteProfile);
   document.getElementById('generatePleadingBtn').addEventListener('click', generateShell);
+
+  // Discovery mode toggle — show/hide discovery panel
+  const discoveryPanel = document.getElementById('discoveryPanel');
+  document.querySelectorAll('input[name="pleadingMode"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const disc = isDiscoveryMode();
+      discoveryPanel.classList.toggle('hidden', !disc);
+      if (disc) updateDiscoveryTitle();
+    });
+  });
+
+  // Auto-update document title when discovery fields change
+  ['disc_type', 'disc_propounding_name', 'disc_propounding_role',
+   'disc_responding_name', 'disc_responding_role', 'disc_set_number'
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', updateDiscoveryTitle);
+  });
 
   // Pre-fill Section B from saved case caption when a case is selected.
   // Only fills fields that are currently empty; does not overwrite user-entered data.
