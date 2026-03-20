@@ -79,9 +79,9 @@ function renderPalette() {
     const catId    = 'vfcat-' + cat;
     html += `<div class="vf-palette-group">
       <div class="vf-palette-group-title" data-cat="${cat}">
-        <span>${catLabel}</span><span id="${catId}-arrow">▾</span>
+        <span>${catLabel}</span><span id="${catId}-arrow">▸</span>
       </div>
-      <div class="vf-palette-group-body" id="${catId}-body">`;
+      <div class="vf-palette-group-body" id="${catId}-body" style="display:none">`;
     for (const group of byCategory[cat]) {
       for (const q of group.questions) {
         const preview = q.text.replace(/\[.*?\]/g, '[…]').substring(0, 55);
