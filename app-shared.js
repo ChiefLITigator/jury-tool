@@ -94,7 +94,13 @@ text = text.replace(/([^.!?:;\]"'\)\n])\n([A-Z]\w*)/g, (match, prev, word) => {
   if (TITLE_SENTENCE_STARTERS.has(word)) return match;
   return prev + ' ' + word;
 });
-text = text.replace(/([^.!?:;\]"'\)\n])\n([\d"'§\/\u201C\u201D\u2018\u2019])/g, '$1 $2');
+text = text.replace(/([^.!?:;\]"'\)\n])\n(["'§\/\u201C\u201D\u2018\u2019])/g, '$1 $2');
+text = text.replace(/([^.!?:;\]"'\)\n])\n(\d)/g, function(match, prev, ch, offset, str) {
+  // Don't join digits after "and"/"or" — those are list item boundaries
+  var lookback = str.slice(Math.max(0, offset - 5), offset + 1);
+  if (/\b(?:and|or)\s*$/.test(lookback)) return match;
+  return prev + ' ' + ch;
+});
 
 // Join connector signal line breaks (e.g., [./;\nor] → [./; or])
 text = text.replace(/;\n(or\b|\[(?:and|or)\])/g, '; $1');
