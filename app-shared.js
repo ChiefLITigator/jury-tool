@@ -59,12 +59,27 @@ text = text.replace(/^\s*\d{1,4}\s*$/gm, '');
 
 // 4. Strip revision history anchored to month name + year at end of text
 text = text.replace(
-  /\s+(?:New|Renumbered|Formerly)\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}[\s\S]*$/i,
+  /\s+(?:New|Renumbered|Formerly|Derived from)\s+(?:former\s+)?(?:CACI\s+No\.\s+\d+\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}[\s\S]*$/i,
   ''
 );
 
-// Add this BEFORE step 5 (the \n{3,} collapse):
-text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitespace
+// 4a. Strip leaked next-instruction header lines at end (e.g. "3201 SONG-BEVERLY...")
+text = text.replace(/\n\d{3,4}\s+[A-Z][A-Z\s\-\/]+\s*$/m, '');
+
+// 4b. Strip leaked "NNNN–NNNN. Reserved for Future Use" lines from next page
+text = text.replace(/\n\d{3,4}[–-]\d{3,4}\.\s*Reserved for Future Use\s*$/i, '');
+
+// 4c. Strip trailing footnote marker (bare * line left after revision history stripped)
+text = text.replace(/\n\*\s*$/, '');
+
+// 4d. Bracket-balance repair (PDF extraction drops closing brackets)
+// Fix [N. [or] and [N. [and] missing trailing ] (same logic as flattenForCompare)
+text = text.replace(/(\[\d+\.\s*\[\s*(?:or|and)\s*\])(?!\])/g, '$1]');
+// Fix [N. [ or ] missing trailing ] (space-padded variant)
+text = text.replace(/(\[\d+\.\s*\[\s*or\s*\]\s*)(?!\])/g, '$1]');
+
+// Blank out lines that are only whitespace
+text = text.replace(/^[ \t]+$/gm, '');
 
 // NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
 text = text.replace(/([^.!?:\]"'\)\n])\n\n([^\n])/g, '$1\n$2');
@@ -78,6 +93,23 @@ text = text.replace(/^(\d{3,4}\s*\.\s*[^\n]+)\n(?!\n)/m, '$1\n\n');
 // Join lines broken mid-sentence (PDF column-wrap artifact)
 text = text.replace(/([^.!?:;\n])\n([a-z\[])/g, '$1 $2');
 text = text.replace(/(\])\n([a-z])/g, '$1 $2');
+
+// Join lines broken before uppercase/digit/quote continuation (PDF column-wrap)
+// Skips sentence-starting words to avoid joining at natural sentence boundaries
+text = text.replace(/([^.!?:;\]"'\)\n])\n([A-Z]\w*)/g, (match, prev, word) => {
+  if (TITLE_SENTENCE_STARTERS.has(word)) return match;
+  return prev + ' ' + word;
+});
+text = text.replace(/([^.!?:;\]"'\)\n])\n(["'§\/\u201C\u201D\u2018\u2019])/g, '$1 $2');
+text = text.replace(/([^.!?:;\]"'\)\n])\n(\d)/g, function(match, prev, ch, offset, str) {
+  // Don't join if digit starts a numbered list item (N. followed by space)
+  var ahead = str.slice(offset + 3, offset + 15);
+  if (/^\.\s/.test(ahead)) return match;
+  return prev + ' ' + ch;
+});
+
+// Join connector signal line breaks (e.g., [./;\nor] → [./; or])
+text = text.replace(/;\n(or\b|\[(?:and|or)\])/g, '; $1');
 
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
