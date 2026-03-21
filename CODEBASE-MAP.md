@@ -1,6 +1,6 @@
 # CODEBASE MAP
 ## California Civil Litigation Tool Suite
-## Last updated: 2026-03-19
+## Last updated: 2026-03-20
 
 Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
@@ -15,7 +15,7 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | File | Lines | ~Tokens | Status | Load for session? |
 |------|-------|---------|--------|-------------------|
 | caci-compare.html | ~1137 | ~10,000 | Active | Only if touching HTML/CSS/tabs |
-| app-shared.js | 225 | ~1,700 | Active | Yes — shared utilities, CACI lookup, print |
+| app-shared.js | 261 | ~2,200 | Active | Yes — shared utilities, CACI lookup, print |
 | docx-reader.js | 385 | ~3,500 | Active | When touching batch compare / DOCX parsing |
 | app-compare.js | 476 | ~5,300 | Active | Yes — diff engine, compare tab |
 | app-draft.js | 595 | ~6,300 | Active | Yes — instruction drafter |
@@ -142,7 +142,7 @@ Shared:
 
 ---
 
-## app-shared.js  (225 lines)
+## app-shared.js  (261 lines)
 
 **Purpose:** Shared utilities used across multiple app files.
 Reads from caciDB (set by caci-data.js). No module system — all globals.
@@ -151,7 +151,7 @@ Reads from caciDB (set by caci-data.js). No module system — all globals.
 |-----------------|-------------|
 | `const esc` | HTML-escape for text content — escapes `& < >` only |
 | `const escAttr` | HTML-escape for attribute values — escapes `& < > " '` (superset of esc) |
-| `lookupCACITextForDraft(num)` | PDF cleanup only, bracket structure preserved → use for draft/parse pipeline |
+| `lookupCACITextForDraft(num)` | PDF cleanup + bracket repair, bracket structure preserved → use for draft/parse pipeline |
 | `lookupCACIText(num)` | Same + `flattenForCompare()` → use for compare tab only |
 | `downloadTXT(text, filename)` | Creates blob and triggers download |
 | `setPrintHeader(text)` | Sets `#print-header` text content |
@@ -166,6 +166,21 @@ Reads from caciDB (set by caci-data.js). No module system — all globals.
 ### Two lookup functions — know which to use:
 - `lookupCACITextForDraft(num)` — bracket structure preserved → use for draft/parse pipeline
 - `lookupCACIText(num)` — same + `flattenForCompare()` → use for compare tab only
+
+### lookupCACITextForDraft cleanup pipeline (in order):
+1. **Step 0:** Join wrapped title lines (paren continuations, non-sentence-starter words)
+2. **Step 1:** Strip `CACI No. XXXX` running headers
+3. **Step 2:** Strip orphaned ALL-CAPS series title lines
+4. **Step 3:** Strip bare page folio numbers
+5. **Step 4:** Strip revision history (`New/Renumbered/Formerly/Derived from [Month] [Year]...`)
+6. **Step 4a:** Strip leaked next-instruction header lines at end
+7. **Step 4b:** Strip leaked `NNNN–NNNN. Reserved for Future Use` lines
+8. **Step 4c:** Strip trailing footnote marker (`*`)
+9. **Step 4d:** Bracket-balance repair: close `[N. [or]` → `[N. [or]]`, `[N. [and]` → `[N. [and]]`
+10. **Whitespace cleanup:** blank-only lines, mid-paragraph blank line removal
+11. **Re-split** numbered list items merged by PDF extraction
+12. **Line joins:** lowercase, uppercase (with sentence-starter guard), digit (with `N.` guard), quote/§/slash, connector signals
+13. **Collapse** extra blank lines
 
 ---
 
@@ -729,8 +744,14 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 
 ## KNOWN BUGS (PENDING FIX)
 
+**16 CACI instructions with unbalanced brackets in raw PDF data** (caci-data.json):
+- Extra `]`: 433, 441, 611, 2000, 3020, 4575
+- Missing `]`: 325, 1249, 1730, 1901, 1983, 2544, 3100, 4208, 4605, 4606
+- General regex patterns too risky (caused collateral damage in testing); each needs a targeted per-instruction fix in `lookupCACITextForDraft()` or in `caci-data.json`
 
-*No known open bugs as of 2026-03-19.*
+**2 CACI instructions with broken field labels** (not fixable by cleanup regex):
+- CACI 115: multi-paragraph example text with natural `\n` after periods (by design)
+- CACI 2505: `]]\n3.` data-level issue — numbered element absorbed into dropdown
 
 > See CHANGELOG.md for full fix history.
 
