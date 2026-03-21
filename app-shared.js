@@ -59,9 +59,18 @@ text = text.replace(/^\s*\d{1,4}\s*$/gm, '');
 
 // 4. Strip revision history anchored to month name + year at end of text
 text = text.replace(
-  /\s+(?:New|Renumbered|Formerly)\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}[\s\S]*$/i,
+  /\s+(?:New|Renumbered|Formerly|Derived from)\s+(?:former\s+)?(?:CACI\s+No\.\s+\d+\s+)?(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}[\s\S]*$/i,
   ''
 );
+
+// 4a. Strip leaked next-instruction header lines at end (e.g. "3201 SONG-BEVERLY...")
+text = text.replace(/\n\d{3,4}\s+[A-Z][A-Z\s\-\/]+\s*$/m, '');
+
+// 4b. Strip leaked "NNNN–NNNN. Reserved for Future Use" lines from next page
+text = text.replace(/\n\d{3,4}[–-]\d{3,4}\.\s*Reserved for Future Use\s*$/i, '');
+
+// 4c. Strip trailing footnote marker (bare * line left after revision history stripped)
+text = text.replace(/\n\*\s*$/, '');
 
 // Add this BEFORE step 5 (the \n{3,} collapse):
 text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitespace
