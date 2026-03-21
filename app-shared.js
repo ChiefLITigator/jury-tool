@@ -88,6 +88,17 @@ text = text.replace(/^(\d{3,4}\s*\.\s*[^\n]+)\n(?!\n)/m, '$1\n\n');
 text = text.replace(/([^.!?:;\n])\n([a-z\[])/g, '$1 $2');
 text = text.replace(/(\])\n([a-z])/g, '$1 $2');
 
+// Join lines broken before uppercase/digit/quote continuation (PDF column-wrap)
+// Skips sentence-starting words to avoid joining at natural sentence boundaries
+text = text.replace(/([^.!?:;\]"'\)\n])\n([A-Z]\w*)/g, (match, prev, word) => {
+  if (TITLE_SENTENCE_STARTERS.has(word)) return match;
+  return prev + ' ' + word;
+});
+text = text.replace(/([^.!?:;\]"'\)\n])\n([\d"'§\/\u201C\u201D\u2018\u2019])/g, '$1 $2');
+
+// Join connector signal line breaks (e.g., [./;\nor] → [./; or])
+text = text.replace(/;\n(or\b|\[(?:and|or)\])/g, '; $1');
+
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
 
