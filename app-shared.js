@@ -96,9 +96,9 @@ text = text.replace(/([^.!?:;\]"'\)\n])\n([A-Z]\w*)/g, (match, prev, word) => {
 });
 text = text.replace(/([^.!?:;\]"'\)\n])\n(["'§\/\u201C\u201D\u2018\u2019])/g, '$1 $2');
 text = text.replace(/([^.!?:;\]"'\)\n])\n(\d)/g, function(match, prev, ch, offset, str) {
-  // Don't join digits after "and"/"or" — those are list item boundaries
-  var lookback = str.slice(Math.max(0, offset - 5), offset + 1);
-  if (/\b(?:and|or)\s*$/.test(lookback)) return match;
+  // Don't join if digit starts a numbered list item (N. followed by space)
+  var ahead = str.slice(offset + 3, offset + 15);
+  if (/^\.\s/.test(ahead)) return match;
   return prev + ' ' + ch;
 });
 
