@@ -72,8 +72,14 @@ text = text.replace(/\n\d{3,4}[–-]\d{3,4}\.\s*Reserved for Future Use\s*$/i, '
 // 4c. Strip trailing footnote marker (bare * line left after revision history stripped)
 text = text.replace(/\n\*\s*$/, '');
 
-// Add this BEFORE step 5 (the \n{3,} collapse):
-text = text.replace(/^[ \t]+$/gm, '');  // blank out lines that are only whitespace
+// 4d. Bracket-balance repair (PDF extraction drops closing brackets)
+// Fix [N. [or] and [N. [and] missing trailing ] (same logic as flattenForCompare)
+text = text.replace(/(\[\d+\.\s*\[\s*(?:or|and)\s*\])(?!\])/g, '$1]');
+// Fix [N. [ or ] missing trailing ] (space-padded variant)
+text = text.replace(/(\[\d+\.\s*\[\s*or\s*\]\s*)(?!\])/g, '$1]');
+
+// Blank out lines that are only whitespace
+text = text.replace(/^[ \t]+$/gm, '');
 
 // NEW: Remove blank lines mid-paragraph (line before doesn't end a sentence)
 text = text.replace(/([^.!?:\]"'\)\n])\n\n([^\n])/g, '$1\n$2');
