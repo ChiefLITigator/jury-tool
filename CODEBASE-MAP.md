@@ -1,6 +1,6 @@
 # CODEBASE MAP
 ## California Civil Litigation Tool Suite
-## Last updated: 2026-03-20
+## Last updated: 2026-03-21
 
 Use this file to orient any LLM at the start of a session.
 Paste this file + only the specific source file(s) being touched.
@@ -14,8 +14,8 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 
 | File | Lines | ~Tokens | Status | Load for session? |
 |------|-------|---------|--------|-------------------|
-| caci-compare.html | ~1137 | ~10,000 | Active | Only if touching HTML/CSS/tabs |
-| app-shared.js | 261 | ~2,200 | Active | Yes — shared utilities, CACI lookup, print |
+| caci-compare.html | ~1145 | ~10,000 | Active | Only if touching HTML/CSS/tabs |
+| app-shared.js | 281 | ~2,500 | Active | Yes — shared utilities, CACI lookup, print |
 | docx-reader.js | 385 | ~3,500 | Active | When touching batch compare / DOCX parsing |
 | app-compare.js | 476 | ~5,300 | Active | Yes — diff engine, compare tab |
 | app-draft.js | 595 | ~6,300 | Active | Yes — instruction drafter |
@@ -23,12 +23,12 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | app-cases.js | 238 | ~2,300 | Active | Yes — localStorage case system |
 | app-browse.js | 203 | ~1,200 | Active | When touching browse/search panel |
 | draft-parser.js | 341 | ~3,700 | Stable | Only if touching parse logic |
-| vf-app.js | 1573 | ~15,000 | Active | When touching VF tab |
-| docx-export.js | 291 | ~2,800 | Stable | When touching DOCX export |
+| vf-app.js | 1645 | ~16,000 | Active | When touching VF tab |
+| docx-export.js | 401 | ~3,800 | Active | When touching DOCX export |
 | pleading-shell.js | 812 | ~7,000 | Active | When touching pleading shell |
 | pleading-ui.js | 385 | ~2,800 | Active | When touching Pleading tab UI |
-| vf-data.js | 4628 | ~40k+ | Stable | NEVER — data file |
-| parse-vf.js | 689 | ~6,000 | Utility | Only if re-parsing VF corpus |
+| vf-data.js | 6022 | ~50k+ | Stable | NEVER — data file |
+| parse-vf.js | 841 | ~7,500 | Utility | Only if re-parsing VF corpus |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
 | parse-caci.js | 208 | ~1,900 | Utility | Only if re-parsing CACI PDF |
 | verify-caci.js | 114 | ~1,100 | Utility | Only if verifying data |
@@ -76,6 +76,8 @@ Served locally via VS Code Live Server. Opened in browser as file or localhost.
 
 **Purpose:** App shell. Contains all HTML structure, CSS, and `<script>` tags.
 No inline JavaScript (all logic is in .js files).
+
+**Theme:** `[data-theme="dark"]` CSS variables + `color-scheme: dark`. Toggle via `#themeToggle` button. All colors use CSS variables (`--card`, `--bg`, `--text`, `--border`, etc.). **Never use hardcoded colors** (`#fff`, `white`, etc.) in inline styles — always use `var(--card)`, `var(--bg)`, `var(--text)` so dark mode works.
 
 **Tabs:**
 - `data-tab="compare"` — diff viewer (`#tab-compare`)
@@ -142,7 +144,7 @@ Shared:
 
 ---
 
-## app-shared.js  (261 lines)
+## app-shared.js  (281 lines)
 
 **Purpose:** Shared utilities used across multiple app files.
 Reads from caciDB (set by caci-data.js). No module system — all globals.
@@ -181,6 +183,7 @@ Reads from caciDB (set by caci-data.js). No module system — all globals.
 11. **Re-split** numbered list items merged by PDF extraction
 12. **Line joins:** lowercase, uppercase (with sentence-starter guard), digit (with `N.` guard), quote/§/slash, connector signals
 13. **Collapse** extra blank lines
+14. **Step 5a:** Per-instruction bracket fixes (16 targeted `.replace()` calls for specific CACI numbers)
 
 ---
 
@@ -461,7 +464,7 @@ then wrap output as `const caciDB = { ... };` → save as `caci-data.js`.
 
 ---
 
-## docx-export.js  (291 lines)
+## docx-export.js  (401 lines)
 
 **Purpose:** Shared DOCX export utility. Wraps docx v9 (loaded as `window.docx`
 by the preceding `node_modules/docx/dist/index.iife.js` script tag).
@@ -481,7 +484,7 @@ by the preceding `node_modules/docx/dist/index.iife.js` script tag).
 
 ---
 
-## vf-app.js  (1573 lines)
+## vf-app.js  (1645 lines)
 
 **Purpose:** Verdict Form Builder — all VF tab logic.
 Isolated from app-draft.js/app-cases.js (no shared mutable state except via the two bridge functions below).
@@ -504,12 +507,20 @@ only-if-empty pattern as pleading-ui.js). Mapping: `court_name → court`,
 `plaintiff_name + " v. " + defendant_name → caseName` (handles both/one/neither).
 Calls `renderCaptionFields()` after updating. Does not create or overwrite forms.
 
+**`select_one` question type:**
+General verdict forms use `select_one` questions with an `options` array.
+Preview renders each option with a `______` blank-line prefix. Form title
+auto-switches to "GENERAL VERDICT FORM" when any question is `select_one`.
+Inline editor supports add/remove/edit of options. Supported across all
+output paths: preview, plain text, DOCX, and pleading DOCX.
+
 **VF Export — "Pleading DOCX" format (in exportVfPicker click handler):**
 Loads the saved attorney profile from localStorage (strips `pl_` prefix from keys),
 overlays the current case caption (only-if-missing), sets `document_title` from
 the form name, sets `body_text` from `renderVFPlainText()` with the caption
-preamble stripped (starts after "SPECIAL VERDICT FORM\n"), then calls
-`generatePleadingShell({ fields, plainPaper })`. Respects `#vfPleadingCheck` (independent from Pleading tab checkbox).
+preamble stripped (starts after "SPECIAL VERDICT FORM\n" or "GENERAL VERDICT FORM\n"),
+then calls `generatePleadingShell({ fields, plainPaper })`. Respects `#vfPleadingCheck`
+(independent from Pleading tab checkbox).
 
 **Architecture:** Three-column layout
 - Left: component palette (groups of question blocks from vfDB)
@@ -533,10 +544,10 @@ Auto-generated by `parse-vf.js` from `vf-corpus-target.txt`.
 
 **Exposes:** `window.vfDB`
 
-**Current contents:** 62 verdict forms across 10 categories:
+**Current contents:** 64 verdict forms across 11 categories:
 contract (5), negligence (12), medical_negligence (3), motor_vehicle (5),
 premises_liability (4), dangerous_condition (2), products_liability (8),
-insurance (4), employment (9), punitive_damages (10).
+insurance (4), employment (9), damages (10), general_verdict (2).
 
 **Re-generating:** Run `node parse-vf.js` to re-parse the corpus. Output goes to
 `vf-data-generated.js` + `vf-parse-report.txt`. Copy generated file to `vf-data.js`
@@ -554,12 +565,13 @@ vfDB = {
       questions: [
         {
           id: "q1",          // stable internal ID, never shown on form
-          type: "yes_no",    // yes_no | damages | percentage | write_in
+          type: "yes_no",    // yes_no | damages | percentage | write_in | select_one
           text: "Was [name of defendant] negligent?",
           fields: ["name of defendant"],
           if_yes: "q2",      // routing: internal ID | "sign" | "stop"
           if_no: "stop",
-          stop_text: "..."   // required when routing = "stop"
+          stop_text: "...",  // required when routing = "stop"
+          options: [...]     // select_one only: array of option strings
         }
       ]
     }
@@ -573,7 +585,7 @@ from array order. Never store display numbers — always compute them.
 
 ---
 
-## parse-vf.js  (689 lines)
+## parse-vf.js  (841 lines)
 
 **Purpose:** Automated parser for the CACI verdict form corpus.
 Reads `vf-corpus-target.txt` and generates `vf-data-generated.js` + `vf-parse-report.txt`.
@@ -587,6 +599,11 @@ Reads `vf-corpus-target.txt` and generates `vf-data-generated.js` + `vf-parse-re
 - Extracts `[ name of ... ]` fields, routing instructions, damage line items, percentage parties
 - Handles optional brackets, [or] alternatives, multi-party questions, inline `$` amounts
 - Generates validation report with warnings + round-trip renderings for diff checking
+
+**Manual overrides:** `MANUAL_OVERRIDES` object contains hand-crafted entries for
+forms that don't fit the numbered-question parser pattern. These bypass the parser entirely:
+- VF-3920: unique `[e.g., ...]` + `[Enter the amount...]` bracket structure per damage line
+- VF-5000, VF-5001: general verdict forms with `select_one` options
 
 **Validation report categories:**
 - "Complex routing" — skip patterns, [or] alternatives, multi-target routing (flagged, usually parsed correctly)
@@ -739,21 +756,27 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 - Element numbers do not auto-renumber when optional elements toggled — attorney fixes in Lock & Edit
 - caci-data.js requires manual refresh when Judicial Council updates CACI (re-run parse-caci.js)
 - vf-data.js is auto-generated by parse-vf.js from vf-corpus-target.txt; re-run parser to update
+- VF-3920, VF-5000, VF-5001 use `MANUAL_OVERRIDES` in parse-vf.js — parser cannot auto-parse these unique formats
+- VF-5001 ships with 2 claim blocks; attorney adds more claims via custom questions or Lock & Edit
 - Discovery response auto-numbering uses two independent Word numbering sequences (request + response); deleting a request without its paired response will desync the numbering
 - CACI 803: sequential bracket alternatives (`[A railroad company]` / `[A train operator]`) appear as separate brackets rather than a single choice set — classifier cannot detect adjacent mutually exclusive brackets
 
 ## KNOWN BUGS (PENDING FIX)
 
-**16 CACI instructions with unbalanced brackets in raw PDF data** (caci-data.json):
-- Extra `]`: 433, 441, 611, 2000, 3020, 4575
-- Missing `]`: 325, 1249, 1730, 1901, 1983, 2544, 3100, 4208, 4605, 4606
-- General regex patterns too risky (caused collateral damage in testing); each needs a targeted per-instruction fix in `lookupCACITextForDraft()` or in `caci-data.json`
+**CACI:**
+- CACI 115: multi-paragraph `[ Describe each class, e.g., ... ]` block classified as text input instead of note — bracket structure is correct but `classifyBracket` in draft-parser.js triggers `'text'` on the `Describe` verb; needs special-case or length heuristic
 
-**2 CACI instructions with broken field labels** (not fixable by cleanup regex):
-- CACI 115: multi-paragraph example text with natural `\n` after periods (by design)
-- CACI 2505: `]]\n3.` data-level issue — numbered element absorbed into dropdown
+**VF — empty question text (parser failed to extract):**
+- VF-402 q8: question text is empty (complex multi-party form with non-standard routing)
+- VF-1200 q9: question text is empty (percentage allocation question with unusual structure)
 
-> See CHANGELOG.md for full fix history.
+**VF — missing or incomplete routing (44 warnings total in parse report):**
+- 3 yes_no questions with no routing: VF-402 q8, VF-1200 q6, VF-1201 q5
+- 6 terminal questions defaulted to sign (correct in most cases)
+- 20 complex routing patterns (skip questions, multi-target, [either option]) — parsed approximately but may not match CACI precisely
+- 10 `[or]` alternative formulations — flagged for review, mostly handled by alt_text feature
+
+> See CHANGELOG.md for full fix history. See vf-parse-report.txt for complete warning details.
 
 ---
 
