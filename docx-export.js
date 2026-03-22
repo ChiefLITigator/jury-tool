@@ -352,6 +352,16 @@ function exportDOCX(content, filename) {
           }));
         }
 
+      } else if (q.type === 'select_one') {
+        var opts = q.options || [];
+        for (var oi = 0; oi < opts.length; oi++) {
+          items.push(new Paragraph({
+            indent:   { left: IN_HALF },
+            spacing:  { line: LINE15, before: 60, after: 60 },
+            children: [r('______ ' + (opts[oi] || ''))]
+          }));
+        }
+
       } else if (q.type === 'write_in') {
         // Visible writing lines — underscores match HTML preview / TXT output (C4)
         for (var bi = 0; bi < 3; bi++) {

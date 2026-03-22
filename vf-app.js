@@ -239,6 +239,7 @@ function typeBadgeLabel(type) {
     case 'damages':      return 'DAMAGES';
     case 'percentage':   return '%';
     case 'write_in':     return 'WRITE-IN';
+    case 'select_one':   return 'SELECT ONE';
     default:             return type ? type.toUpperCase() : '?';
   }
 }
@@ -415,6 +416,7 @@ function buildInlineEditorHTML(q, form) {
     { v: 'damages',      l: 'Damages'        },
     { v: 'percentage',   l: '%'              },
     { v: 'write_in',     l: 'Write-in'       },
+    { v: 'select_one',   l: 'Select One'     },
   ];
 
   const typeRadios = types.map(t =>
@@ -536,6 +538,23 @@ function buildInlineEditorHTML(q, form) {
       </div>`;
   }
 
+  if (q.type === 'select_one') {
+    const opts = q.options || [];
+    const optRows = opts.map((o, i) =>
+      `<div style="display:flex;gap:4px;margin-bottom:5px;align-items:center">
+        <textarea data-ed-opt="${i}" rows="2"
+          style="flex:1;font-family:var(--serif);font-size:.83em;padding:4px 8px;border:1px solid var(--border);border-radius:3px">${escHtml(o)}</textarea>
+        <button class="btn-ghost" data-ed-opt-del="${i}" style="padding:2px 8px;font-size:.8em">\u00d7</button>
+      </div>`
+    ).join('');
+    typeFields += `
+      <div style="margin-bottom:6px;font-family:var(--sans);font-size:.75em;color:var(--muted)">
+        Each option is a selectable choice on the verdict form.
+      </div>
+      <div id="vfed-optlist-${uid}">${optRows}</div>
+      <button class="btn-ghost" id="vfed-optadd-${uid}" style="font-size:.78em;margin-top:4px">+ Add option</button>`;
+  }
+
   // if_done routing for non-yes_no types ("stop" not supported for these — A4)
   if (q.type !== 'yes_no' && q.type !== 'yes_no_multi') {
     const doneLabel = (q.type === 'damages' && q.if_none != null) ? 'If damages proved →' : 'When done →';
@@ -622,6 +641,7 @@ function wireEditorEvents() {
         if (q.type !== 'damages') { delete q.if_none; delete q.stop_text; }
         if (q.type === 'damages'    && !q.line_items) q.line_items = [];
         if (q.type === 'percentage' && !q.parties)    q.parties    = [];
+        if (q.type === 'select_one' && !q.options)    q.options    = [];
       }
       // Clean up alt_text when switching away from yes_no
       if (prev === 'yes_no' && q.type !== 'yes_no') delete q.alt_text;
@@ -884,6 +904,31 @@ function wireEditorEvents() {
     });
   }
 
+  // Select One: option text
+  el.querySelectorAll('[data-ed-opt]').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const i = parseInt(ta.dataset.edOpt, 10);
+      if (q.options && q.options[i] != null) {
+        q.options[i] = ta.value;
+        renderPreview();
+      }
+    });
+  });
+  el.querySelectorAll('[data-ed-opt-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.edOptDel, 10);
+      if (q.options) { q.options.splice(i, 1); renderBuilder(); renderPreview(); }
+    });
+  });
+  const optAdd = document.getElementById('vfed-optadd-' + uid);
+  if (optAdd) {
+    optAdd.addEventListener('click', () => {
+      if (!q.options) q.options = [];
+      q.options.push('');
+      renderBuilder(); renderPreview();
+    });
+  }
+
   // Done button
   const doneBtn = document.getElementById('vfed-done-' + uid);
   if (doneBtn) {
@@ -962,7 +1007,8 @@ function renderPreview() {
     html += '</div>';
   }
 
-  html += '<div class="vf-preview-title">SPECIAL VERDICT FORM</div>';
+  const isGeneral = qs.some(q => q.type === 'select_one');
+  html += '<div class="vf-preview-title">' + (isGeneral ? 'GENERAL VERDICT FORM' : 'SPECIAL VERDICT FORM') + '</div>';
 
   qs.forEach((q, idx) => {
     const num  = idx + 1;
@@ -1040,6 +1086,12 @@ function renderPreview() {
           <div class="vf-preview-damage-label"><strong>TOTAL</strong></div>
           <div class="vf-preview-damage-blank">100%</div>
         </div>`;
+      }
+
+    } else if (q.type === 'select_one') {
+      for (const opt of (q.options || [])) {
+        const optText = substituteParties(opt, parties);
+        html += `<div style="margin:0.5em 0 0.3em 2em">______ ${escHtml(optText)}</div>`;
       }
 
     } else if (q.type === 'write_in') {
@@ -1263,7 +1315,8 @@ function renderVFPlainText() {
   if (cap.caseName)   lines.push(cap.caseName);
   if (cap.caseNumber) lines.push('Case No. ' + cap.caseNumber);
   if (lines.length)   lines.push('');
-  lines.push('SPECIAL VERDICT FORM', '');
+  const isGeneral = qs.some(q => q.type === 'select_one');
+  lines.push(isGeneral ? 'GENERAL VERDICT FORM' : 'SPECIAL VERDICT FORM', '');
 
   qs.forEach((q, idx) => {
     const num  = idx + 1;
@@ -1314,6 +1367,11 @@ function renderVFPlainText() {
       for (const p of (q.parties || [])) lines.push(`    ${substituteParties(p.label, parties)}    _____%`);
       if ((q.parties || []).length) lines.push('    TOTAL    100%');
 
+    } else if (q.type === 'select_one') {
+      for (const opt of (q.options || [])) {
+        lines.push(`    ______ ${substituteParties(opt, parties)}`);
+      }
+
     } else if (q.type === 'write_in') {
       lines.push('    _______________________________________________');
       lines.push('    _______________________________________________');
@@ -1344,7 +1402,7 @@ function buildVFDocxContent() {
   return {
     type:      'verdict_form',
     caption:   Object.assign({}, form.caption),
-    formTitle: 'SPECIAL VERDICT FORM',
+    formTitle: qs.some(q => q.type === 'select_one') ? 'GENERAL VERDICT FORM' : 'SPECIAL VERDICT FORM',
     questions: qs.map((q, idx) => {
       const num  = idx + 1;
       const text = substituteParties(q.text || '', parties);
@@ -1369,6 +1427,8 @@ function buildVFDocxContent() {
         });
       } else if (q.type === 'percentage') {
         obj.parties = (q.parties || []).map(p => ({ label: substituteParties(p.label, parties) }));
+      } else if (q.type === 'select_one') {
+        obj.options = (q.options || []).map(o => substituteParties(o, parties));
       }
       return obj;
     }),
@@ -1514,9 +1574,10 @@ function renderAll() {
             }
             // Document title from form name; body is the verdict questions only
             // (strip caption preamble that renderVFPlainText prepends)
-            fields.document_title = form.name || 'SPECIAL VERDICT FORM';
+            const isGV = form.questions.some(q => q.type === 'select_one');
+            fields.document_title = form.name || (isGV ? 'GENERAL VERDICT FORM' : 'SPECIAL VERDICT FORM');
             const full   = renderVFPlainText();
-            const marker = 'SPECIAL VERDICT FORM\n';
+            const marker = isGV ? 'GENERAL VERDICT FORM\n' : 'SPECIAL VERDICT FORM\n';
             const mIdx   = full.indexOf(marker);
             fields.body_text = mIdx >= 0 ? full.slice(mIdx + marker.length).trimStart() : full;
             const plainPaper = (fmt === 'reading');
