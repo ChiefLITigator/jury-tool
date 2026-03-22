@@ -657,6 +657,62 @@ const MANUAL_OVERRIDES = {
       }
     ]
   },
+  'VF-3920': {
+    id: 'VF-3920',
+    title: 'Damages on Multiple Legal Theories',
+    category: 'damages',
+    signature_block: true,
+    questions: [
+      {
+        id: 'q1',
+        type: 'damages',
+        text: '[ e.g., economic damages: lost past earnings ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify all of the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify all of the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'q2'
+      },
+      {
+        id: 'q2',
+        type: 'damages',
+        text: '[ e.g., economic damages: past medical expenses ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'q3'
+      },
+      {
+        id: 'q3',
+        type: 'damages',
+        text: '[ e.g., economic damages: lost future earnings ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'q4'
+      },
+      {
+        id: 'q4',
+        type: 'damages',
+        text: '[ e.g., economic damages: future medical expenses ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'q5'
+      },
+      {
+        id: 'q5',
+        type: 'damages',
+        text: '[ e.g., past noneconomic loss including physical pain/mental suffering ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'q6'
+      },
+      {
+        id: 'q6',
+        type: 'damages',
+        text: '[ e.g., future noneconomic loss including physical pain/mental suffering ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use "or" if more than one ].',
+        fields: ['name of defendant', 'name of plaintiff', 'specify the legal theories supporting this element of damages; use "or" if more than one'],
+        line_items: [],
+        if_done: 'sign'
+      }
+    ]
+  },
   'VF-5001': {
     id: 'VF-5001',
     title: 'General Verdict Form\u2014Single Plaintiff\u2014Single Defendant\u2014Multiple Causes of Action',

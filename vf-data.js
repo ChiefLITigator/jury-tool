@@ -5906,71 +5906,71 @@ const vfDB = {
         {
           "id": "q1",
           "type": "damages",
-          "text": "e.g., economic damages: lost past earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify all of the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "text": "[ e.g., economic damages: lost past earnings ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify all of the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify all of the legal theories supporting this element of damages; use “or” if more than one"
+            "specify all of the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q2"
         },
         {
           "id": "q2",
           "type": "damages",
-          "text": "e.g., economic damages: past medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "text": "[ e.g., economic damages: past medical expenses ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify the legal theories supporting this element of damages; use “or” if more than one"
+            "specify the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q3"
         },
         {
           "id": "q3",
           "type": "damages",
-          "text": "e.g., economic damages: lost future earnings ]. [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "text": "[ e.g., economic damages: lost future earnings ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify the legal theories supporting this element of damages; use “or” if more than one"
+            "specify the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q4"
         },
         {
           "id": "q4",
           "type": "damages",
-          "text": "e.g., economic damages: future medical expenses ]. [Enter the amount below if you find that [ name of defendant ] is liable to [name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one ].]",
+          "text": "[ e.g., economic damages: future medical expenses ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify the legal theories supporting this element of damages; use “or” if more than one"
+            "specify the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q5"
         },
         {
           "id": "q5",
           "type": "damages",
-          "text": "e.g., past noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]",
+          "text": "[ e.g., past noneconomic loss including physical pain/mental suffering ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify the legal theories supporting this element of damages; use “or” if more than one"
+            "specify the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
-          "if_done": "sign"
+          "if_done": "q6"
         },
         {
           "id": "q6",
           "type": "damages",
-          "text": "e.g., future noneconomic loss including [physical pain/mental suffering ].] [Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use “or” if more than one].]",
+          "text": "[ e.g., future noneconomic loss including physical pain/mental suffering ]. Enter the amount below if you find that [ name of defendant ] is liable to [ name of plaintiff ] under [ specify the legal theories supporting this element of damages; use \"or\" if more than one ].",
           "fields": [
             "name of defendant",
             "name of plaintiff",
-            "specify the legal theories supporting this element of damages; use “or” if more than one"
+            "specify the legal theories supporting this element of damages; use \"or\" if more than one"
           ],
           "line_items": [],
           "if_done": "sign"
