@@ -5707,10 +5707,39 @@ const vfDB = {
     },
     {
       "id": "VF-3904",
-      "title": "",
+      "title": "Punitive Damages—Entity Defendant—Authorization",
       "category": "damages",
-      "signature_block": false,
-      "questions": []
+      "signature_block": true,
+      "questions": [
+        {
+          "id": "q1",
+          "type": "yes_no",
+          "text": "Did an agent or employee of [ name of defendant ] engage in the conduct with malice, oppression, or fraud?",
+          "fields": [
+            "name of defendant"
+          ],
+          "if_yes": "q2"
+        },
+        {
+          "id": "q2",
+          "type": "yes_no",
+          "text": "Did one or more officers, directors, or managing agents of [ name of defendant ] authorize this conduct?",
+          "fields": [
+            "name of defendant"
+          ],
+          "if_yes": "q3"
+        },
+        {
+          "id": "q3",
+          "type": "damages",
+          "text": "What amount of punitive damages, if any, do you award [ name of plaintiff ]?",
+          "fields": [
+            "name of plaintiff"
+          ],
+          "line_items": [],
+          "if_done": "sign"
+        }
+      ]
     },
     {
       "id": "VF-3905",

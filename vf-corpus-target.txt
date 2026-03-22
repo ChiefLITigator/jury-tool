@@ -3258,31 +3258,28 @@ bracketed option in CACI Nos. 3945 and 3946.
 1014
 
 ===== VF-3904 =====
-If the jury answers “yes” to questions 1, 2, and 3, attorney fees and costs are
-recoverable from the individual defendant without any additional showing of any
-kind. (Welf. & Inst. Code, § 15657.5(a).) Attorney fees are also recoverable from the
-employer, assuming that standard vicarious liability is shown. (See Welf. & Inst.
-Code, § 15657.5(c).) Incorporate questions 3 and 4 from CACI No. VF-3700,
-Negligence—Vicarious Liability, to address the liability of the employer for the acts
-of the employee.
-Should the financial abuse in some way have caused the victim’s death, the
-decedent’s pain and suffering before death is recoverable on a showing by clear and
-convincing evidence that the individual defendant acted with recklessness,
-oppression, fraud, or malice. (See Welf. & Inst. Code, § 15657.5(b); Code Civ.
-Proc., § 377.34.) In such a case, in question 4, include only item 4a for past
-economic loss. But also include questions 5 and 6.
-If punitive damages are sought, incorporate a verdict form for punitive damages.
-(See CACI Nos. VF-3900–VF-3904.)
-If there are multiple causes of action, users may wish to combine the individual
-forms into one form. If different damages are recoverable on different causes of
-action, replace the damages tables in all of the verdict forms with CACI No. VF-
-3920, Damages on Multiple Legal Theories .
-If the jury is given the discretion under Civil Code section 3288 to award
-prejudgment interest (see Bullis v. Security Pac. Nat’l Bank (1978) 21 Cal.3d 801,
-814 [148 Cal.Rptr. 22, 582 P.2d 109]), give CACI No. 3935, Prejudgment Interest .
-This verdict form may need to be augmented for the jury to make any factual
-findings that are required in order to calculate the amount of prejudgment interest.ELDER ABUSE & DEPENDENT ADULTS VF-3100
-447
+VF-3904 .Punitive Damages—Entity Defendant—Authorization
+We answer the questions submitted to us as follows:
+1. Did an agent or employee of [ name of defendant ] engage in the
+conduct with malice, oppression, or fraud?
+1. Yes No
+1.If your answer to question 1 is yes, then answer question 2. If you
+answered no, stop here, answer no further questions, and have
+the presiding juror sign and date this form.
+2. Did one or more officers, directors, or managing agents of [ name
+of defendant ] authorize this conduct?
+2. Yes No
+2.[If your answer to question 2 is yes, then answer question 3. If
+you answered no, stop here, answer no further questions, and
+have the presiding juror sign and date this form.
+3. What amount of punitive damages, if any, do you award [ name of
+plaintiff ]? $ ]
+Signed:
+Presiding Juror
+Dated:
+After [this verdict form has/all verdict forms have] been signed, notify
+the [clerk/bailiff/court attendant].
+New September 2003; Revised October 2008, December 2010, May 2024
 
 ===== VF-3905 =====
 VF-3905 .Damages for Wrongful Death (Death of an Adult)
