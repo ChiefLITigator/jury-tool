@@ -114,6 +114,26 @@ text = text.replace(/;\n(or\b|\[(?:and|or)\])/g, '; $1');
 // 5. Collapse extra blank lines
 text = text.replace(/\n{3,}/g, '\n\n');
 
+// 5a. Per-instruction bracket fixes (targeted overrides — see KNOWN BUGS in codebase-map.md)
+// Extra ] — remove orphan closing bracket
+if (key === '433')  text = text.replace('act;]]', 'act;]');
+if (key === '441')  text = text.replace('person]][; or/.]]', 'person][; or/.]]');
+if (key === '611')  text = text.replace('date of filing ]][,/; or]]', 'date of filing ][,/; or]]');
+if (key === '2000') { text = text.replace('property] [or]', 'property [or]'); text = text.replace('\u2019s property];', '\u2019s property;'); }
+if (key === '3020') text = text.replace('used[; and/.]]', 'used[; and/.]');
+if (key === '4575') { text = text.replace('obligations];', 'obligations;'); text = text.replace('obligations].', 'obligations.'); }
+// Missing ] — insert closing bracket for unclosed optional element
+if (key === '325')  text = text.replace('those things;] [3.', 'those things;]] [3.');
+if (key === '1249') text = text.replace('[2. and\n', '[2. and]\n');
+if (key === '1730') text = text.replace('recorded a deed ] that cast doubts', 'recorded a deed ]] that cast doubts');
+if (key === '1901') text = text.replace('facts to [ name of plaintiff ];] [1. [or]]', 'facts to [ name of plaintiff ];]] [1. [or]]');
+if (key === '1983') text = text.replace('preshooting conduct.\u2019\u201d)', 'preshooting conduct.\u2019\u201d])');
+if (key === '2544') text = text.replace('the health or safety of others]; and', 'the health or safety of others]]; and');
+if (key === '3100') text = text.replace('to be harmful to [ name of plaintiff/decedent ].', 'to be harmful to [ name of plaintiff/decedent ].]');
+if (key === '4208') text = text.replace('[ name of plaintiff ]].\n[[With respect', '[ name of plaintiff ]]].\n[[With respect');
+if (key === '4605') text = text.replace('Health Act ];]\n3.', 'Health Act ];]]\n3.');
+if (key === '4606') { text = text.replace('Past Economic Damages: $ ] [b.', 'Past Economic Damages: $ ]] [b.'); text = text.replace('Future Economic Damages: $ ] [c.', 'Future Economic Damages: $ ]] [c.'); text = text.replace('[d. TOTAL $ Signed:', '[d. TOTAL $ ]\nSigned:'); }
+
   return text.trim();
 }
 
