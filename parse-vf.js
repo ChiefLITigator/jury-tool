@@ -26,7 +26,8 @@ function getCategory(id) {
   if (num >= 1200 && num < 1300) return 'products_liability';
   if (num >= 2300 && num < 2400) return 'insurance';
   if (num >= 2400 && num < 2500) return 'employment';
-  if (num >= 3900 && num < 4000) return 'punitive_damages';
+  if (num >= 3900 && num < 4000) return 'damages';
+  if (num >= 5000 && num < 5100) return 'general_verdict';
   return 'other';
 }
 
@@ -633,6 +634,69 @@ function renderFormText(form) {
   return lines.join('\n');
 }
 
+// ─ MANUAL OVERRIDES ─────────────────────────────────────────────────────────
+// Hand-crafted entries for forms that don't fit the numbered-question parser
+// pattern (e.g. general verdict forms with "select one" options).
+const MANUAL_OVERRIDES = {
+  'VF-5000': {
+    id: 'VF-5000',
+    title: 'General Verdict Form\u2014Single Plaintiff\u2014Single Defendant\u2014Single Cause of Action',
+    category: 'general_verdict',
+    signature_block: true,
+    questions: [
+      {
+        id: 'q1',
+        type: 'select_one',
+        text: 'Select one of the following two options:',
+        fields: ['name of plaintiff', 'name of defendant'],
+        options: [
+          'We find in favor of [ name of plaintiff ] and against [ name of defendant ] and award damages to [ name of plaintiff ] in the amount of $___.',
+          'We find in favor of [ name of defendant ] and against [ name of plaintiff ].'
+        ],
+        if_done: 'sign'
+      }
+    ]
+  },
+  'VF-5001': {
+    id: 'VF-5001',
+    title: 'General Verdict Form\u2014Single Plaintiff\u2014Single Defendant\u2014Multiple Causes of Action',
+    category: 'general_verdict',
+    signature_block: true,
+    questions: [
+      {
+        id: 'q1',
+        type: 'select_one',
+        text: 'On [ name of plaintiff ]\'s claim for [ insert first cause of action ]:',
+        fields: ['name of plaintiff', 'name of defendant', 'insert first cause of action'],
+        options: [
+          'we find in favor of [ name of plaintiff ] and against [ name of defendant ].',
+          'we find in favor of [ name of defendant ] and against [ name of plaintiff ].'
+        ],
+        if_done: 'q2'
+      },
+      {
+        id: 'q2',
+        type: 'select_one',
+        text: 'On [ name of plaintiff ]\'s claim for [ insert second cause of action ]:',
+        fields: ['name of plaintiff', 'name of defendant', 'insert second cause of action'],
+        options: [
+          'we find in favor of [ name of plaintiff ] and against [ name of defendant ].',
+          'we find in favor of [ name of defendant ] and against [ name of plaintiff ].'
+        ],
+        if_done: 'q3'
+      },
+      {
+        id: 'q3',
+        type: 'damages',
+        text: 'Complete the section below only if you find in favor of [ name of plaintiff ] on at least one of [his/her/nonbinary pronoun/its] claims. We award [ name of plaintiff ] the following damages:',
+        fields: ['name of plaintiff'],
+        line_items: [],
+        if_done: 'sign'
+      }
+    ]
+  }
+};
+
 // ─ MAIN ─────────────────────────────────────────────────────────────────────
 function main() {
   const corpusPath = path.resolve(CORPUS_FILE);
@@ -648,6 +712,10 @@ function main() {
 
   const parsedForms = [];
   for (const rf of rawForms) {
+    if (MANUAL_OVERRIDES[rf.id]) {
+      parsedForms.push(MANUAL_OVERRIDES[rf.id]);
+      continue;
+    }
     const form = parseForm(rf);
     validateForm(form);
     parsedForms.push(form);

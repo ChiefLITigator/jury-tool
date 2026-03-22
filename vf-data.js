@@ -89,11 +89,13 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_economic_loss_insert",
-              "label": "Past economic loss insert"
+              "label": "Past economic loss insert",
+              "children": []
             },
             {
               "id": "future_economic_loss_insert",
-              "label": "Future economic loss insert"
+              "label": "Future economic loss insert",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -286,11 +288,13 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_economic_loss_insert_descriptions_o",
-              "label": "Past economic loss insert descriptions of claimed"
+              "label": "Past economic loss insert descriptions of claimed",
+              "children": []
             },
             {
               "id": "future_economic_loss_insert_descriptions",
-              "label": "Future economic loss insert descriptions of"
+              "label": "Future economic loss insert descriptions of",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -395,11 +399,13 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_economic_loss_insert",
-              "label": "Past economic loss insert"
+              "label": "Past economic loss insert",
+              "children": []
             },
             {
               "id": "future_economic_loss_insert",
-              "label": "Future economic loss insert"
+              "label": "Future economic loss insert",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -485,11 +491,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -524,7 +532,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
           "fields": [
             "name of plaintiff"
           ],
@@ -575,16 +583,16 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
-          "if_done": "q4",
-          "if_none": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          "if_done": "sign"
         },
         {
           "id": "q4",
@@ -618,7 +626,7 @@ const vfDB = {
             },
             {
               "id": "p_name_of_plaintiff",
-              "label": "[Name of plaintiff]"
+              "label": "[[Name of plaintiff]"
             }
           ],
           "must_total": 100,
@@ -656,9 +664,15 @@ const vfDB = {
           "if_yes": "q3"
         },
         {
+          "id": "q8",
+          "type": "yes_no",
+          "text": "",
+          "fields": []
+        },
+        {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
           "fields": [
             "name of plaintiff"
           ],
@@ -709,16 +723,16 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
-          "if_done": "q4",
-          "if_none": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          "if_done": "sign"
         },
         {
           "id": "q4",
@@ -743,8 +757,7 @@ const vfDB = {
           "type": "yes_no_multi",
           "text": "Was [ name/description of first nonparty ] negligent? Was [ name/description of second nonparty ] negligent?",
           "fields": [],
-          "if_yes": "q7",
-          "if_no": "q8"
+          "if_yes": "q8"
         },
         {
           "id": "q7",
@@ -769,19 +782,19 @@ const vfDB = {
             },
             {
               "id": "p_name_of_second_defendant",
-              "label": "[Name of second defendant]"
+              "label": "[[Name of second defendant]"
             },
             {
               "id": "p_name_of_plaintiff",
-              "label": "[Name of plaintiff]"
+              "label": "[[Name of plaintiff]"
             },
             {
               "id": "p_namedescription_of_first_non_party",
-              "label": "[Name/description of first non- party]"
+              "label": "[[Name/description of first non- party]"
             },
             {
               "id": "p_namedescription_of_second_nonparty",
-              "label": "[Name/description of second nonparty]"
+              "label": "[[Name/description of second nonparty]"
             }
           ],
           "must_total": 100,
@@ -870,11 +883,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -973,11 +988,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1073,11 +1090,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1106,10 +1125,7 @@ const vfDB = {
           "fields": [
             "name of defendant",
             "name of alleged minor"
-          ],
-          "if_yes": "q3",
-          "if_no": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          ]
         },
         {
           "id": "q3",
@@ -1205,11 +1221,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1316,11 +1334,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1426,11 +1446,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1525,11 +1547,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1668,11 +1692,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1759,11 +1785,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1882,11 +1910,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -1950,8 +1980,7 @@ const vfDB = {
             "insert medical procedure",
             "name of plaintiff"
           ],
-          "if_no": "q7",
-          "if_yes": "q6"
+          "if_no": "q7"
         },
         {
           "id": "q6",
@@ -2016,11 +2045,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2194,11 +2225,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2303,11 +2336,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2423,11 +2458,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2522,11 +2559,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2640,11 +2679,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical_painmenta",
-              "label": "Past noneconomic loss, physical pain/mental"
+              "label": "Past noneconomic loss, physical pain/mental",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical_painmen",
-              "label": "Future noneconomic loss, physical pain/mental"
+              "label": "Future noneconomic loss, physical pain/mental",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -2739,16 +2780,21 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
+            },
+            {
+              "id": "if_name_of_plaintiff_has_proved_any_dama",
+              "label": "If name of plaintiff  has proved any damages, then answer",
+              "children": []
             }
           ],
-          "if_done": "q5",
-          "if_none": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          "if_done": "sign"
         },
         {
           "id": "q5",
@@ -2905,11 +2951,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3017,11 +3065,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3083,10 +3133,7 @@ const vfDB = {
           "text": "Answer if you answered yes to the first option for question 4: When you consider the likelihood and seriousness of potential injury, compared with the practicality and cost of either (a) taking alternative action that would not have created the risk of injury, or (b) protecting against the risk of injury, was [ name of defendant ]’s [act/ specify failure to act ] that created the dangerous condition reasonable under the circumstances?] [Answer if you answered yes to the second option for question 4: When you consider the likelihood and seriousness of potential injury, compared with (a) how much time and opportunity [ name of defendant ] had to take action, and (b) the practicality and cost of protecting against the risk of injury, was [ name of defendant ]’s failure to take sufficient steps to protect against the risk of injury created by the dangerous condition reasonable under the circumstances?",
           "fields": [
             "name of defendant"
-          ],
-          "if_yes": "q7",
-          "if_no": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          ]
         },
         {
           "id": "q7",
@@ -3131,8 +3178,8 @@ const vfDB = {
                   "label": "Lost profits"
                 },
                 {
-                  "id": "medical_expenses",
-                  "label": "Medical expenses"
+                  "id": "medical_expenses_vf1101_dangerous_condit",
+                  "label": "Medical expenses $ VF-1101 DANGEROUS CONDITION OF PUBLIC PROPERTY"
                 },
                 {
                   "id": "other_future_economic_loss",
@@ -3142,11 +3189,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3191,7 +3240,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ].",
+          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
           "fields": [
             "name of plaintiff"
           ],
@@ -3242,16 +3291,16 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
-          "if_done": "q5",
-          "if_none": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          "if_done": "sign"
         },
         {
           "id": "q5",
@@ -3268,9 +3317,14 @@ const vfDB = {
           "text": "Was [ name of plaintiff ]’s negligence a substantial factor in causing [his/her/ nonbinary pronoun ] harm?",
           "fields": [
             "name of plaintiff"
-          ],
-          "if_yes": "q7",
-          "if_no": "q7"
+          ]
+        },
+        {
+          "id": "q9",
+          "type": "yes_no",
+          "text": "",
+          "fields": [],
+          "if_yes": "q7"
         },
         {
           "id": "q7",
@@ -3291,7 +3345,7 @@ const vfDB = {
         {
           "id": "q9",
           "type": "percentage",
-          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:",
+          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:PRODUCTS LIABILITY VF-1200",
           "fields": [
             "name of plaintiff"
           ],
@@ -3362,13 +3416,11 @@ const vfDB = {
         {
           "id": "q5",
           "type": "yes_no",
-          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way?",
+          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way? Regardless of your answer to question 5, answer question 6.",
           "fields": [
             "product"
           ],
-          "optional": true,
-          "if_yes": "q6",
-          "if_no": "q6"
+          "optional": true
         },
         {
           "id": "q6",
@@ -3446,11 +3498,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3570,11 +3624,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3620,7 +3676,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
           "fields": [
             "name of plaintiff"
           ],
@@ -3671,16 +3727,16 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
-          "if_done": "q5",
-          "if_none": "stop",
-          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
+          "if_done": "sign"
         },
         {
           "id": "q5",
@@ -3840,11 +3896,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -3953,11 +4011,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4072,11 +4132,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4204,11 +4266,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4360,11 +4424,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4482,11 +4548,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4529,8 +4597,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "line_items": [],
-          "if_yes": "q4",
-          "if_done": "q4"
+          "if_yes": "q4"
         },
         {
           "id": "q4",
@@ -4570,7 +4637,8 @@ const vfDB = {
           "line_items": [
             {
               "id": "amount_of_judgment_entered_against_name_",
-              "label": "Amount of judgment entered against  name of plaintiff"
+              "label": "Amount of judgment entered against  name of plaintiff",
+              "children": []
             },
             {
               "id": "past_economic_loss",
@@ -4618,7 +4686,8 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -4697,12 +4766,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -4790,12 +4859,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -4864,12 +4933,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -4948,12 +5017,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -5032,12 +5101,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -5135,12 +5204,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss",
-              "label": "Past economic loss"
+              "id": "past_economic_loss_",
+              "label": "Past economic loss: $"
             },
             {
-              "id": "future_economic_loss",
-              "label": "Future economic loss"
+              "id": "future_economic_loss_",
+              "label": "Future economic loss: $"
             }
           ],
           "if_done": "sign"
@@ -5246,11 +5315,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -5365,11 +5436,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -5492,11 +5565,13 @@ const vfDB = {
             },
             {
               "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical"
+              "label": "Past noneconomic loss, physical",
+              "children": []
             },
             {
               "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical"
+              "label": "Future noneconomic loss, physical",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -5506,7 +5581,7 @@ const vfDB = {
     {
       "id": "VF-3900",
       "title": "Punitive Damages",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5533,7 +5608,7 @@ const vfDB = {
     {
       "id": "VF-3901",
       "title": "Punitive Damages Against Employer or Principal for Conduct of a Specific Agent or Employee",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5570,7 +5645,7 @@ const vfDB = {
     {
       "id": "VF-3902",
       "title": "Punitive Damages—Entity Defendant",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5597,7 +5672,7 @@ const vfDB = {
     {
       "id": "VF-3903",
       "title": "Punitive Damages—Entity Defendant—Ratification",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5632,15 +5707,15 @@ const vfDB = {
     },
     {
       "id": "VF-3904",
-      "title": "Punitive Damages—Entity Defendant—Authorization or Ratification",
-      "category": "punitive_damages",
+      "title": "",
+      "category": "damages",
       "signature_block": false,
       "questions": []
     },
     {
       "id": "VF-3905",
       "title": "Damages for Wrongful Death (Death of an Adult)",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5653,22 +5728,26 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_financial_support_that_name_of",
-              "label": "Past financial support that  name of"
+              "label": "Past financial support that  name of",
+              "children": []
             },
             {
               "id": "future_financial_support_that_name_of",
-              "label": "Future financial support that  name of"
+              "label": "Future financial support that  name of",
+              "children": []
             },
             {
               "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that"
+              "label": "Past losses of gifts or benefits that",
+              "children": []
             },
             {
               "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that"
+              "label": "Future losses of gifts or benefits that",
+              "children": []
             }
           ],
-          "if_done": "q2"
+          "if_done": "sign"
         },
         {
           "id": "q2",
@@ -5680,11 +5759,13 @@ const vfDB = {
           "line_items": [
             {
               "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love"
+              "label": "The loss of  name of decedent ’s love",
+              "children": []
             },
             {
               "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love"
+              "label": "The loss of  name of decedent ’s love",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -5694,7 +5775,7 @@ const vfDB = {
     {
       "id": "VF-3906",
       "title": "Damages for Wrongful Death (Parents’ Recovery for Death of a Minor Child)",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5707,22 +5788,26 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_financial_support_that_name_of",
-              "label": "Past financial support that  name of"
+              "label": "Past financial support that  name of",
+              "children": []
             },
             {
               "id": "future_financial_support_that_name_of",
-              "label": "Future financial support that  name of"
+              "label": "Future financial support that  name of",
+              "children": []
             },
             {
               "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that"
+              "label": "Past losses of gifts or benefits that",
+              "children": []
             },
             {
               "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that"
+              "label": "Future losses of gifts or benefits that",
+              "children": []
             }
           ],
-          "if_done": "q2"
+          "if_done": "sign"
         },
         {
           "id": "q2",
@@ -5734,11 +5819,13 @@ const vfDB = {
           "line_items": [
             {
               "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love"
+              "label": "The loss of  name of decedent ’s love",
+              "children": []
             },
             {
               "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love"
+              "label": "The loss of  name of decedent ’s love",
+              "children": []
             }
           ],
           "if_done": "sign"
@@ -5748,7 +5835,7 @@ const vfDB = {
     {
       "id": "VF-3907",
       "title": "Damages for Loss of Consortium (Noneconomic Damage)",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5766,7 +5853,7 @@ const vfDB = {
     {
       "id": "VF-3919",
       "title": "Damages for Loss of Consortium (Noneconomic Damage)",
-      "category": "punitive_damages",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5783,8 +5870,8 @@ const vfDB = {
     },
     {
       "id": "VF-3920",
-      "title": "Damages on Multiple Legal Theories What are [ name of plaintiff ]’s damages? [ List each item of damages listed in CACI No. 3934. ]",
-      "category": "punitive_damages",
+      "title": "Damages on Multiple Legal Theories",
+      "category": "damages",
       "signature_block": true,
       "questions": [
         {
@@ -5855,6 +5942,76 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff",
             "specify the legal theories supporting this element of damages; use “or” if more than one"
+          ],
+          "line_items": [],
+          "if_done": "sign"
+        }
+      ]
+    },
+    {
+      "id": "VF-5000",
+      "title": "General Verdict Form—Single Plaintiff—Single Defendant—Single Cause of Action",
+      "category": "general_verdict",
+      "signature_block": true,
+      "questions": [
+        {
+          "id": "q1",
+          "type": "select_one",
+          "text": "Select one of the following two options:",
+          "fields": [
+            "name of plaintiff",
+            "name of defendant"
+          ],
+          "options": [
+            "We find in favor of [ name of plaintiff ] and against [ name of defendant ] and award damages to [ name of plaintiff ] in the amount of $___.",
+            "We find in favor of [ name of defendant ] and against [ name of plaintiff ]."
+          ],
+          "if_done": "sign"
+        }
+      ]
+    },
+    {
+      "id": "VF-5001",
+      "title": "General Verdict Form—Single Plaintiff—Single Defendant—Multiple Causes of Action",
+      "category": "general_verdict",
+      "signature_block": true,
+      "questions": [
+        {
+          "id": "q1",
+          "type": "select_one",
+          "text": "On [ name of plaintiff ]'s claim for [ insert first cause of action ]:",
+          "fields": [
+            "name of plaintiff",
+            "name of defendant",
+            "insert first cause of action"
+          ],
+          "options": [
+            "we find in favor of [ name of plaintiff ] and against [ name of defendant ].",
+            "we find in favor of [ name of defendant ] and against [ name of plaintiff ]."
+          ],
+          "if_done": "q2"
+        },
+        {
+          "id": "q2",
+          "type": "select_one",
+          "text": "On [ name of plaintiff ]'s claim for [ insert second cause of action ]:",
+          "fields": [
+            "name of plaintiff",
+            "name of defendant",
+            "insert second cause of action"
+          ],
+          "options": [
+            "we find in favor of [ name of plaintiff ] and against [ name of defendant ].",
+            "we find in favor of [ name of defendant ] and against [ name of plaintiff ]."
+          ],
+          "if_done": "q3"
+        },
+        {
+          "id": "q3",
+          "type": "damages",
+          "text": "Complete the section below only if you find in favor of [ name of plaintiff ] on at least one of [his/her/nonbinary pronoun/its] claims. We award [ name of plaintiff ] the following damages:",
+          "fields": [
+            "name of plaintiff"
           ],
           "line_items": [],
           "if_done": "sign"

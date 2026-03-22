@@ -3432,8 +3432,7 @@ VF-3908–VF-3919. Reserved for Future Use
 
 ===== VF-3920 =====
 VF-3920 .Damages on Multiple Legal Theories
-What are [ name of plaintiff ]’s damages? [ List each item of damages listed
-in CACI No. 3934. ]
+We answer the questions submitted to us as follows:
 1. [e.g., economic damages: lost past earnings ]. [Enter the amount
 below if you find that [ name of defendant ] is liable to [ name of
 plaintiff ] under [ specify all of the legal theories supporting this
@@ -3475,3 +3474,40 @@ After [this verdict form has/all verdict forms have] been signed, notify
 the [clerk/bailiff/court attendant].
 New December 2010; Revised May 2024
 
+===== VF-5000 =====
+VF-5000 .General Verdict Form—Single Plaintiff—Single Defendant—Single Cause of Action
+Select one of the following two options:
+We find in favor of [ name of plaintiff ] and against [ name of
+defendant ] and award damages to [ name of plaintiff ] in the
+amount of $ .
+We find in favor of [ name of defendant ] and against [ name of
+plaintiff ].
+Signed:
+Presiding Juror
+Dated:
+After [this verdict form has/all verdict forms have] been signed, notify
+the [clerk/bailiff/court attendant].
+New September 2003; Revised December 2010, May 2024
+
+===== VF-5001 =====
+VF-5001 .General Verdict Form—Single Plaintiff—Single Defendant—Multiple Causes of Action
+For each claim, select one of the two options listed.
+On [ name of plaintiff ]'s claim for [ insert first cause of action ]
+we find in favor of [ name of plaintiff ] and against [ name of
+defendant ].
+we find in favor of [ name of defendant ] and against [ name of
+plaintiff ].
+On [ name of plaintiff ]'s claim for [ insert second cause of action ]
+we find in favor of [ name of plaintiff ] and against [ name of
+defendant ].
+we find in favor of [ name of defendant ] and against [ name of
+plaintiff ].
+Complete the section below only if you find in favor of [ name of
+plaintiff ] on at least one of [his/her/nonbinary pronoun/its] claims.
+We award [ name of plaintiff ] the following damages: $
+Signed:
+Presiding Juror
+Dated:
+After [this verdict form has/all verdict forms have] been signed, notify
+the [clerk/bailiff/court attendant].
+New September 2003; Revised December 2010, May 2024
