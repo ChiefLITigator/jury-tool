@@ -219,6 +219,9 @@ function parseRouting(routingLine, formId, qNum, totalQs) {
     result.if_no = 'q' + noYesRoute[1];
     if (/If you answered yes,?\s+.*stop here/i.test(r)) {
       result.if_yes = 'stop'; result.stop_text = STOP_TEXT;
+    } else if (!result.if_yes) {
+      const yesAlt = r.match(/answered yes.*?answer question (\d+)/i);
+      if (yesAlt) result.if_yes = 'q' + yesAlt[1];
     }
     return result;
   }
@@ -404,7 +407,7 @@ function parseQuestionBlock(block, formId, totalQs) {
     }
 
     // Routing instruction (N.If... or N.[If... or N.Regardless... or standalone [If...)
-    if (new RegExp('^\\[*' + num + '\\.\\s*\\[?(?:If\\s+(your|you)|Regardless)').test(line) ||
+    if (new RegExp('^\\[*' + num + '\\.\\s*\\[?(?:If\\s+(?:your|you|\\[)|Regardless)').test(line) ||
         (new RegExp('^\\[*' + num + '\\.').test(line) === false && /^\[?If\s+(your|you)/i.test(line.trim()))) {
       routingLine = line.replace(new RegExp('^\\[*' + num + '\\.\\s*'), '').trim();
       continue;
@@ -499,13 +502,11 @@ function parseQuestionBlock(block, formId, totalQs) {
     if (routingLine) {
       const routing = parseRouting(routingLine, formId, num, totalQs);
       Object.assign(q, routing);
-    } else {
-      q.if_done = 'sign';
     }
+    // else: no routing — post-processing defaults based on position
   } else if (type === 'percentage') {
     q.parties = parsePercentageParties(subItemLines);
     q.must_total = 100;
-    q.if_done = 'sign';
     if (routingLine) {
       const routing = parseRouting(routingLine, formId, num, totalQs);
       Object.assign(q, routing);
@@ -541,7 +542,8 @@ function parseForm(formData) {
   for (const q of questions) {
     const noRoute = !q.if_yes && !q.if_no && !q.if_done;
     if (noRoute && (q.type === 'damages' || q.type === 'percentage')) {
-      q.if_done = 'sign';
+      const idx = questions.indexOf(q);
+      q.if_done = (idx < questions.length - 1) ? questions[idx + 1].id : 'sign';
     } else if (noRoute && (q.type === 'yes_no' || q.type === 'yes_no_multi')) {
       // If it's the last question or the next question is damages/sign, default to sign
       const idx = questions.indexOf(q);
