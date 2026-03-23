@@ -296,7 +296,7 @@ async function generateShell() {
 
     statusEl.textContent = 'Downloaded.';
     statusEl.className   = 'status ok';
-    setTimeout(() => { if (statusEl.textContent === 'Downloaded.') statusEl.textContent = ''; }, 4000);
+    setTimeout(() => { if (statusEl.textContent === 'Downloaded.') statusEl.textContent = ''; }, 3000);
   } catch (err) {
     console.error('[pleading-ui] generatePleadingShell failed:', err);
     statusEl.textContent = 'Error: ' + (err.message || 'generation failed');

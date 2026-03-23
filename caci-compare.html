@@ -1124,6 +1124,18 @@ button { padding: 9px 20px; border: none; border-radius: 4px; font-family: var(-
 <!-- Packet print area — populated at print time, hidden otherwise -->
 <div id="packetPrintArea"></div>
 
+<!-- App modal (replaces browser confirm/prompt) -->
+<div id="appModal" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:center;justify-content:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;width:min(400px,88vw);padding:22px 24px;box-shadow:0 8px 30px rgba(0,0,0,.3)">
+    <div id="appModalMsg" style="font-family:var(--sans);font-size:.92em;color:var(--text);margin-bottom:16px;line-height:1.5"></div>
+    <input id="appModalInput" type="text" class="hidden" style="width:100%;margin-bottom:14px;font-family:var(--sans);font-size:.88em;padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text)">
+    <div style="display:flex;justify-content:flex-end;gap:10px">
+      <button id="appModalCancel" class="btn-ghost">Cancel</button>
+      <button id="appModalOk" class="btn" style="padding:7px 20px;font-size:.85em">OK</button>
+    </div>
+  </div>
+</div>
+
 <!-- Packet compile overlay -->
 <div id="packetCompileOverlay" class="hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center">
   <div style="background:var(--card);border-radius:6px;width:min(780px,92vw);max-height:80vh;display:flex;flex-direction:column;padding:20px">

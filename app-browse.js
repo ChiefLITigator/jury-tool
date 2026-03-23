@@ -12,6 +12,7 @@ function buildCaciIndex() {
   const index = [];
   for (const key of Object.keys(caciDB)) {
     if (key.includes('_')) continue;               // skip _directions, _sources, etc.
+    if (typeof CACI_UNAVAILABLE !== 'undefined' && CACI_UNAVAILABLE.has(key)) continue;
     const firstLine = caciDB[key].split('\n')[0].trim();
     const m = firstLine.match(/^(\d+)\.\s*(.+)/);
     if (!m) continue;
@@ -70,6 +71,14 @@ function closePanel() {
 // ─ SEARCH ────────────────────────────────────────────────────────────────────
 
 let searchTimer = null;
+let searchHighlight = -1;
+
+function updateSearchHighlight(items) {
+  items.forEach((el, i) => {
+    el.style.background = (i === searchHighlight) ? 'var(--accent-bg)' : '';
+  });
+  if (items[searchHighlight]) items[searchHighlight].scrollIntoView({ block: 'nearest' });
+}
 
 function renderSearchResults(query) {
   const container = document.getElementById('caciSearchResults');
@@ -168,10 +177,27 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('caciModeSearch').addEventListener('click', () => switchMode('search'));
   document.getElementById('caciModeBrowse').addEventListener('click', () => switchMode('browse'));
 
-  // Search input — debounced 250 ms
-  document.getElementById('caciSearchInput').addEventListener('input', e => {
+  // Search input — debounced 250 ms + keyboard navigation
+  const searchInput = document.getElementById('caciSearchInput');
+  searchInput.addEventListener('input', e => {
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => renderSearchResults(e.target.value), 250);
+    searchTimer = setTimeout(() => { renderSearchResults(e.target.value); searchHighlight = -1; }, 250);
+  });
+  searchInput.addEventListener('keydown', e => {
+    const items = document.querySelectorAll('#caciSearchResults .caci-result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      searchHighlight = Math.min(searchHighlight + 1, items.length - 1);
+      updateSearchHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      searchHighlight = Math.max(searchHighlight - 1, 0);
+      updateSearchHighlight(items);
+    } else if (e.key === 'Enter' && searchHighlight >= 0 && items[searchHighlight]) {
+      e.preventDefault();
+      pickResult(items[searchHighlight].dataset.num);
+    }
   });
 
   // Event delegation on the panel: result clicks + browse header toggles
