@@ -65,8 +65,16 @@
 }
 [data-theme="dark"] select,
 [data-theme="dark"] select option {
-  background: var(--card);
+  background-color: var(--card);
   color: var(--text);
+  border-color: var(--border);
+  color-scheme: dark;
+}
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] textarea {
+  color-scheme: dark;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--sans); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; }

@@ -1585,7 +1585,7 @@ pain/mental suffering:] $ ]
 [d. Future noneconomic loss, including [physical
 pain/mental suffering:] $ ]
 [d. TOTAL $
-[d. If [name of plaintiff ] has proved any damages, then answer
+4.If [name of plaintiff ] has proved any damages, then answer
 question 5. If [ name of plaintiff ] has not proved any damages,
 then stop here, answer no further questions, and have the
 presiding juror sign and date this form.

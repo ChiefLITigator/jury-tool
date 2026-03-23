@@ -576,7 +576,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -634,7 +634,9 @@ const vfDB = {
               "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q4",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -712,7 +714,7 @@ const vfDB = {
         {
           "id": "q3",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others. If [name of plaintiff ] has proved any damages, then answer question 4. If [ name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or others.",
           "fields": [
             "name of plaintiff"
           ],
@@ -770,7 +772,9 @@ const vfDB = {
               "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q4",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2081,7 +2085,8 @@ const vfDB = {
             "insert medical procedure",
             "name of plaintiff"
           ],
-          "if_no": "q7"
+          "if_no": "q7",
+          "if_yes": "q6"
         },
         {
           "id": "q6",
@@ -2929,14 +2934,11 @@ const vfDB = {
             {
               "id": "future_noneconomic_loss_physical_painmen",
               "label": "Future noneconomic loss, physical pain/mental suffering"
-            },
-            {
-              "id": "if_name_of_plaintiff_has_proved_any_dama",
-              "label": "If name of plaintiff  has proved any damages, then answer question 5. If  name of plaintiff  has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
-              "children": []
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -3419,7 +3421,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ] or [ name/ description of other person ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -3477,7 +3479,9 @@ const vfDB = {
               "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -3874,7 +3878,7 @@ const vfDB = {
         {
           "id": "q4",
           "type": "damages",
-          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ]. If [name of plaintiff ] has proved any damages, answer question 5. If [name of plaintiff ] has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
+          "text": "What are [ name of plaintiff ]’s total damages? Do not reduce the damages based on the fault, if any, of [ name of plaintiff ].",
           "fields": [
             "name of plaintiff"
           ],
@@ -3932,7 +3936,9 @@ const vfDB = {
               "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q5",
+          "if_none": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -6146,7 +6152,7 @@ const vfDB = {
               "label": "Future losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent : $  e.  Name of decedent ’s funeral and burial expenses: $  f. Past household services that name of decedent  would have provided: $  g. Future household services that name of decedent  would have provided"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q2"
         },
         {
           "id": "q2",
@@ -6200,7 +6206,7 @@ const vfDB = {
               "label": "Future losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent : $  e.  Name of decedent ’s funeral and burial expenses: $  f. Past household services that name of decedent  would have provided: $  g. Future household services that name of decedent  would have provided"
             }
           ],
-          "if_done": "sign"
+          "if_done": "q2"
         },
         {
           "id": "q2",
