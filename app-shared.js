@@ -8,6 +8,50 @@ const esc     = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 const escAttr = s => esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); // C1: safe for HTML attributes
 
 // ═══════════════════════════════════════════════════════════════════════
+// IN-APP MODAL (replaces browser confirm/prompt)
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Show an in-app modal dialog. Returns a Promise.
+ * Confirm mode:  showModal('Delete?')  → true / false
+ * Input mode:    showModal('Enter name:', { input: true, value: '' })  → string / null
+ */
+function showModal(message, opts = {}) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('appModal');
+    const msgEl   = document.getElementById('appModalMsg');
+    const inputEl = document.getElementById('appModalInput');
+    const okBtn   = document.getElementById('appModalOk');
+    const cancelBtn = document.getElementById('appModalCancel');
+
+    msgEl.textContent = message;
+    if (opts.input) {
+      inputEl.classList.remove('hidden');
+      inputEl.value = opts.value || '';
+    } else {
+      inputEl.classList.add('hidden');
+    }
+    overlay.classList.remove('hidden');
+    (opts.input ? inputEl : okBtn).focus();
+
+    function cleanup(val) {
+      overlay.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      inputEl.removeEventListener('keydown', onKey);
+      resolve(val);
+    }
+    function onOk()     { cleanup(opts.input ? inputEl.value : true); }
+    function onCancel() { cleanup(opts.input ? null : false); }
+    function onKey(e)   { if (e.key === 'Enter') onOk(); }
+
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    if (opts.input) inputEl.addEventListener('keydown', onKey);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // CACI DATA (loaded from local file on startup)
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -17,8 +61,11 @@ const escAttr = s => esc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;'); // C1:
  * (alternative signal brackets, optional blocks) is preserved for
  * parseInstruction.
  */
+const CACI_UNAVAILABLE = new Set(['115']);
+
 function lookupCACITextForDraft(caciNum) {
   const key = String(parseInt(caciNum, 10));
+  if (CACI_UNAVAILABLE.has(key)) throw new Error(`CACI ${caciNum} — instruction not available`);
   let text = caciDB[key];
   if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
 

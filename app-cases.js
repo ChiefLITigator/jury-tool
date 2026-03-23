@@ -116,15 +116,19 @@ function clearAllWorkspace() {
   renderPacketTray();
 }
 
-function caseSave() {
+async function caseSave() {
   const name = document.getElementById('caseNameInput').value.trim();
   if (!name) { setCaseBarStatus('Enter a case name first.', 'err'); return; }
+  const currentCase = document.getElementById('caseSelect').value;
+  const index = loadCaseIndex();
+  if (index[name] && name !== currentCase) {
+    if (!(await showModal(`Case "${name}" already exists. Overwrite?`))) return;
+  }
   const instructions = packetInstructions.map(e => ({
     caciNum: e.caciNum, label: e.label, parsedState: serializeParsedState(e.parsedState)
   }));
   const caption = readCaptionFromDOM(); // B3
   try {
-    const index = loadCaseIndex();
     // [VF integration] include verdict form state alongside instructions
     index[name] = {
       instructions,

@@ -1243,23 +1243,23 @@ function renderFormSelector() {
     renderAll();
   });
 
-  document.getElementById('vfDeleteFormBtn').addEventListener('click', () => {
+  document.getElementById('vfDeleteFormBtn').addEventListener('click', async () => {
     if (vfForms.length <= 1) return;
     const f = activeWorkingForm();
     if (!f) return;
-    if (!confirm(`Delete "${f.name}"?`)) return;
+    if (!(await showModal(`Delete "${f.name}"?`))) return;
     vfForms = vfForms.filter(x => x.id !== f.id);
     activeVfFormId  = vfForms[0].id;
     vfOpenEditorUid = null;
     renderAll();
   });
 
-  document.getElementById('vfSaveFormBtn').addEventListener('click', () => {
+  document.getElementById('vfSaveFormBtn').addEventListener('click', async () => {
     const f = activeWorkingForm();
     if (!f) return;
     const name = (f.name || '').trim() || 'Untitled';
     const lib = loadSavedVFs();
-    if (lib[name] && !confirm(`Overwrite saved form "${name}"?`)) return;
+    if (lib[name] && !(await showModal(`Overwrite saved form "${name}"?`))) return;
     lib[name] = JSON.parse(JSON.stringify(f));
     saveSavedVFs(lib);
     const statusEl = document.getElementById('vfFormStatus');
@@ -1517,10 +1517,10 @@ function renderAll() {
   // + Add Party button (builder panel)
   const addPartyBtn = document.getElementById('vfAddPartyBtn');
   if (addPartyBtn) {
-    addPartyBtn.addEventListener('click', () => {
+    addPartyBtn.addEventListener('click', async () => {
       const form = activeWorkingForm();
       if (!form) return;
-      const raw = prompt('Party role (e.g. "third party"):');
+      const raw = await showModal('Party role (e.g. "third party"):', { input: true });
       if (!raw || !raw.trim()) return;
       const key = raw.trim().toLowerCase().replace(/\s+/g, '_');
       if (!(key in form.parties)) {

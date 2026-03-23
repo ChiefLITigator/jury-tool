@@ -455,7 +455,7 @@ document.getElementById('addToPacketBtn').addEventListener('click', () => {
   if (activePacketId !== null) {
     statusEl.textContent = 'Already in packet';
     statusEl.className   = 'status';
-    setTimeout(() => { statusEl.textContent = ''; }, 2000);
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
     return;
   }
   const label = document.getElementById('addToPacketLabel').value.trim();
@@ -465,7 +465,7 @@ document.getElementById('addToPacketBtn').addEventListener('click', () => {
   renderPacketTray();
   statusEl.textContent = '\u2713 Added to packet';
   statusEl.className   = 'status ok';
-  setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 2500);
+  setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status'; }, 3000);
 });
 
 /**

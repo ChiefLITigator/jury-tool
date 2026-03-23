@@ -104,13 +104,19 @@ function getPacketUnfilledSummary() {
 
 /** Returns [{heading, body}] for each instruction in the packet. */
 function compilePacketSections() {
-  return packetInstructions.map(entry => {
+  const sections = packetInstructions.map(entry => {
     const titleMatch = entry.parsedState.rawText.match(/^\d{3,4}\s*\.\s*([^\[\n]+)/);
     const title   = titleMatch ? titleMatch[1].trim() : '';
     const heading = title ? `CACI ${entry.caciNum}: ${title}` : `CACI ${entry.caciNum}`;
     const body    = compileInstruction(entry.parsedState);
     return { heading, body };
   });
+  // Prepend TOC for multi-instruction packets
+  if (sections.length >= 2) {
+    const tocBody = sections.map((s, i) => `${i + 1}.  ${s.heading}`).join('\n');
+    sections.unshift({ heading: 'TABLE OF CONTENTS', body: tocBody });
+  }
+  return sections;
 }
 
 /** Flat text version for compile overlay, TXT export, and pleading body_text.
