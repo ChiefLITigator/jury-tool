@@ -436,8 +436,7 @@ in causing harm to [ name of plaintiff ]?
 2.[Repeat as necessary for other defendants. ]
 2.If you answered yes for any defendant in question 2, then answer
 question 3. If you answered no for any defendant in question 2,
-insert the number zero next to that defendant’s name in question
-8. If you did not answer yes for any defendant in question 2, stop
+insert the number zero next to that defendant’s name in question 8. If you did not answer yes for any defendant in question 2, stop
 here, answer no further questions, and have the presiding juror
 sign and date this form.
 3. What are [ name of plaintiff ]’s total damages? Do not reduce the
@@ -480,7 +479,7 @@ name in question 8 and answer question 6.
 6.Was [ name/description of second nonparty ] negligent?
 6. Yes No
 6.[Repeat as necessary for other nonparties .]
-6.If you answered yes for any person in question 6, then answerNEGLIGENCE VF-402
+6.If you answered yes for any person in question 6, then answer
 405
 question 7 for that person. If you answered no for any person in
 question 6, insert the number zero next to that person’s name in
@@ -1891,8 +1890,7 @@ name in question 9 and answer question 7.
 6. Was [ name of plaintiff ]’s negligence a substantial factor in causing
 [his/her/ nonbinary pronoun ] harm?
 6. Yes No
-6.If your answer to question 6 is yes, then answer questions 7 and
-9. If you answered no, insert the number zero next to [ name of
+6.If your answer to question 6 is yes, then answer questions 7 and 9. If you answered no, insert the number zero next to [ name of
 plaintiff ]’s name in question 9 and answer question 7.
 7. Was [ name/description of other person ] negligent?
 7. Yes No
@@ -1906,7 +1904,7 @@ factor in causing harm to [ name of plaintiff ]?
 answered no, insert the number zero next to [ name/description of
 other person ]’s name in question 9.
 9. What percentage of responsibility for [ name of plaintiff ]’s harm do
-you assign to:PRODUCTS LIABILITY VF-1200
+you assign to:
 827
 [Name of defendant ]:
 [Name of plaintiff ]:

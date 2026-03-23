@@ -49,7 +49,7 @@ function splitCorpus(text) {
 
 // ─ CLEAN FORM TEXT ──────────────────────────────────────────────────────────
 function cleanFormLines(raw) {
-  let lines = raw.split('\n');
+  let lines = raw.replace(/\r/g, '').split('\n');
 
   // Strip everything from "Signed:" onward (signature block + revision history)
   const sigIdx = lines.findIndex(l => /^\s*Signed:\s*$/.test(l));
@@ -223,8 +223,16 @@ function parseRouting(routingLine, formId, qNum, totalQs) {
     return result;
   }
 
+  // Unconditional: "Regardless of your answer to question N, answer question M"
+  const regardless = r.match(/regardless of your answer.*?answer question (\d+)/i);
+  if (regardless) {
+    result.if_yes = 'q' + regardless[1];
+    result.if_no = 'q' + regardless[1];
+    return result;
+  }
+
   // Standard: "If your answer to question N is yes, then answer question M"
-  const yesRoute = r.match(/answer to question \d+ is yes,?\s+(?:then )?answer question (\d+)/i);
+  const yesRoute = r.match(/answer to question \d+ is yes,?\s+(?:then )?answer questions? (\d+)/i);
   if (yesRoute) {
     result.if_yes = 'q' + yesRoute[1];
     const noRoute = r.match(/If you answered no,?\s+(.*)/i);
@@ -395,8 +403,8 @@ function parseQuestionBlock(block, formId, totalQs) {
       continue;
     }
 
-    // Routing instruction (N.If... or N.[If... or standalone [If...)
-    if (new RegExp('^\\[*' + num + '\\.\\s*\\[?If\\s+(your|you)').test(line) ||
+    // Routing instruction (N.If... or N.[If... or N.Regardless... or standalone [If...)
+    if (new RegExp('^\\[*' + num + '\\.\\s*\\[?(?:If\\s+(your|you)|Regardless)').test(line) ||
         (new RegExp('^\\[*' + num + '\\.').test(line) === false && /^\[?If\s+(your|you)/i.test(line.trim()))) {
       routingLine = line.replace(new RegExp('^\\[*' + num + '\\.\\s*'), '').trim();
       continue;

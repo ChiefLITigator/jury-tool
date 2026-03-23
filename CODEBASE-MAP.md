@@ -27,8 +27,8 @@ Never paste caci-data.js or vf-data.js into a session unless debugging data.
 | docx-export.js | 401 | ~3,800 | Active | When touching DOCX export |
 | pleading-shell.js | 812 | ~7,000 | Active | When touching pleading shell |
 | pleading-ui.js | 385 | ~2,800 | Active | When touching Pleading tab UI |
-| vf-data.js | 6022 | ~50k+ | Stable | NEVER — data file |
-| parse-vf.js | 841 | ~7,500 | Utility | Only if re-parsing VF corpus |
+| vf-data.js | 6413 | ~50k+ | Stable | NEVER — data file |
+| parse-vf.js | 849 | ~7,500 | Utility | Only if re-parsing VF corpus |
 | caci-data.js | large | ~150k+ | Stable | NEVER — too large |
 | parse-caci.js | 208 | ~1,900 | Utility | Only if re-parsing CACI PDF |
 | verify-caci.js | 114 | ~1,100 | Utility | Only if verifying data |
@@ -766,15 +766,11 @@ with other app files. Does not read `draftState`, `packetInstructions`, or `vfFo
 **CACI:**
 - CACI 115: multi-paragraph `[ Describe each class, e.g., ... ]` block classified as text input instead of note — bracket structure is correct but `classifyBracket` in draft-parser.js triggers `'text'` on the `Describe` verb; needs special-case or length heuristic
 
-**VF — empty question text (parser failed to extract):**
-- VF-402 q8: question text is empty (complex multi-party form with non-standard routing)
-- VF-1200 q9: question text is empty (percentage allocation question with unusual structure)
-
-**VF — missing or incomplete routing (44 warnings total in parse report):**
-- 3 yes_no questions with no routing: VF-402 q8, VF-1200 q6, VF-1201 q5
-- 6 terminal questions defaulted to sign (correct in most cases)
-- 20 complex routing patterns (skip questions, multi-target, [either option]) — parsed approximately but may not match CACI precisely
-- 10 `[or]` alternative formulations — flagged for review, mostly handled by alt_text feature
+**VF — remaining routing warnings (23 warnings total in parse report):**
+- 4 terminal questions with no routing instruction (defaulted to sign — correct in most cases)
+- 7 complex routing patterns (skip questions, cross-question dependencies) — parsed approximately but may not match CACI precisely
+- 9 `[or]` alternative formulations — flagged for review, mostly handled by alt_text feature
+- VF-1201 q6: cross-question routing (depends on both q5 and q6 answers) — approximated as if_yes→q7, if_no→stop
 
 > See CHANGELOG.md for full fix history. See vf-parse-report.txt for complete warning details.
 
