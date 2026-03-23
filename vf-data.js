@@ -14,7 +14,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -24,7 +26,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q3",
+          "if_yes": "q4",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -36,7 +38,9 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -46,7 +50,7 @@ const vfDB = {
             "name of defendant"
           ],
           "optional": true,
-          "if_yes": "q5",
+          "if_yes": "q6",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -56,7 +60,9 @@ const vfDB = {
           "text": "Were the required conditions that did not occur [excused/waived]?",
           "fields": [],
           "optional": true,
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -77,7 +83,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -88,14 +96,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_insert",
-              "label": "Past economic loss insert",
-              "children": []
+              "id": "past_economic_loss_insert_descriptions_o",
+              "label": "Past economic loss insert descriptions of claimed damages"
             },
             {
-              "id": "future_economic_loss_insert",
-              "label": "Future economic loss insert",
-              "children": []
+              "id": "future_economic_loss_insert_descriptions",
+              "label": "Future economic loss insert descriptions of claimed damages"
             }
           ],
           "if_done": "sign"
@@ -116,7 +122,9 @@ const vfDB = {
             "name of defendant",
             "insert description of mistake"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -126,7 +134,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -135,7 +145,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_no": "q4"
+          "if_no": "q4",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -164,7 +176,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -173,7 +187,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -199,21 +215,27 @@ const vfDB = {
           "type": "yes_no",
           "text": "Were the contract terms clear enough so that the parties could understand what each was required to do?",
           "fields": [],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
           "type": "yes_no",
           "text": "Did the parties agree to give each other something of value?",
           "fields": [],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
           "type": "yes_no",
           "text": "Did the parties agree to the terms of the contract?",
           "fields": [],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -223,7 +245,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q5",
+          "if_yes": "q6",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -235,7 +257,9 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -245,7 +269,7 @@ const vfDB = {
             "name of defendant"
           ],
           "optional": true,
-          "if_yes": "q7",
+          "if_yes": "q8",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -255,7 +279,9 @@ const vfDB = {
           "text": "Were the required conditions that did not occur [excused/waived]?",
           "fields": [],
           "optional": true,
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -276,7 +302,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q10"
+          "if_yes": "q10",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q10",
@@ -288,12 +316,12 @@ const vfDB = {
           "line_items": [
             {
               "id": "past_economic_loss_insert_descriptions_o",
-              "label": "Past economic loss insert descriptions of claimed",
+              "label": "Past economic loss insert descriptions of claimed damages",
               "children": []
             },
             {
               "id": "future_economic_loss_insert_descriptions",
-              "label": "Future economic loss insert descriptions of",
+              "label": "Future economic loss insert descriptions of claimed damages",
               "children": []
             }
           ],
@@ -315,7 +343,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -325,7 +355,7 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q3",
+          "if_yes": "q4",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -337,7 +367,9 @@ const vfDB = {
             "name of plaintiff"
           ],
           "optional": true,
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -347,7 +379,7 @@ const vfDB = {
             "name of defendant"
           ],
           "optional": true,
-          "if_yes": "q5",
+          "if_yes": "q6",
           "if_no": "stop",
           "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
@@ -357,7 +389,9 @@ const vfDB = {
           "text": "Were the required conditions that did not occur [excused/waived]?",
           "fields": [],
           "optional": true,
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -367,7 +401,9 @@ const vfDB = {
             "name of defendant",
             "specify conduct that plaintiff claims prevented plaintiff from receiving the benefits under the contract"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -377,7 +413,9 @@ const vfDB = {
             "insert specified conduct from question 6",
             "name of defendant"
           ],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -387,7 +425,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q9"
+          "if_yes": "q9",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q9",
@@ -398,14 +438,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_insert",
-              "label": "Past economic loss insert",
-              "children": []
+              "id": "past_economic_loss_insert_descriptions_o",
+              "label": "Past economic loss insert descriptions of claimed damages"
             },
             {
-              "id": "future_economic_loss_insert",
-              "label": "Future economic loss insert",
-              "children": []
+              "id": "future_economic_loss_insert_descriptions",
+              "label": "Future economic loss insert descriptions of claimed damages"
             }
           ],
           "if_done": "sign"
@@ -425,7 +463,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -435,7 +475,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -490,14 +532,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -517,7 +557,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -527,7 +569,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -582,14 +626,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -601,7 +643,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -610,7 +654,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -662,12 +708,6 @@ const vfDB = {
             "name of second defendant"
           ],
           "if_yes": "q3"
-        },
-        {
-          "id": "q8",
-          "type": "yes_no",
-          "text": "",
-          "fields": []
         },
         {
           "id": "q3",
@@ -722,14 +762,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -741,7 +779,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "q6"
         },
         {
           "id": "q5",
@@ -750,14 +789,15 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "q6"
         },
         {
           "id": "q6",
           "type": "yes_no_multi",
           "text": "Was [ name/description of first nonparty ] negligent? Was [ name/description of second nonparty ] negligent?",
           "fields": [],
-          "if_yes": "q8"
+          "if_yes": "q7"
         },
         {
           "id": "q7",
@@ -817,7 +857,9 @@ const vfDB = {
             "name of plaintiff",
             "specify sport or activity, e.g., touch football"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -827,7 +869,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -882,14 +926,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -910,7 +952,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -932,7 +976,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -987,14 +1033,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1014,7 +1058,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1024,7 +1070,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1034,7 +1082,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1089,14 +1139,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1116,7 +1164,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1125,7 +1175,10 @@ const vfDB = {
           "fields": [
             "name of defendant",
             "name of alleged minor"
-          ]
+          ],
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1134,7 +1187,9 @@ const vfDB = {
           "fields": [
             "name of alleged minor"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1144,7 +1199,9 @@ const vfDB = {
             "name of defendant",
             "name of alleged minor"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1154,7 +1211,9 @@ const vfDB = {
             "name of alleged minor",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -1165,7 +1224,9 @@ const vfDB = {
             "name of alleged minor",
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -1220,14 +1281,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1248,7 +1307,9 @@ const vfDB = {
             "name of defendant",
             "insert ultrahazardous activity"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1257,7 +1318,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1267,7 +1330,9 @@ const vfDB = {
             "name of plaintiff",
             "insert ultrahazardous activity"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1278,7 +1343,9 @@ const vfDB = {
             "insert ultrahazardous activity",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1333,14 +1400,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1361,7 +1426,9 @@ const vfDB = {
             "name of defendant",
             "insert type of animal"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1370,7 +1437,9 @@ const vfDB = {
           "fields": [
             "insert type of animal"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1380,7 +1449,9 @@ const vfDB = {
             "name of defendant",
             "insert type of animal"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1390,7 +1461,9 @@ const vfDB = {
             "insert type of animal",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1445,14 +1518,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1473,7 +1544,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1482,7 +1555,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1491,7 +1566,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1546,14 +1623,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1574,7 +1649,9 @@ const vfDB = {
             "name of plaintiff",
             "insert date from applicable statute of limitations"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1606,7 +1683,9 @@ const vfDB = {
             "name of minor",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1616,7 +1695,9 @@ const vfDB = {
             "name of defendant",
             "name of minor"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1626,7 +1707,9 @@ const vfDB = {
             "name of defendant",
             "name of minor"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1636,7 +1719,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1691,14 +1776,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1719,7 +1802,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1729,7 +1814,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1784,14 +1871,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1813,7 +1898,9 @@ const vfDB = {
             "insert medical procedure",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1823,7 +1910,9 @@ const vfDB = {
             "name of plaintiff",
             "insert medical procedure"
           ],
-          "if_no": "q3"
+          "if_no": "q3",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1833,7 +1922,9 @@ const vfDB = {
             "name of plaintiff",
             "insert medical procedure"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1843,7 +1934,9 @@ const vfDB = {
             "name of plaintiff",
             "insert medical procedure"
           ],
-          "if_no": "q5"
+          "if_no": "q5",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1854,7 +1947,9 @@ const vfDB = {
             "name of defendant",
             "insert medical procedure"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -1909,14 +2004,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -1938,7 +2031,9 @@ const vfDB = {
             "insert medical procedure",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -1948,7 +2043,9 @@ const vfDB = {
             "name of plaintiff",
             "insert medical procedure"
           ],
-          "if_no": "q3"
+          "if_no": "q3",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -1958,7 +2055,9 @@ const vfDB = {
             "name of plaintiff",
             "insert medical procedure"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -1969,7 +2068,9 @@ const vfDB = {
             "name of defendant",
             "insert medical procedure"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -1989,7 +2090,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_no": "q7"
+          "if_no": "q7",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -2044,14 +2147,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2072,7 +2173,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2102,7 +2205,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2112,7 +2217,9 @@ const vfDB = {
             "name of defendant",
             "name of driver"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2121,7 +2228,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2149,7 +2258,9 @@ const vfDB = {
           "fields": [
             "name of minor"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2159,7 +2270,9 @@ const vfDB = {
             "name of minor",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2169,7 +2282,9 @@ const vfDB = {
             "name of defendant",
             "name of minor"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2224,14 +2339,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2251,7 +2364,9 @@ const vfDB = {
           "fields": [
             "name of minor"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2261,7 +2376,9 @@ const vfDB = {
             "name of minor",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2271,7 +2388,9 @@ const vfDB = {
             "name of defendant",
             "name of minor"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2280,7 +2399,9 @@ const vfDB = {
           "fields": [
             "name of minor"
           ],
-          "if_no": "q5"
+          "if_no": "q5",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -2335,14 +2456,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2362,7 +2481,9 @@ const vfDB = {
           "fields": [
             "name of driver"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2372,7 +2493,9 @@ const vfDB = {
             "name of defendant",
             "name of driver"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2382,7 +2505,9 @@ const vfDB = {
             "name of defendant",
             "name of driver"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2392,7 +2517,9 @@ const vfDB = {
             "name of defendant",
             "name of driver"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -2402,7 +2529,9 @@ const vfDB = {
             "name of driver",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -2457,14 +2586,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2484,7 +2611,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2493,7 +2622,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2503,7 +2634,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2558,14 +2691,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2585,7 +2716,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2594,7 +2727,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2604,7 +2739,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2614,7 +2751,8 @@ const vfDB = {
             "name of plaintiff/name of person causing injury",
             "name of defendant"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "q6"
         },
         {
           "id": "q5",
@@ -2623,7 +2761,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -2651,7 +2791,7 @@ const vfDB = {
                 },
                 {
                   "id": "other_past_economic_loss",
-                  "label": "Other past economic\r loss"
+                  "label": "Other past economic loss"
                 }
               ]
             },
@@ -2673,19 +2813,17 @@ const vfDB = {
                 },
                 {
                   "id": "other_future_eco_nomic_loss",
-                  "label": "Other future eco-\r nomic loss"
+                  "label": "Other future eco- nomic loss"
                 }
               ]
             },
             {
               "id": "past_noneconomic_loss_physical_painmenta",
-              "label": "Past noneconomic loss, physical pain/mental",
-              "children": []
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
               "id": "future_noneconomic_loss_physical_painmen",
-              "label": "Future noneconomic loss, physical pain/mental",
-              "children": []
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2705,7 +2843,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2714,7 +2854,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2724,7 +2866,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2779,18 +2923,16 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             },
             {
               "id": "if_name_of_plaintiff_has_proved_any_dama",
-              "label": "If name of plaintiff  has proved any damages, then answer",
+              "label": "If name of plaintiff  has proved any damages, then answer question 5. If  name of plaintiff  has not proved any damages, then stop here, answer no further questions, and have the presiding juror sign and date this form.",
               "children": []
             }
           ],
@@ -2803,7 +2945,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -2812,7 +2956,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -2849,7 +2995,9 @@ const vfDB = {
           "fields": [
             "name of defendant landlord"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -2858,7 +3006,9 @@ const vfDB = {
           "fields": [
             "name of defendant landlord"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -2867,7 +3017,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -2876,7 +3028,9 @@ const vfDB = {
           "fields": [
             "name of defendant landlord"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -2885,7 +3039,9 @@ const vfDB = {
           "fields": [
             "name of defendant landlord"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -2895,7 +3051,9 @@ const vfDB = {
             "name of defendant landlord",
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -2950,14 +3108,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -2977,21 +3133,27 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
           "type": "yes_no",
           "text": "Was the property in a dangerous condition at the time of the injury?",
           "fields": [],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
           "type": "yes_no",
           "text": "Did the dangerous condition create a reasonably foreseeable risk that this kind of injury would occur?",
           "fields": [],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3000,7 +3162,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -3009,7 +3173,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -3064,14 +3230,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3091,21 +3255,27 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
           "type": "yes_no",
           "text": "Was the property in a dangerous condition at the time of the incident?",
           "fields": [],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
           "type": "yes_no",
           "text": "Did the dangerous condition create a reasonably foreseeable risk that this kind of incident would occur?",
           "fields": [],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3125,7 +3295,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -3133,7 +3305,10 @@ const vfDB = {
           "text": "Answer if you answered yes to the first option for question 4: When you consider the likelihood and seriousness of potential injury, compared with the practicality and cost of either (a) taking alternative action that would not have created the risk of injury, or (b) protecting against the risk of injury, was [ name of defendant ]’s [act/ specify failure to act ] that created the dangerous condition reasonable under the circumstances?] [Answer if you answered yes to the second option for question 4: When you consider the likelihood and seriousness of potential injury, compared with (a) how much time and opportunity [ name of defendant ] had to take action, and (b) the practicality and cost of protecting against the risk of injury, was [ name of defendant ]’s failure to take sufficient steps to protect against the risk of injury created by the dangerous condition reasonable under the circumstances?",
           "fields": [
             "name of defendant"
-          ]
+          ],
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -3188,14 +3363,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3216,7 +3389,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3226,7 +3401,9 @@ const vfDB = {
             "product",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -3235,7 +3412,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3290,14 +3469,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3309,7 +3486,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "q7"
         },
         {
           "id": "q6",
@@ -3317,21 +3495,17 @@ const vfDB = {
           "text": "Was [ name of plaintiff ]’s negligence a substantial factor in causing [his/her/ nonbinary pronoun ] harm?",
           "fields": [
             "name of plaintiff"
-          ]
-        },
-        {
-          "id": "q9",
-          "type": "yes_no",
-          "text": "",
-          "fields": [],
-          "if_yes": "q7"
+          ],
+          "if_yes": "q7",
+          "if_no": "q7"
         },
         {
           "id": "q7",
           "type": "yes_no",
           "text": "Was [ name/description of other person ] negligent?",
           "fields": [],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "sign"
         },
         {
           "id": "q8",
@@ -3340,12 +3514,13 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q9"
+          "if_yes": "q9",
+          "if_no": "sign"
         },
         {
           "id": "q9",
           "type": "percentage",
-          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:PRODUCTS LIABILITY VF-1200",
+          "text": "What percentage of responsibility for [ name of plaintiff ]’s harm do you assign to:",
           "fields": [
             "name of plaintiff"
           ],
@@ -3382,7 +3557,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3392,7 +3569,8 @@ const vfDB = {
             "product",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "q4"
         },
         {
           "id": "q3",
@@ -3401,7 +3579,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_no": "q4"
+          "if_no": "q4",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3416,11 +3596,13 @@ const vfDB = {
         {
           "id": "q5",
           "type": "yes_no",
-          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way? Regardless of your answer to question 5, answer question 6.",
+          "text": "Did the [ product ] fail to perform as safely as an ordinary consumer would have expected when used or misused in an intended or reasonably foreseeable way?",
           "fields": [
             "product"
           ],
-          "optional": true
+          "optional": true,
+          "if_yes": "q6",
+          "if_no": "q6"
         },
         {
           "id": "q6",
@@ -3442,7 +3624,9 @@ const vfDB = {
             "product",
             "name of plaintiff"
           ],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -3497,14 +3681,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3525,7 +3707,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3534,7 +3718,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -3543,14 +3729,18 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
           "type": "yes_no",
           "text": "Would ordinary consumers have recognized the potential [risks/ side effects/allergic reactions]?",
           "fields": [],
-          "if_no": "q5"
+          "if_no": "q5",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -3559,7 +3749,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -3568,7 +3760,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -3623,14 +3817,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3651,7 +3843,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3661,7 +3855,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -3671,7 +3867,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3726,14 +3924,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3745,7 +3941,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -3754,7 +3952,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -3792,7 +3992,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3802,7 +4004,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -3811,7 +4015,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3821,7 +4027,9 @@ const vfDB = {
             "name of defendant",
             "product"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -3830,7 +4038,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -3840,7 +4050,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -3895,14 +4107,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -3925,7 +4135,9 @@ const vfDB = {
             "product",
             "insert description of alleged express warranty"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -3936,7 +4148,9 @@ const vfDB = {
             "product",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -3945,7 +4159,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -3955,7 +4171,9 @@ const vfDB = {
             "product",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4010,14 +4228,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -4039,7 +4255,9 @@ const vfDB = {
             "product",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4048,7 +4266,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4057,7 +4277,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_no": "q4"
+          "if_no": "q4",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4066,7 +4288,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_no": "q5"
+          "if_no": "q5",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4076,7 +4300,9 @@ const vfDB = {
             "product",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4131,14 +4357,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -4160,7 +4384,9 @@ const vfDB = {
             "product",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4171,7 +4397,9 @@ const vfDB = {
             "name of plaintiff",
             "product"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4181,7 +4409,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4191,7 +4421,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4200,7 +4432,9 @@ const vfDB = {
           "fields": [
             "product"
           ],
-          "if_no": "q6"
+          "if_no": "q6",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4210,7 +4444,9 @@ const vfDB = {
             "product",
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -4265,14 +4501,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -4293,7 +4527,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4302,7 +4538,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4331,7 +4569,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4340,7 +4580,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4349,7 +4591,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4358,7 +4602,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4368,7 +4614,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4423,14 +4671,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -4451,7 +4697,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4461,7 +4709,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4471,7 +4721,9 @@ const vfDB = {
             "name of plaintiff",
             "describe right or obligation at issue; e.g., “to request arbitration within 180 days”"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4482,7 +4734,9 @@ const vfDB = {
             "name of plaintiff",
             "describe right or obligation"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4492,7 +4746,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4547,14 +4803,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -4575,7 +4829,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4586,7 +4842,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4597,7 +4855,9 @@ const vfDB = {
             "name of plaintiff"
           ],
           "line_items": [],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4606,7 +4866,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4615,7 +4877,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4625,7 +4889,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -4685,9 +4951,8 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering $  e. Future noneconomic loss, including physical pain/mental suffering $  e. TOTAL"
             }
           ],
           "if_done": "sign"
@@ -4708,7 +4973,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4718,7 +4985,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4727,7 +4996,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q5",
+          "if_no": "q4"
         },
         {
           "id": "q4",
@@ -4736,7 +5006,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4746,7 +5018,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4755,7 +5029,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -4766,12 +5042,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4792,7 +5068,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4802,7 +5080,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -4811,7 +5091,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q5",
+          "if_no": "q4"
         },
         {
           "id": "q4",
@@ -4820,7 +5101,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4830,7 +5113,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4839,7 +5124,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -4848,7 +5135,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -4859,12 +5148,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4885,7 +5174,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4894,7 +5185,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q4",
+          "if_no": "q3"
         },
         {
           "id": "q3",
@@ -4903,7 +5195,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4913,7 +5207,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4922,7 +5218,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -4933,12 +5231,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -4959,7 +5257,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -4968,7 +5268,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q4",
+          "if_no": "q3"
         },
         {
           "id": "q3",
@@ -4977,7 +5278,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -4987,7 +5290,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -4997,7 +5302,9 @@ const vfDB = {
             "name of defendant",
             "name of plaintiff"
           ],
-          "if_no": "q6"
+          "if_no": "q6",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -5006,7 +5313,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -5017,12 +5326,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -5043,7 +5352,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5052,7 +5363,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q4",
+          "if_no": "q3"
         },
         {
           "id": "q3",
@@ -5061,7 +5373,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -5071,7 +5385,9 @@ const vfDB = {
             "name of defendant",
             "specify conduct that plaintiff claims prevented plaintiff from receiving the benefits under the contract"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -5080,7 +5396,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -5090,7 +5408,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -5101,12 +5421,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -5127,7 +5447,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5136,7 +5458,8 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q4",
+          "if_no": "q3"
         },
         {
           "id": "q3",
@@ -5145,7 +5468,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -5155,7 +5480,9 @@ const vfDB = {
             "name of defendant",
             "specify conduct that plaintiff claims prevented plaintiff from receiving the benefits under the contract"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -5165,7 +5492,8 @@ const vfDB = {
             "name of defendant",
             "insert alleged mistake"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "q7"
         },
         {
           "id": "q6",
@@ -5174,7 +5502,9 @@ const vfDB = {
           "fields": [
             "insert alleged mistake"
           ],
-          "if_no": "q7"
+          "if_no": "q7",
+          "if_yes": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -5183,7 +5513,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q8"
+          "if_yes": "q8",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q8",
@@ -5193,7 +5525,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q9"
+          "if_yes": "q9",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q9",
@@ -5204,12 +5538,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_economic_loss_",
-              "label": "Past economic loss: $"
+              "id": "past_economic_loss",
+              "label": "Past economic loss"
             },
             {
-              "id": "future_economic_loss_",
-              "label": "Future economic loss: $"
+              "id": "future_economic_loss",
+              "label": "Future economic loss"
             }
           ],
           "if_done": "sign"
@@ -5230,7 +5564,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5239,7 +5575,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5250,7 +5588,9 @@ const vfDB = {
             "insert alleged activity protected by public policy, e.g., “refusal to engage in price fixing”",
             "name of defendant"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -5259,7 +5599,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -5314,14 +5656,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -5342,7 +5682,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5353,7 +5695,9 @@ const vfDB = {
             "name of plaintiff",
             "specify alleged conduct in violation of public policy, e.g., “engage in price fixing”"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5362,7 +5706,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -5371,7 +5717,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -5380,7 +5728,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -5435,14 +5785,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -5463,7 +5811,9 @@ const vfDB = {
             "name of plaintiff",
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5473,7 +5823,9 @@ const vfDB = {
             "name of plaintiff",
             "describe conditions imposed on the employee that constitute the violation, e.g., “plaintiff was treated intolerably in retaliation for filing a workers’ compensation claim”"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5482,7 +5834,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q4"
+          "if_yes": "q4",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q4",
@@ -5491,7 +5845,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q5"
+          "if_yes": "q5",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q5",
@@ -5500,7 +5856,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q6"
+          "if_yes": "q6",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q6",
@@ -5509,7 +5867,9 @@ const vfDB = {
           "fields": [
             "name of plaintiff"
           ],
-          "if_yes": "q7"
+          "if_yes": "q7",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q7",
@@ -5564,14 +5924,12 @@ const vfDB = {
               ]
             },
             {
-              "id": "past_noneconomic_loss_physical",
-              "label": "Past noneconomic loss, physical",
-              "children": []
+              "id": "past_noneconomic_loss_physical_painmenta",
+              "label": "Past noneconomic loss, physical pain/mental suffering"
             },
             {
-              "id": "future_noneconomic_loss_physical",
-              "label": "Future noneconomic loss, physical",
-              "children": []
+              "id": "future_noneconomic_loss_physical_painmen",
+              "label": "Future noneconomic loss, physical pain/mental suffering"
             }
           ],
           "if_done": "sign"
@@ -5591,7 +5949,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5618,7 +5978,9 @@ const vfDB = {
           "fields": [
             "name of agent/employee"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5628,7 +5990,9 @@ const vfDB = {
             "name of employee/agent",
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5655,7 +6019,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5682,7 +6048,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5691,7 +6059,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5718,7 +6088,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q2"
+          "if_yes": "q2",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q2",
@@ -5727,7 +6099,9 @@ const vfDB = {
           "fields": [
             "name of defendant"
           ],
-          "if_yes": "q3"
+          "if_yes": "q3",
+          "if_no": "stop",
+          "stop_text": "Stop here, answer no further questions, and have the presiding juror sign and date this form."
         },
         {
           "id": "q3",
@@ -5756,24 +6130,20 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_financial_support_that_name_of",
-              "label": "Past financial support that  name of",
-              "children": []
+              "id": "past_financial_support_that_name_of_dece",
+              "label": "Past financial support that  name of decedent  would have contributed to the family"
             },
             {
-              "id": "future_financial_support_that_name_of",
-              "label": "Future financial support that  name of",
-              "children": []
+              "id": "future_financial_support_that_name_of_de",
+              "label": "Future financial support that  name of decedent  would have contributed to the family"
             },
             {
-              "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that",
-              "children": []
+              "id": "past_losses_of_gifts_or_benefits_that_na",
+              "label": "Past losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent"
             },
             {
-              "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that",
-              "children": []
+              "id": "future_losses_of_gifts_or_benefits_that_",
+              "label": "Future losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent : $  e.  Name of decedent ’s funeral and burial expenses: $  f. Past household services that name of decedent  would have provided: $  g. Future household services that name of decedent  would have provided"
             }
           ],
           "if_done": "sign"
@@ -5787,14 +6157,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love",
-              "children": []
+              "id": "the_loss_of_name_of_decedent_s_love_comp",
+              "label": "The loss of  name of decedent ’s love, companionship, comfort, care, assistance, protection, affection, society, and moral support, and the enjoyment of sexual relations/ name of decedent ’s training and guidance from  insert date of death  to the present"
             },
             {
-              "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love",
-              "children": []
+              "id": "the_loss_of_name_of_decedent_s_love_comp",
+              "label": "The loss of  name of decedent ’s love, companionship, comfort, care, assistance, protection, affection, society, and moral support, and the enjoyment of sexual relations/ name of decedent ’s training and guidance from today forward"
             }
           ],
           "if_done": "sign"
@@ -5816,24 +6184,20 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "past_financial_support_that_name_of",
-              "label": "Past financial support that  name of",
-              "children": []
+              "id": "past_financial_support_that_name_of_dece",
+              "label": "Past financial support that  name of decedent  would have contributed to the family"
             },
             {
-              "id": "future_financial_support_that_name_of",
-              "label": "Future financial support that  name of",
-              "children": []
+              "id": "future_financial_support_that_name_of_de",
+              "label": "Future financial support that  name of decedent  would have contributed to the family"
             },
             {
-              "id": "past_losses_of_gifts_or_benefits_that",
-              "label": "Past losses of gifts or benefits that",
-              "children": []
+              "id": "past_losses_of_gifts_or_benefits_that_na",
+              "label": "Past losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent"
             },
             {
-              "id": "future_losses_of_gifts_or_benefits_that",
-              "label": "Future losses of gifts or benefits that",
-              "children": []
+              "id": "future_losses_of_gifts_or_benefits_that_",
+              "label": "Future losses of gifts or benefits that name of plaintiff  would have expected to receive from  name of decedent : $  e.  Name of decedent ’s funeral and burial expenses: $  f. Past household services that name of decedent  would have provided: $  g. Future household services that name of decedent  would have provided"
             }
           ],
           "if_done": "sign"
@@ -5847,14 +6211,12 @@ const vfDB = {
           ],
           "line_items": [
             {
-              "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love",
-              "children": []
+              "id": "the_loss_of_name_of_decedent_s_love_comp",
+              "label": "The loss of  name of decedent ’s love, companionship, comfort, care, assistance, protection, affection, society, and moral support from  insert date of death  to the present"
             },
             {
-              "id": "the_loss_of_name_of_decedent_s_love",
-              "label": "The loss of  name of decedent ’s love",
-              "children": []
+              "id": "the_loss_of_name_of_decedent_s_love_comp",
+              "label": "The loss of  name of decedent ’s love, companionship, comfort, care, assistance, protection, affection, society, and moral support from today forward"
             }
           ],
           "if_done": "sign"
