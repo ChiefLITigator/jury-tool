@@ -168,9 +168,10 @@ function caseLoad(name) {
   if (typeof setVFState === 'function') setVFState(saved.verdictForms || []);
 }
 
-function caseDelete() {
+async function caseDelete() {
   const name = document.getElementById('caseSelect').value;
   if (!name) { setCaseBarStatus('No case selected.', 'err'); return; }
+  if (!(await showModal(`Delete case "${name}"? This cannot be undone.`))) return;
   const index = loadCaseIndex();
   delete index[name];
   saveCaseIndex(index);

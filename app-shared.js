@@ -38,16 +38,19 @@ function showModal(message, opts = {}) {
       overlay.classList.add('hidden');
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
-      inputEl.removeEventListener('keydown', onKey);
+      document.removeEventListener('keydown', onKey);
       resolve(val);
     }
     function onOk()     { cleanup(opts.input ? inputEl.value : true); }
     function onCancel() { cleanup(opts.input ? null : false); }
-    function onKey(e)   { if (e.key === 'Enter') onOk(); }
+    function onKey(e) {
+      if (e.key === 'Escape') onCancel();
+      else if (e.key === 'Enter' && opts.input && e.target === inputEl) onOk();
+    }
 
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
-    if (opts.input) inputEl.addEventListener('keydown', onKey);
+    document.addEventListener('keydown', onKey);
   });
 }
 
@@ -63,6 +66,13 @@ function showModal(message, opts = {}) {
  */
 const CACI_UNAVAILABLE = new Set(['115']);
 
+const TITLE_SENTENCE_STARTERS = new Set([
+  'To','In','If','On','At','By','For','From','Of','With','No','Not','Each',
+  'Either','Neither','Both','All','Any','It','He','She','His','Her','Their',
+  'Its','They','Or','And','But','Whether','When','Where','Who','Which','What',
+  'How','As','You','We','See','Note','This','The','A','An','That','These'
+]);
+
 function lookupCACITextForDraft(caciNum) {
   const key = String(parseInt(caciNum, 10));
   if (CACI_UNAVAILABLE.has(key)) throw new Error(`CACI ${caciNum} — instruction not available`);
@@ -70,12 +80,6 @@ function lookupCACITextForDraft(caciNum) {
   if (!text) throw new Error(`CACI ${caciNum} not found in local data`);
 
 // Step 0: Join wrapped title lines (run up to 3 times for multi-line wraps)
-const TITLE_SENTENCE_STARTERS = new Set([
-  'To','In','If','On','At','By','For','From','Of','With','No','Not','Each',
-  'Either','Neither','Both','All','Any','It','He','She','His','Her','Their',
-  'Its','They','Or','And','But','Whether','When','Where','Who','Which','What',
-  'How','As','You','We','See','Note','This','The','A','An','That','These'
-]);
 for (let i = 0; i < 3; i++) {
   const prev = text;
   // Paren continuations: (Corporate Liability...) etc.

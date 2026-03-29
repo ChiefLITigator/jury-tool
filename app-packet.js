@@ -194,6 +194,7 @@ document.getElementById('exportPacketPicker').addEventListener('click', e => {
         URL.revokeObjectURL(url);
       } catch (err) {
         console.error('[packet] Pleading DOCX failed:', err);
+        setCaseBarStatus('Pleading export failed: ' + (err.message || 'unknown error'), 'err');
       }
     })();
   }
