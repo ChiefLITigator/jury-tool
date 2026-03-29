@@ -157,7 +157,7 @@ function applyUnfilledHighlights(state) {
       ? formEl.querySelector(`input[data-ftype="custom"][data-key="${f.key}"]`)
       : formEl.querySelector(`select[data-key="${f.key}"]`);
     else if (f.type === 'note')     el = formEl.querySelector(`textarea[data-key="${f.key}"]`);
-    if (el) { el.style.borderColor = '#fbbf24'; el.style.background = '#fffbeb'; }
+    if (el) { el.style.borderColor = 'var(--yellow, #fbbf24)'; el.style.background = 'var(--yellow-bg, #fffbeb)'; }
   }
 }
 
